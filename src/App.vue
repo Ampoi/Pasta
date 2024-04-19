@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen flex flex-col bg-slate-950 text-white">
+  <div class="w-screen h-screen flex flex-col">
     <header
       data-tauri-drag-region
       class="flex flex-row items-end basis-12 p-2">
@@ -8,10 +8,31 @@
         type="text"
         class="bg-transparent py-1 px-2 rounded-md outline-none">
     </header>
-    <main class="m-2 mt-0 grow border-[1px] bg-slate-900 border-slate-600/80 rounded-md">
+    <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md">
       <div
-        v-for="block in blocks">
-        {{ block.value }}
+        class="w-full h-full p-4"
+        v-if="projectPath">
+        <div
+          v-for="block in blocks"
+          class="bg-white p-2 rounded-xl w-[520px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40">
+          <div class="flex flex-row">
+            <input
+              type="text"
+              class="bg-gray-100 px-2 py-1 rounded-md outline-none">
+          </div>
+          <div class="bg-gray-100 p-2 rounded-md whitespace-pre-wrap">
+            {{ block.value.code }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="w-full h-full grid place-content-center"
+        v-else>
+        <div class="flex flex-row gap-8 items-center">
+          <button
+            @click="openProject">Open</button>
+          <button>Create</button>
+        </div>
       </div>
     </main>
   </div>
@@ -19,9 +40,11 @@
 <script setup lang="ts">
 import { dialog, fs } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
-import {  ref, watch } from 'vue';
+import { ref, watch } from 'vue';
+import { getSettings } from './utils/getSettings';
 
-const blockPaths = ref<string[]>([])
+const projectPath = ref<string>()
+
 type Block = {
   title?: string
   value: {
@@ -32,35 +55,11 @@ type Block = {
 }
 const blocks = ref<Block[]>()
 
-function getSettings(code: string){
-  let isPastaSetting = false
-  const settings: Record<string, string> = {}
-  code.split("\n").forEach((line) => {
-    if( line == "// == PASTA START ==" ){
-      isPastaSetting = true
-    }else if( line == "// === PASTA END ===" ){
-      isPastaSetting = false
-    }else if( isPastaSetting ){
-      const settingText = line.slice(3, line.length)
-      
-      let separateSymbolIndex: number | undefined = undefined
-      for( let i = 0; i < settingText.length; i++ ){
-        if( settingText.slice(i, i+2) == ": " ) separateSymbolIndex = i
-      }
-      if( typeof separateSymbolIndex != "number" ) throw new Error("分割シンボルを見つけられませんでした")
-      console.log(separateSymbolIndex)
+watch(projectPath, async () => {
+  if( !projectPath.value ) return
 
-      const key = settingText.slice(0, separateSymbolIndex)
-      const value = settingText.slice(separateSymbolIndex+2, settingText.length)
-      settings[key] = value
-    }
-  })
-
-  return settings
-}
-
-watch(blockPaths, async () => {
-  blocks.value = await Promise.all(blockPaths.value.map(async (path) => {
+  const blockPaths = (await fs.readDir(projectPath.value)).map(file => file.path);
+  blocks.value = await Promise.all(blockPaths.map(async (path) => {
     const value = await fs.readTextFile(path)
     
     const settings = getSettings(value)
@@ -77,18 +76,14 @@ watch(blockPaths, async () => {
   }))
 })
 
-appWindow.listen("open", async () => {
+async function openProject(){
   const path = await dialog.open({
     directory: true,
     multiple: false
   });
   if( typeof path != "string" ) throw new Error("パスが想定外の型です！　型：" + typeof path)
-  
-  try {
-    const filePaths = (await fs.readDir(path)).map(file => file.path);
-    blockPaths.value = filePaths
-  } catch (error) {
-    console.error('Error listing files in directory:', error);
-  }
-})
+  projectPath.value = path
+}
+
+appWindow.listen("open", openProject)
 </script>
