@@ -12,18 +12,9 @@
       <div
         class="w-full h-full p-4"
         v-if="projectPath">
-        <div
+        <Block
           v-for="block in blocks"
-          class="bg-white p-2 rounded-xl w-[520px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40">
-          <div class="flex flex-row">
-            <input
-              type="text"
-              class="bg-gray-100 px-2 py-1 rounded-md outline-none">
-          </div>
-          <div class="bg-gray-100 p-2 rounded-md whitespace-pre-wrap">
-            {{ block.value.code }}
-          </div>
-        </div>
+          :block/>
       </div>
       <div
         class="w-full h-full grid place-content-center"
@@ -42,6 +33,7 @@ import { dialog, fs } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 import { ref, watch } from 'vue';
 import { getSettings } from './utils/getSettings';
+import Block from './components/block.vue';
 
 const projectPath = ref<string>()
 
