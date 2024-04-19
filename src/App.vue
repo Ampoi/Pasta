@@ -1,8 +1,19 @@
 <template>
-  aaa
-  <div
-    v-for="block in blocks">
-    {{ block.value }}
+  <div class="w-screen h-screen flex flex-col bg-slate-950 text-white">
+    <header
+      data-tauri-drag-region
+      class="flex flex-row items-end basis-12 p-2">
+      <div class="basis-16"/>
+      <input
+        type="text"
+        class="bg-transparent py-1 px-2 rounded-md outline-none">
+    </header>
+    <main class="m-2 mt-0 grow border-[1px] bg-slate-900 border-slate-600/80 rounded-md">
+      <div
+        v-for="block in blocks">
+        {{ block.value }}
+      </div>
+    </main>
   </div>
 </template>
 <script setup lang="ts">

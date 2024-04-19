@@ -21,13 +21,18 @@
       },
       "dialog": {
         "open": true
+      },
+      "window": {
+        "startDragging": true
       }
     },
     "windows": [
       {
         "title": "pasta",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay"
       }
     ],
     "security": {
