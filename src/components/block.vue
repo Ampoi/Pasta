@@ -8,8 +8,9 @@
             :value="blockSettings.title">
         </div>
         <div
+            id="editorElement"
             ref="editorElement"
-            class="h-[200px] rounded-md overflow-hidden"/>
+            class="h-[200px]"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -39,33 +40,56 @@ const code = `export default (
     console.log("hey!")
     const a = 10
     const b = "ewioafjoiaw"
-
     return { a, b }
 }`
 
-//async function getBlockData(code: string)/*: {
-//    parameters: { name: string, type: string }[]
-//    body: string
-//    returnType: string
-//}*/ {
-//    const model = Monaco.editor.createModel(code, "typescript")
-//    const worker = await Monaco.languages.typescript.getTypeScriptWorker()
-//    const client = await worker(model.uri)
-//
-//    const ast = await client.getNavigationTree(model.uri.toString());
-//    console.log(ast)
-//
-//    return {
-//
-//    }
-//}
+function getBlockData(code: string) {
+    let isArgs = false
+    const args: { name: string, type: string }[] = []
+    
+    let isBody = false
+    const bodyLines: string[] = []
 
-onMounted(() => {
+    const codeLines = code.split("\n")
+    codeLines.forEach((line, row) => {
+        if( row == 0 ){
+            isArgs = true
+        }else if( line == ") => {" ){
+            isArgs = false
+            isBody = true
+        }else if( row == code.split("\n").length - 2 ){
+            isBody = false
+        }else{
+            if( isArgs ){
+                const pairText = line[line.length-1] == "," ? line.slice(0, line.length-1) : line
+                const [ name, type ] = pairText.trim().split(": ")
+                args.push({name, type})
+            }else if( isBody ){
+                bodyLines.push(line.replace(/^(\t|    )/, ""))
+            }
+        }
+    })
+
+    const body = bodyLines.join("\n")
+
+    const returnLine = codeLines[codeLines.length-2].replace(/\s+/g,'')
+    const returnValues = returnLine.slice(7, returnLine.length-1).split(",")
+
+    return {
+        args,
+        body,
+        returnValues
+    }
+}
+
+onMounted(async () => {
     if( !editorElement.value ) throw new Error("エディターが設定されてません！")
+
+    console.log(getBlockData(code))
 
     const editor = Monaco.editor.create(editorElement.value, {
         language: "typescript",
-        value: code,
+        value: getBlockData(code).body,
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
@@ -73,7 +97,5 @@ onMounted(() => {
             enabled: false
         }
     })
-
-    //getBlockData(code)
 })
 </script>
