@@ -2,11 +2,10 @@
   <div class="w-screen h-screen flex flex-col">
     <header
       data-tauri-drag-region
-      class="flex flex-row items-end basis-12 p-2">
-      <div class="basis-16"/>
+      class="flex flex-row items-end justify-center basis-12 p-2">
       <input
         type="text"
-        class="bg-transparent py-1 px-2 rounded-md outline-none">
+        class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-gray-200 basis-80 text-center">
     </header>
     <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md">
       <div
@@ -16,7 +15,7 @@
           <div
             v-for="row in renderedBlockIDs"
             class="flex flex-col gap-10">
-            <Block
+            <BlockComponent
               v-for="blockID in row"
               :blockID
               :blockSettings="project.blocks[blockID]"/>
@@ -35,47 +34,49 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import Block from './components/block.vue';
+import { computed, reactive, ref } from 'vue';
+import BlockComponent from './components/block.vue';
 import { createLayers } from "./utils/createLayers"
+import { Block } from "./model/block"
 
 const projectPath = ref<string>("aaaa")
 
-type Block = {
-  title: string
-  description?: string
-  connectedTo: string[]
-}
-
 const project: {
   blocks: Record<string, Block>
-} = {
+} = reactive({
   blocks: {
     home: {
       title: "コマンドが呼び出されたとき",
       description: "aaaaaa",
-      connectedTo: ["getDate"]
+      connectedTo: {
+        getDate: ["default"],
+        getWeather: ["city"]
+      }
     },
     getDate: {
       title: "日付を取得",
-      connectedTo: ["sendMessage"]
+      connectedTo: {
+        sendMessage: ["date"]
+      }
     },
     getWeather: {
       title: "天気を取得",
       description: "abbb",
-      connectedTo: ["sendMessage"]
+      connectedTo: {
+        sendMessage: ["weather"]
+      }
     },
     sendMessage: {
       title: "メッセージを送信",
-      connectedTo: []
+      connectedTo: {}
     }
   }
-}
+})
 
 const renderedBlockIDs = computed(() => {
   const dependencies: Record<string, string[]> = {}
   Object.entries(project.blocks).forEach(([id, value]) => {
-    dependencies[id] = value.connectedTo
+    dependencies[id] = Object.keys(value.connectedTo)
   })
   return createLayers(dependencies)
 })

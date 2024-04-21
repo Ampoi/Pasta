@@ -8,32 +8,64 @@
             :value="blockSettings.title">
         </div>
         <div
-            ref="editor"
+            ref="editorElement"
             class="h-[200px] rounded-md overflow-hidden"/>
     </div>
 </template>
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
+import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import { onMounted, ref } from "vue";
-
-type Block = {
-  title: string
-  description?: string
-  connectedTo: string[]
-}
+import { Block } from "../model/block";
 
 const props = defineProps<{
     blockID: string
     blockSettings: Block
 }>()
 
-const editor = ref<HTMLElement>()
+const editorElement = ref<HTMLElement>()
+
+window.MonacoEnvironment = {
+    getWorker(id){
+        return new tsWorker({ name: id })
+    }
+}
+
+const code = `export default (
+    arg1: string,
+    arg2: number,
+    arg3: object
+) => {
+    console.log("hey!")
+    const a = 10
+    const b = "ewioafjoiaw"
+
+    return { a, b }
+}`
+
+//async function getBlockData(code: string)/*: {
+//    parameters: { name: string, type: string }[]
+//    body: string
+//    returnType: string
+//}*/ {
+//    const model = Monaco.editor.createModel(code, "typescript")
+//    const worker = await Monaco.languages.typescript.getTypeScriptWorker()
+//    const client = await worker(model.uri)
+//
+//    const ast = await client.getNavigationTree(model.uri.toString());
+//    console.log(ast)
+//
+//    return {
+//
+//    }
+//}
 
 onMounted(() => {
-    if( !editor.value ) throw new Error("エディターが設定されてません！")
-    Monaco.editor.create(editor.value, {
+    if( !editorElement.value ) throw new Error("エディターが設定されてません！")
+
+    const editor = Monaco.editor.create(editorElement.value, {
         language: "typescript",
-        value: "console.log('Hello World!')",
+        value: code,
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
@@ -41,5 +73,7 @@ onMounted(() => {
             enabled: false
         }
     })
+
+    //getBlockData(code)
 })
 </script>
