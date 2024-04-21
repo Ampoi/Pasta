@@ -4,7 +4,8 @@
         <div class="flex flex-row">
         <input
             type="text"
-            class="bg-gray-100 px-2 py-1 rounded-md outline-none">
+            class="bg-gray-100 px-2 py-1 rounded-md outline-none"
+            :value="blockSettings.title">
         </div>
         <div
             ref="editor"
@@ -16,16 +17,14 @@ import * as Monaco from "monaco-editor";
 import { onMounted, ref } from "vue";
 
 type Block = {
-  title?: string
-  value: {
-    argument: Record<string, string>
-    code: string
-    returnValue: Record<string, string>
-  }
+  title: string
+  description?: string
+  connectedTo: string[]
 }
 
 const props = defineProps<{
-    block: Block
+    blockID: string
+    blockSettings: Block
 }>()
 
 const editor = ref<HTMLElement>()
@@ -34,7 +33,7 @@ onMounted(() => {
     if( !editor.value ) throw new Error("エディターが設定されてません！")
     Monaco.editor.create(editor.value, {
         language: "typescript",
-        value: props.block.value.code,
+        value: "console.log('Hello World!')",
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
