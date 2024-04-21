@@ -11,7 +11,7 @@
       <div
         class="w-full h-full p-4 overflow-hidden"
         v-if="projectPath">
-        <div class="flex flex-row gap-12 items-center">
+        <div class="flex flex-row gap-72 items-center">
           <div
             v-for="row in renderedBlockIDs"
             class="flex flex-col gap-10">

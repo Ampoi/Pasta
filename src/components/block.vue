@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-white p-2 rounded-xl w-[520px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40">
+        class="bg-white py-2 px-4 rounded-xl w-[400px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 relative">
         <div class="flex flex-row">
         <input
             type="text"
@@ -11,6 +11,29 @@
             id="editorElement"
             ref="editorElement"
             class="h-[200px]"/>
+        
+        <div class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-2rem)] flex flex-col gap-2">
+            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
+                    T
+                </div>
+                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+            </div>
+            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
+                    T
+                </div>
+                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+            </div>
+        </div>
+        <div class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-[calc(100%-2rem)] flex flex-col gap-2">
+            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
+                    T
+                </div>
+                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+            </div>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
