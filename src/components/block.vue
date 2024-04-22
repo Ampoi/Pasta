@@ -12,26 +12,35 @@
             ref="editorElement"
             class="h-[200px]"/>
         
-        <div class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-2rem)] flex flex-col gap-2">
-            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-                    T
-                </div>
-                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+        <!--返り値-->
+        <div class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-0.8rem)] flex flex-col items-start gap-2 max-w-[160px]">
+            <div
+                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
             </div>
-            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+            <div
+                v-for="returnValue in data.returnValues"
+                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2 select-none">
                 <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-                    T
+                    {{ "O"/*returnValue.type[0].toUpperCase()*/ }}
                 </div>
-                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+                <p class="overflow-hidden text-ellipsis text-sm">{{ returnValue/*.name*/ }}</p>
             </div>
         </div>
-        <div class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-[calc(100%-2rem)] flex flex-col gap-2">
-            <div class="bg-white py-1 px-1.5 rounded-xl w-[160px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+
+        <!--引数-->
+        <div class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-[calc(100%-0.8rem)] flex flex-col items-end gap-2 max-w-[160px]">
+            <div
+                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
+            </div>
+            <div
+                v-for="arg in data.args"
+                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2 select-none">
                 <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-                    T
+                    {{ arg.type[0].toUpperCase() }}
                 </div>
-                <p class="overflow-hidden text-ellipsis">ofeiowajfoa</p>
+                <p class="overflow-hidden text-ellipsis text-sm">{{ arg.name }}</p>
             </div>
         </div>
     </div>
@@ -105,6 +114,8 @@ function getBlockData(code: string) {
     }
 }
 
+const data = getBlockData(code)
+
 onMounted(async () => {
     if( !editorElement.value ) throw new Error("エディターが設定されてません！")
 
@@ -112,7 +123,7 @@ onMounted(async () => {
 
     const editor = Monaco.editor.create(editorElement.value, {
         language: "typescript",
-        value: getBlockData(code).body,
+        value: data.body,
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
