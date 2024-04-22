@@ -18,14 +18,10 @@
                 class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
                 <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
             </div>
-            <div
+            <Port
                 v-for="returnValue in data.returnValues"
-                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2 select-none">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-                    {{ "O"/*returnValue.type[0].toUpperCase()*/ }}
-                </div>
-                <p class="overflow-hidden text-ellipsis text-sm">{{ returnValue/*.name*/ }}</p>
-            </div>
+                :type="'O'"
+                :name="returnValue"/>
         </div>
 
         <!--引数-->
@@ -34,14 +30,10 @@
                 class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
                 <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
             </div>
-            <div
+            <Port
                 v-for="arg in data.args"
-                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2 select-none">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-                    {{ arg.type[0].toUpperCase() }}
-                </div>
-                <p class="overflow-hidden text-ellipsis text-sm">{{ arg.name }}</p>
-            </div>
+                :type="arg.type[0].toUpperCase()"
+                :name="arg.name"/>
         </div>
     </div>
 </template>
@@ -50,6 +42,7 @@ import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import { onMounted, ref } from "vue";
 import { Block } from "../model/block";
+import Port from "./block/port.vue"
 
 const props = defineProps<{
     blockID: string
