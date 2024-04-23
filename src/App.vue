@@ -7,11 +7,13 @@
         type="text"
         class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-gray-200 basis-80 text-center">
     </header>
-    <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md">
+    <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md relative">
+      <Lines
+        :blocks="project.blocks"/>
       <div
         class="w-full h-full p-4 overflow-hidden"
         v-if="projectPath">
-        <div class="flex flex-row gap-72 items-center">
+        <div class="flex flex-row gap-60 items-center">
           <div
             v-for="row in renderedBlockIDs"
             class="flex flex-col gap-10">
@@ -34,10 +36,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
 import BlockComponent from './components/block.vue';
+import { computed, reactive, ref } from 'vue';
 import { createLayers } from "./utils/createLayers"
 import { Block } from "./model/block"
+import Lines from "./components/lines.vue"
 
 const projectPath = ref<string>("aaaa")
 
@@ -46,29 +49,23 @@ const project: {
 } = reactive({
   blocks: {
     home: {
-      title: "コマンドが呼び出されたとき",
-      description: "aaaaaa",
-      connectedTo: {
-        getDate: ["default"],
-        getWeather: ["city"]
+      title: "from",
+      ports: {
+        a: {
+          A: "arg1"
+        },
+        b: {
+          B: "arg2"
+        }
       }
     },
-    getDate: {
-      title: "日付を取得",
-      connectedTo: {
-        sendMessage: ["date"]
-      }
+    A: {
+      title: "Aaaa",
+      ports: {}
     },
-    getWeather: {
-      title: "天気を取得",
-      description: "abbb",
-      connectedTo: {
-        sendMessage: ["weather"]
-      }
-    },
-    sendMessage: {
-      title: "メッセージを送信",
-      connectedTo: {}
+    B: {
+      title: "Bbbb",
+      ports: {}
     }
   }
 })
@@ -76,7 +73,7 @@ const project: {
 const renderedBlockIDs = computed(() => {
   const dependencies: Record<string, string[]> = {}
   Object.entries(project.blocks).forEach(([id, value]) => {
-    dependencies[id] = Object.keys(value.connectedTo)
+    dependencies[id] = Object.values(value.ports).map((port) => Object.keys(port)).flat()
   })
   return createLayers(dependencies)
 })

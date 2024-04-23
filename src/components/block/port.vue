@@ -1,6 +1,8 @@
 <template>
     <div
-        class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2 select-none">
+        class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex items-center gap-2 select-none"
+        :class="reverse ? 'flex-row-reverse' : 'flex-row'"
+        ref="port">
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
             {{ type }}
         </div>
@@ -8,10 +10,37 @@
     </div>
 </template>
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { portPositions } from "../../utils/portPositions"
 const props = defineProps<{
+    blockID: string
     type: string
     name: string
+    reverse?: boolean
 }>()
 
 if( props.type.length != 1 ) console.warn("typeは1文字である必要があります！")
+
+const port = ref<HTMLElement>()
+
+onMounted(() => {
+    if(!port.value) throw new Error("ポートの要素がないです！")
+    
+    const { top, left, width, height } = port.value.getBoundingClientRect()
+    const x = left + ( props.reverse ? 0 : width )
+    const y = top + height / 2
+
+    if( portPositions[props.blockID] ){
+        if( portPositions[props.blockID][props.name] ){
+            portPositions[props.blockID][props.name].y = y
+            portPositions[props.blockID][props.name].x = x
+        }else{
+            portPositions[props.blockID][props.name] = { x, y }
+        }
+    }else{
+        portPositions[props.blockID] = {
+            [props.name]: { x, y }
+        }
+    }
+})
 </script>

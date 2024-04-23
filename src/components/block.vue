@@ -20,6 +20,7 @@
             </div>
             <Port
                 v-for="returnValue in data.returnValues"
+                :blockID
                 :type="'O'"
                 :name="returnValue"/>
         </div>
@@ -32,8 +33,10 @@
             </div>
             <Port
                 v-for="arg in data.args"
+                :blockID
                 :type="arg.type[0].toUpperCase()"
-                :name="arg.name"/>
+                :name="arg.name"
+                :reverse="true"/>
         </div>
     </div>
 </template>
@@ -44,7 +47,7 @@ import { onMounted, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
 
-const props = defineProps<{
+defineProps<{
     blockID: string
     blockSettings: Block
 }>()
@@ -112,9 +115,7 @@ const data = getBlockData(code)
 onMounted(async () => {
     if( !editorElement.value ) throw new Error("エディターが設定されてません！")
 
-    console.log(getBlockData(code))
-
-    const editor = Monaco.editor.create(editorElement.value, {
+    Monaco.editor.create(editorElement.value, {
         language: "typescript",
         value: data.body,
         theme: "vs-dark",

@@ -1,7 +1,9 @@
 export type Block = {
     title: string
     description?: string
-    connectedTo: {
-        [blockID: string]: string[]
+    ports: {
+        [portID: string]: {
+            [blockID: string]: string
+        }
     }
 }
