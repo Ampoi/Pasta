@@ -8,22 +8,31 @@
         class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-gray-200 basis-80 text-center">
     </header>
     <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md relative">
-      <Lines
-        :blocks="project.blocks"/>
-      <div
-        class="w-full h-full p-4 overflow-hidden"
-        v-if="projectPath">
-        <div class="flex flex-row gap-60 items-center">
-          <div
-            v-for="row in renderedBlockIDs"
-            class="flex flex-col gap-10">
-            <BlockComponent
-              v-for="blockID in row"
-              :blockID
-              :blockSettings="project.blocks[blockID]"/>
+      <DraggableArea
+        v-if="projectPath"
+        v-slot="{ position, size }"
+        class="w-full h-full p-4">
+        <Lines
+          :blocks="project.blocks"/>
+        <div
+          class="absolute"
+          :style="{
+            top: `${-position.y}px`,
+            left: `${-position.x}px`,
+            transform: `scale(${size})`
+          }">
+          <div class="flex flex-row gap-60 items-center">
+            <div
+              v-for="row in renderedBlockIDs"
+              class="flex flex-col gap-10">
+              <BlockComponent
+                v-for="blockID in row"
+                :blockID
+                :blockSettings="project.blocks[blockID]"/>
+            </div>
           </div>
         </div>
-      </div>
+      </DraggableArea>
       <div
         class="w-full h-full grid place-content-center"
         v-else>
@@ -41,6 +50,7 @@ import { computed, reactive, ref } from 'vue';
 import { createLayers } from "./utils/createLayers"
 import { Block } from "./model/block"
 import Lines from "./components/lines.vue"
+import DraggableArea from "./components/draggableArea.vue"
 
 const projectPath = ref<string>("aaaa")
 
