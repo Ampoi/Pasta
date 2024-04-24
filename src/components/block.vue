@@ -47,7 +47,7 @@ import { onMounted, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
 
-defineProps<{
+const props = defineProps<{
     blockID: string
     blockSettings: Block
 }>()
@@ -56,6 +56,7 @@ const editorElement = ref<HTMLElement>()
 
 window.MonacoEnvironment = {
     getWorker(id){
+        console.log(id)
         return new tsWorker({ name: id })
     }
 }
@@ -115,15 +116,29 @@ const data = getBlockData(code)
 onMounted(async () => {
     if( !editorElement.value ) throw new Error("エディターが設定されてません！")
 
+    Monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        ...Monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
+        target: Monaco.languages.typescript.ScriptTarget.ES2020,
+        moduleResolution: Monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    })
+
+    const model = Monaco.editor.createModel(
+        data.body,
+        "typescript",
+        Monaco.Uri.from({
+            scheme: "file",
+            path: `/${props.blockID}.ts`
+        })
+    )
+
     Monaco.editor.create(editorElement.value, {
-        language: "typescript",
-        value: data.body,
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
         minimap: {
             enabled: false
-        }
+        },
+        model
     })
 })
 </script>

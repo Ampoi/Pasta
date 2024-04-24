@@ -52,10 +52,14 @@ watch(size, (newValue, oldValue) => {
 
 const resizeSpeed = 0.005
 const resizeMin = 0.25
+const resizeMax = 1
 
 const resize = (event: WheelEvent) => {
     size.value += event.deltaY * resizeSpeed
     if(size.value < resizeMin) size.value = resizeMin
+    if(size.value > resizeMax) size.value = resizeMax
+
+    portPositionUpdaters.forEach(updater => updater())
 }
 
 const zone = ref<HTMLElement>()
