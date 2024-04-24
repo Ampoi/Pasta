@@ -11,7 +11,8 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { portPositions } from "../../utils/portPositions"
+import { portPositions, portPositionUpdaters } from "../../utils/portPositions"
+
 const props = defineProps<{
     blockID: string
     type: string
@@ -23,9 +24,8 @@ if( props.type.length != 1 ) console.warn("typeは1文字である必要があ�
 
 const port = ref<HTMLElement>()
 
-onMounted(() => {
+const updatePosition = () => {
     if(!port.value) throw new Error("ポートの要素がないです！")
-    
     const { top, left, width, height } = port.value.getBoundingClientRect()
     const x = left + ( props.reverse ? 0 : width )
     const y = top + height / 2
@@ -42,5 +42,10 @@ onMounted(() => {
             [props.name]: { x, y }
         }
     }
+}
+
+onMounted(() => {
+    portPositionUpdaters.push(updatePosition)
+    updatePosition()
 })
 </script>

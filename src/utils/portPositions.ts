@@ -5,3 +5,5 @@ export const portPositions = reactive<{
         [portID: string]: Record<"x" | "y", number>
     }
 }>({})
+
+export const portPositionUpdaters: (() => void)[] = []

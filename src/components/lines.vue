@@ -30,7 +30,6 @@ const lines = ref<Line[]>([])
 watch(portPositions, updateLines)
 
 function updateLines(){
-    console.log("update")
     if( !linesArea.value ) throw new Error("ラインエリアが指定されてないです")
  
     const { top, left } = linesArea.value.getBoundingClientRect()
@@ -44,7 +43,6 @@ function updateLines(){
     lines.value = Object.entries(props.blocks).map(([blockID, block]) => {
         return Object.entries(block.ports).map(([portID, port]) => {
             return Object.entries(port).map<Line | undefined>(([toBlockID, argPortID]) => {
-                console.log(portPositions)
                 if(
                     !portPositions[blockID] ||
                     !portPositions[blockID][portID] ||

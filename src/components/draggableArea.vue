@@ -14,6 +14,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
+import { portPositionUpdaters } from '../utils/portPositions';
 
 let isMoving = false
 const position = reactive({
@@ -30,6 +31,8 @@ const move = (event: MouseEvent) => {
     }
     mousePosition.x = event.x
     mousePosition.y = event.y
+
+    portPositionUpdaters.forEach(updater => updater())
 }
 
 const mousePosition = {
