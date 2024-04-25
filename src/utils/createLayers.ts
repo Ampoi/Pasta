@@ -1,31 +1,68 @@
-type DependencyMap = { [key: string]: string[] };
+type DependencyMap = {
+    home: string[]
+    [key: string]: string[]
+}
 
-export function createLayers(dependencies: DependencyMap): string[][] {
-    const layers: string[][] = [];
-    const visited = new Set<string>();
+export function createLayers(
+    dependencies: DependencyMap,
+    withSpacers = false
+){
+    type Map = { [key: string]: Map | string }
 
-    const allKeys = new Set(Object.keys(dependencies));
-    const allTargets = new Set<string>();
-    Object.values(dependencies).forEach(targets => targets.forEach(target => allTargets.add(target)));
+    const maxDepths: { [key: string]: number } = {}
+    Object.keys(dependencies).forEach((key) => { maxDepths[key] = 0 })
 
-    const sources = Array.from(allKeys).filter(x => !allTargets.has(x));
-    
-    function visit(node: string, currentLayer: number) {
-        if (visited.has(node)) return;
-        visited.add(node);
+    function makeMap(id: string, depth: number){
+        const children = dependencies[id]
         
-        if (!layers[currentLayer]) layers[currentLayer] = [];
-        layers[currentLayer].push(node);
+        const map: Map = {}
+        children.forEach((child) => {
+            map[child] = makeMap(child, depth+1)
+        })
 
-        if (dependencies[node]) {
-            dependencies[node].forEach(child => {
-                visit(child, currentLayer + 1);
-            });
+        if( maxDepths[id] >= depth ){
+            return id
+        }else{
+            maxDepths[id] = depth
+            if(Object.keys(map).length == 0 ){
+                return id
+            }else{
+                return map
+            }
         }
     }
-
-    // 各ソースから探索開始
-    sources.forEach(source => visit(source, 0));
-
-    return layers;
+    
+    const map = makeMap("home", 1)
+    const maxDepth = (() => {
+        let tmp = 0
+        Object.values(maxDepths).forEach((depth) => {
+            if( depth > tmp ){
+                tmp = depth
+            }
+        })
+        return tmp
+    })();
+    const layers: (string | null)[][] = Array.from({length: maxDepth}).map(() => []);
+    function addBlock(parentID: string, id: string, searchMap: Map | string){
+        const depth = maxDepths[id]-1
+        if( withSpacers ){
+            for( let i = maxDepths[parentID]; i < depth; i++ ){
+                layers[i].push(null)
+            }
+        }
+        layers[depth].push(id)
+        if( typeof searchMap != "string" ){
+            Object.entries(searchMap).forEach(([childID, newMap]) => addBlock(id, childID, newMap))
+        }
+    }
+    addBlock("home", "home", map)
+    return layers.map((layer) => {
+        const newLayer: typeof layer = []
+        layer.forEach((item) => {
+            if( !newLayer.includes(item) || item == null ){
+                newLayer.push(item)
+            }
+        })
+        return newLayer
+    })
 }
