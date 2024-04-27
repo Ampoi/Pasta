@@ -81,7 +81,10 @@ const project: {
 })
 
 const renderedBlockIDs = computed(() => {
-  const dependencies: Record<string, string[]> = {}
+  const dependencies: {
+    home: string[]
+    [id: string]: string[]
+  } = { home: [] }
   Object.entries(project.blocks).forEach(([id, value]) => {
     dependencies[id] = Object.values(value.ports).map((port) => Object.keys(port)).flat()
   })

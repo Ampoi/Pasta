@@ -116,14 +116,16 @@ const data = getBlockData(code)
 onMounted(async () => {
     if( !editorElement.value ) throw new Error("エディターが設定されてません！")
 
-    Monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        ...Monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
-        target: Monaco.languages.typescript.ScriptTarget.ES2020,
-        moduleResolution: Monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    const MonacoTypescript = Monaco.languages.typescript
+    MonacoTypescript.typescriptDefaults.setCompilerOptions({
+        ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
+        target: MonacoTypescript.ScriptTarget.ES2020,
+        moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
     })
+    MonacoTypescript.typescriptDefaults.addExtraLib("declare module 'test/file1' { export interface Test {} }")
 
     const model = Monaco.editor.createModel(
-        data.body,
+        code,
         "typescript",
         Monaco.Uri.from({
             scheme: "file",
