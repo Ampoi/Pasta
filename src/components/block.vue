@@ -43,10 +43,10 @@
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
-
+import { constrainedEditor } from "constrained-editor-plugin"
 const props = defineProps<{
     blockID: string
     blockSettings: Block
@@ -61,7 +61,7 @@ window.MonacoEnvironment = {
     }
 }
 
-const code = `export default (
+const code = ref(`export default (
     arg1: string,
     arg2: number,
     arg3: object
@@ -70,52 +70,52 @@ const code = `export default (
     const a = 10
     const b = "ewioafjoiaw"
     return { a, b }
-}`
+}`)
 
 function getBlockData(code: string) {
     let isArgs = false
     const args: { name: string, type: string }[] = []
-    
-    let isBody = false
-    const bodyLines: string[] = []
 
     const codeLines = code.split("\n")
+
+    const bodyLinesRange: {
+        start?: number
+        end: number
+    } = {
+        end: codeLines.length - 1
+    }
+
     codeLines.forEach((line, row) => {
         if( row == 0 ){
             isArgs = true
         }else if( line == ") => {" ){
             isArgs = false
-            isBody = true
-        }else if( row == code.split("\n").length - 2 ){
-            isBody = false
-        }else{
-            if( isArgs ){
-                const pairText = line[line.length-1] == "," ? line.slice(0, line.length-1) : line
-                const [ name, type ] = pairText.trim().split(": ")
-                args.push({name, type})
-            }else if( isBody ){
-                bodyLines.push(line.replace(/^(\t|    )/, ""))
-            }
+            bodyLinesRange.start = row + 2
+        }else if( isArgs ){
+            const pairText = line[line.length-1] == "," ? line.slice(0, line.length-1) : line
+            const [ name, type ] = pairText.trim().split(": ")
+            args.push({name, type})
         }
     })
-
-    const body = bodyLines.join("\n")
+    if( !bodyLinesRange.start ) throw new Error("bodyLinesの範囲の最初のインデックスを見つけられませんでした")
 
     const returnLine = codeLines[codeLines.length-2].replace(/\s+/g,'')
     const returnValues = returnLine.slice(7, returnLine.length-1).split(",")
 
     return {
         args,
-        body,
+        bodyLinesRange: [bodyLinesRange.start, 1, bodyLinesRange.end+1,1],
+        /*hiddenAreas: [
+            new Monaco.Range(1, 1, bodyLinesRange.start, 1),
+            new Monaco.Range(bodyLinesRange.end, 1, codeLines.length+1, 1)
+        ],*/
         returnValues
     }
 }
 
-const data = getBlockData(code)
+const data = reactive(getBlockData(code.value))
 
-onMounted(async () => {
-    if( !editorElement.value ) throw new Error("エディターが設定されてません！")
-
+function createModel(){
     const MonacoTypescript = Monaco.languages.typescript
     MonacoTypescript.typescriptDefaults.setCompilerOptions({
         ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
@@ -123,9 +123,9 @@ onMounted(async () => {
         moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
     })
     MonacoTypescript.typescriptDefaults.addExtraLib("declare module 'test/file1' { export interface Test {} }")
-
+    
     const model = Monaco.editor.createModel(
-        code,
+        code.value,
         "typescript",
         Monaco.Uri.from({
             scheme: "file",
@@ -133,7 +133,19 @@ onMounted(async () => {
         })
     )
 
-    Monaco.editor.create(editorElement.value, {
+    return model
+}
+
+const model = createModel()
+
+model.onDidChangeContent(() => {
+    code.value = model.getValue()
+})
+
+onMounted(async () => {
+    if( !editorElement.value ) throw new Error("エディターが設定されてません！")
+
+    const editor = Monaco.editor.create(editorElement.value, {
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         lineNumbers: "off",
@@ -142,5 +154,15 @@ onMounted(async () => {
         },
         model
     })
+
+    const constrainedInstance = constrainedEditor(Monaco)
+    constrainedInstance.initializeIn(editor)
+
+    constrainedInstance.addRestrictionsTo(model, [
+        {
+            range: data.bodyLinesRange,
+            allowMultiline: true
+        }
+    ])
 })
 </script>
