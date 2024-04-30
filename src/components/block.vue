@@ -104,7 +104,10 @@ function getBlockData(code: string) {
 
     return {
         args,
-        bodyLinesRange: [bodyLinesRange.start, 1, bodyLinesRange.end+1,1],
+        bodyLinesRange: [
+            bodyLinesRange.start, 1,
+            bodyLinesRange.end-1, codeLines[bodyLinesRange.end-2].length+1,
+        ],
         /*hiddenAreas: [
             new Monaco.Range(1, 1, bodyLinesRange.start, 1),
             new Monaco.Range(bodyLinesRange.end, 1, codeLines.length+1, 1)
