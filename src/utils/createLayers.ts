@@ -1,5 +1,5 @@
 type DependencyMap = {
-    home: string[]
+    trigger: string[]
     [key: string]: string[]
 }
 
@@ -32,7 +32,7 @@ export function createLayers(
         }
     }
     
-    const map = makeMap("home", 1)
+    const map = makeMap("trigger", 1)
     const maxDepth = (() => {
         let tmp = 0
         Object.values(maxDepths).forEach((depth) => {
@@ -42,6 +42,7 @@ export function createLayers(
         })
         return tmp
     })();
+
     const layers: (string | null)[][] = Array.from({length: maxDepth}).map(() => []);
     function addBlock(parentID: string, id: string, searchMap: Map | string){
         const depth = maxDepths[id]-1
@@ -55,7 +56,8 @@ export function createLayers(
             Object.entries(searchMap).forEach(([childID, newMap]) => addBlock(id, childID, newMap))
         }
     }
-    addBlock("home", "home", map)
+
+    addBlock("trigger", "trigger", map)
     return layers.map((layer) => {
         const newLayer: typeof layer = []
         layer.forEach((item) => {

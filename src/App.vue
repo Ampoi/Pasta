@@ -25,10 +25,19 @@
             <div
               v-for="row in renderedBlockIDs"
               class="flex flex-col gap-10">
-              <BlockComponent
-                v-for="blockID in row"
-                :blockID
-                :blockSettings="project.blocks[blockID]"/>
+              <div
+                v-for="blockID in row">
+                <TriggerBlockComponent
+                  v-if="blockID == 'trigger'"
+                  :blockID
+                  :blockSettings="project.trigger"/>
+                <BlockComponent
+                  v-else-if="blockID"
+                  :blockID
+                  :blockSettings="project.blocks[blockID]"/>
+                <div
+                  v-else/>
+              </div>
             </div>
           </div>
         </div>
@@ -51,24 +60,26 @@ import { createLayers } from "./utils/createLayers"
 import { Block } from "./model/block"
 import Lines from "./components/lines.vue"
 import DraggableArea from "./components/draggableArea.vue"
+import TriggerBlockComponent from "./components/triggerBlock.vue"
 
 const projectPath = ref<string>("aaaa")
 
 const project: {
+  trigger: Block
   blocks: Record<string, Block>
 } = reactive({
-  blocks: {
-    home: {
-      title: "from",
-      ports: {
-        a: {
-          A: "arg1"
-        },
-        b: {
-          B: "arg2"
-        }
+  trigger: {
+    title: "trigger",
+    ports: {
+      a: {
+        A: "arg1"
+      },
+      b: {
+        B: "arg2"
       }
-    },
+    }
+  },
+  blocks: {
     A: {
       title: "Aaaa",
       ports: {}
@@ -82,12 +93,16 @@ const project: {
 
 const renderedBlockIDs = computed(() => {
   const dependencies: {
-    home: string[]
+    trigger: string[]
     [id: string]: string[]
-  } = { home: [] }
+  } = {
+    trigger: Object.values(project.trigger.ports).map((port) => Object.keys(port)).flat()
+  }
+
   Object.entries(project.blocks).forEach(([id, value]) => {
     dependencies[id] = Object.values(value.ports).map((port) => Object.keys(port)).flat()
   })
+
   return createLayers(dependencies)
 })
 </script>
