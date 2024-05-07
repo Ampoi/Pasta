@@ -1,29 +1,26 @@
 <template>
   <div
-    class="bg-white py-2 px-4 rounded-xl w-[400px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 relative"
-  >
-    <div class="flex flex-row">
+    class="bg-white px-5 py-3 rounded-xl w-[400px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 relative">
+    <div class="flex flex-row items-center gap-2">
+      <i class="bi bi-code-square text-lg"/>
       <input
         type="text"
-        class="bg-gray-100 px-2 py-1 rounded-md outline-none"
+        class="px-2 py-1 rounded-md outline-gray-200"
         :value="blockSettings.title"
       />
     </div>
-    <div id="editorElement" ref="editorElement" class="h-[200px]" />
+    <div class="p-4 border-gray-200 text-gray-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2">
+      <i class="bi bi-code-square text-lg"/>
+      <p>コードを編集する</p>
+    </div>
 
     <!--返り値-->
-    <div
-      class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-0.8rem)] flex flex-col items-start gap-2 max-w-[160px]"
-    >
-      <div
-        class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2"
-      >
-        <div
-          class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"
-        />
+    <div class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-0.8rem)] flex flex-col items-start gap-2 max-w-[160px]">
+      <div class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
+        <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
       <Port
-        v-for="returnValue in blockData.returnValues"
+        v-for="returnValue in returnValues"
         :blockID
         :type="returnValue.type"
         :name="returnValue.name"
@@ -42,9 +39,9 @@
         />
       </div>
       <Port
-        v-for="arg in blockData.args"
+        v-for="arg in args"
         :blockID
-        :type="arg.type[0].toUpperCase()"
+        :type="arg.type"
         :name="arg.name"
         :reverse="true"
       />
@@ -52,137 +49,26 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as Monaco from "monaco-editor";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { computed, onMounted, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
-import { constrainedEditor } from "constrained-editor-plugin"
 
 const props = defineProps<{
     blockID: string
     blockSettings: Block
 }>()
 
-const editorElement = ref<HTMLElement>()
-
-window.MonacoEnvironment = {
-    getWorker(id){
-        console.log(id)
-        return new tsWorker({ name: id })
-    }
+type Port = {
+  type: string
+  name: string
 }
 
-const code = ref(`export default (
-    arg1: string,
-    arg2: number,
-    arg3: object
-) => {
-    console.log("hey!")
-    const a = 10
-    const b = "ewioafjoiaw"
-    return { a, b }
-}`)
+const args: Port[] =  [
+    { type: "string", name: "arg1" },
+    { type: "number", name: "arg2" }
+]
 
-function createModel(){
-    const MonacoTypescript = Monaco.languages.typescript
-    MonacoTypescript.typescriptDefaults.setCompilerOptions({
-        ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
-        target: MonacoTypescript.ScriptTarget.ES2020,
-        moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
-    })
-    MonacoTypescript.typescriptDefaults.addExtraLib("declare module 'test/file1' { export interface Test {} }")
-
-    const model = Monaco.editor.createModel(
-        code.value,
-        "typescript",
-        Monaco.Uri.from({
-            scheme: "file",
-            path: `/${props.blockID}.ts`
-        })
-    )
-
-    return model
-}
-
-function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor){
-    const constrainedInstance = constrainedEditor(Monaco)
-
-    constrainedInstance.initializeIn(editor)
-    constrainedInstance.addRestrictionsTo(model, [
-        {
-            range: blockData.value.bodyLinesRange,
-            allowMultiline: true
-        }
-    ])
-}
-
-const model = createModel()
-
-const blockData = computed(() => {
-    let isArgs = false
-    const args: { name: string, type: string }[] = []
-
-    const codeLines = code.value.split("\n")
-
-    const bodyLinesRange: {
-        start?: number
-        end: number
-    } = {
-        end: codeLines.length - 1
-    }
-
-    codeLines.forEach((line, row) => {
-        if( row == 0 ){
-            isArgs = true
-        }else if( line == ") => {" ){
-            isArgs = false
-            bodyLinesRange.start = row + 2
-        }else if( isArgs ){
-            const pairText = line[line.length-1] == "," ? line.slice(0, line.length-1) : line
-            const [ name, type ] = pairText.trim().split(": ")
-            args.push({name, type})
-        }
-    })
-
-    if( !bodyLinesRange.start ) throw new Error("bodyLinesの範囲の最初のインデックスを見つけられませんでした")
-
-    const returnLine = codeLines[codeLines.length-2].replace(/\s+/g,'')
-    const returnValueNames = returnLine.slice(7, returnLine.length-1).split(",")
-    const returnValues = returnValueNames.map((returnValueName) => {
-        return {
-            type: "?",
-            name: returnValueName
-        }
-    })
-
-    return {
-        args,
-        bodyLinesRange: [
-            bodyLinesRange.start, 1,
-            bodyLinesRange.end-1, codeLines[bodyLinesRange.end-2].length+1,
-        ],
-        returnValues
-    }
-})
-
-model.onDidChangeContent(() => {
-    code.value = model.getValue()
-})
-
-onMounted(async () => {
-    if( !editorElement.value ) throw new Error("エディターが設定されてません！")
-
-    const editor = Monaco.editor.create(editorElement.value, {
-        theme: "vs-dark",
-        scrollBeyondLastLine: false,
-        lineNumbers: "off",
-        minimap: {
-            enabled: false
-        },
-        model
-    })
-
-    addEditingRestrictions(editor)
-})
+const returnValues: Port[] =  [
+  { type: "string", name: "a" },
+  { type: "number", name: "b" }
+]
 </script>

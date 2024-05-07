@@ -4,7 +4,7 @@
         :class="reverse ? 'flex-row-reverse' : 'flex-row'"
         ref="port">
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-400 grid place-content-center">
-            {{ type }}
+            {{ type ? type[0].toUpperCase(): "?" }}
         </div>
         <p class="overflow-hidden text-ellipsis text-sm">{{ name }}</p>
     </div>
@@ -15,12 +15,10 @@ import { portPositions, portPositionUpdaters } from "../../utils/portPositions"
 
 const props = defineProps<{
     blockID: string
-    type: string
+    type?: string
     name: string
     reverse?: boolean
 }>()
-
-if( props.type.length != 1 ) console.warn("typeは1文字である必要があります！")
 
 const port = ref<HTMLElement>()
 
