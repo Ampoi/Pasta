@@ -1,52 +1,64 @@
 <template>
-    <div
-        class="bg-white py-2 px-4 rounded-xl w-[400px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 relative">
-        <div class="flex flex-row">
-        <input
-            type="text"
-            class="bg-gray-100 px-2 py-1 rounded-md outline-none"
-            :value="blockSettings.title">
-        </div>
-        <div
-            id="editorElement"
-            ref="editorElement"
-            class="h-[200px]"/>
-        
-        <!--返り値-->
-        <div class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-0.8rem)] flex flex-col items-start gap-2 max-w-[160px]">
-            <div
-                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
-            </div>
-            <Port
-                v-for="returnValue in data.returnValues"
-                :blockID
-                :type="'O'"
-                :name="returnValue"/>
-        </div>
-
-        <!--引数-->
-        <div class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-[calc(100%-0.8rem)] flex flex-col items-end gap-2 max-w-[160px]">
-            <div
-                class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
-            </div>
-            <Port
-                v-for="arg in data.args"
-                :blockID
-                :type="arg.type[0].toUpperCase()"
-                :name="arg.name"
-                :reverse="true"/>
-        </div>
+  <div
+    class="bg-white py-2 px-4 rounded-xl w-[400px] flex flex-col gap-2 border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 relative"
+  >
+    <div class="flex flex-row">
+      <input
+        type="text"
+        class="bg-gray-100 px-2 py-1 rounded-md outline-none"
+        :value="blockSettings.title"
+      />
     </div>
+    <div id="editorElement" ref="editorElement" class="h-[200px]" />
+
+    <!--返り値-->
+    <div
+      class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%-0.8rem)] flex flex-col items-start gap-2 max-w-[160px]"
+    >
+      <div
+        class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2"
+      >
+        <div
+          class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"
+        />
+      </div>
+      <Port
+        v-for="returnValue in blockData.returnValues"
+        :blockID
+        :type="returnValue.type"
+        :name="returnValue.name"
+      />
+    </div>
+
+    <!--引数-->
+    <div
+      class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-[calc(100%-0.8rem)] flex flex-col items-end gap-2 max-w-[160px]"
+    >
+      <div
+        class="bg-white p-1.5 rounded-xl border-gray-200 border-[1px] shadow-xl shadow-gray-300/40 flex flex-row items-center gap-2"
+      >
+        <div
+          class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"
+        />
+      </div>
+      <Port
+        v-for="arg in blockData.args"
+        :blockID
+        :type="arg.type[0].toUpperCase()"
+        :name="arg.name"
+        :reverse="true"
+      />
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
 import { constrainedEditor } from "constrained-editor-plugin"
+
 const props = defineProps<{
     blockID: string
     blockSettings: Block
@@ -72,11 +84,46 @@ const code = ref(`export default (
     return { a, b }
 }`)
 
-function getBlockData(code: string) {
+function createModel(){
+    const MonacoTypescript = Monaco.languages.typescript
+    MonacoTypescript.typescriptDefaults.setCompilerOptions({
+        ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
+        target: MonacoTypescript.ScriptTarget.ES2020,
+        moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
+    })
+    MonacoTypescript.typescriptDefaults.addExtraLib("declare module 'test/file1' { export interface Test {} }")
+
+    const model = Monaco.editor.createModel(
+        code.value,
+        "typescript",
+        Monaco.Uri.from({
+            scheme: "file",
+            path: `/${props.blockID}.ts`
+        })
+    )
+
+    return model
+}
+
+function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor){
+    const constrainedInstance = constrainedEditor(Monaco)
+
+    constrainedInstance.initializeIn(editor)
+    constrainedInstance.addRestrictionsTo(model, [
+        {
+            range: blockData.value.bodyLinesRange,
+            allowMultiline: true
+        }
+    ])
+}
+
+const model = createModel()
+
+const blockData = computed(() => {
     let isArgs = false
     const args: { name: string, type: string }[] = []
 
-    const codeLines = code.split("\n")
+    const codeLines = code.value.split("\n")
 
     const bodyLinesRange: {
         start?: number
@@ -97,10 +144,17 @@ function getBlockData(code: string) {
             args.push({name, type})
         }
     })
+
     if( !bodyLinesRange.start ) throw new Error("bodyLinesの範囲の最初のインデックスを見つけられませんでした")
 
     const returnLine = codeLines[codeLines.length-2].replace(/\s+/g,'')
-    const returnValues = returnLine.slice(7, returnLine.length-1).split(",")
+    const returnValueNames = returnLine.slice(7, returnLine.length-1).split(",")
+    const returnValues = returnValueNames.map((returnValueName) => {
+        return {
+            type: "?",
+            name: returnValueName
+        }
+    })
 
     return {
         args,
@@ -108,38 +162,9 @@ function getBlockData(code: string) {
             bodyLinesRange.start, 1,
             bodyLinesRange.end-1, codeLines[bodyLinesRange.end-2].length+1,
         ],
-        /*hiddenAreas: [
-            new Monaco.Range(1, 1, bodyLinesRange.start, 1),
-            new Monaco.Range(bodyLinesRange.end, 1, codeLines.length+1, 1)
-        ],*/
         returnValues
     }
-}
-
-const data = reactive(getBlockData(code.value))
-
-function createModel(){
-    const MonacoTypescript = Monaco.languages.typescript
-    MonacoTypescript.typescriptDefaults.setCompilerOptions({
-        ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
-        target: MonacoTypescript.ScriptTarget.ES2020,
-        moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
-    })
-    MonacoTypescript.typescriptDefaults.addExtraLib("declare module 'test/file1' { export interface Test {} }")
-    
-    const model = Monaco.editor.createModel(
-        code.value,
-        "typescript",
-        Monaco.Uri.from({
-            scheme: "file",
-            path: `/${props.blockID}.ts`
-        })
-    )
-
-    return model
-}
-
-const model = createModel()
+})
 
 model.onDidChangeContent(() => {
     code.value = model.getValue()
@@ -158,14 +183,6 @@ onMounted(async () => {
         model
     })
 
-    const constrainedInstance = constrainedEditor(Monaco)
-    constrainedInstance.initializeIn(editor)
-
-    constrainedInstance.addRestrictionsTo(model, [
-        {
-            range: data.bodyLinesRange,
-            allowMultiline: true
-        }
-    ])
+    addEditingRestrictions(editor)
 })
 </script>
