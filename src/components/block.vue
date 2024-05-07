@@ -6,10 +6,10 @@
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
       <Port
-        v-for="arg in args"
+        v-for="arg in blockSettings.ports.args"
         :blockID
-        :type="arg.type"
-        :name="arg.name"
+        :type="arg/*.type*/"
+        :name="arg/*.name*/"
         :reverse="true"
       />
     </div>
@@ -35,10 +35,10 @@
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
       <Port
-        v-for="returnValue in returnValues"
+        v-for="returnValue in blockSettings.ports.returnValues"
         :blockID
-        :type="returnValue.type"
-        :name="returnValue.name"
+        :type="returnValue/*.type*/"
+        :name="returnValue/*.name*/"
       />
     </div>
   </div>
@@ -58,17 +58,6 @@ type Port = {
   type: string
   name: string
 }
-
-const args: Port[] =  [
-    { type: "string", name: "arg1" },
-    { type: "number", name: "arg2" },
-    { type: "number", name: "arg2" }
-]
-
-const returnValues: Port[] =  [
-  { type: "string", name: "a" },
-  { type: "number", name: "b" }
-]
 
 const block = ref<HTMLElement>()
 

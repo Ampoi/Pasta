@@ -2,9 +2,6 @@
     <svg
         class="w-full h-full absolute top-0 left-0"
         ref="linesArea">
-        <rect
-            v-for="block in blocks"
-            :x="block.x" :y="block.y" width="100" height="100" fill="black" />
         <path
             v-for="line in lines"
             :d="`
@@ -14,10 +11,11 @@
     </svg>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { Project } from '../model/project';
 import { blockRects } from '../utils/blockRects';
 import { createLayers } from '../utils/createLayers';
+import { Block } from '../model/block';
 
 const props = defineProps<{
     project: Project
@@ -35,14 +33,14 @@ const getBlockPositions = () => {
     let widthSum = 0
     layers.forEach((layer) => {
         let heightSum = 0
-        layer.forEach((blockID, i) => {
+        layer.forEach((blockID) => {
             if( blockID ){
                 blockPositions[blockID] = {
                     x: widthSum,
                     y: heightSum
                 }
             }
-            heightSum += (blockID ? blockRects[blockID].height : spaceHeight ) + yGap
+            heightSum += ( blockID ? blockRects[blockID].height : spaceHeight ) + yGap
         })
 
         layerHeights.push(heightSum)
@@ -69,13 +67,76 @@ const getBlockPositions = () => {
     return blockPositions
 }
 
-const lines = computed<Record<"from"|"to",Record<"x"|"y",number>>[]>(() => {
-    return []
-})
+const portHeight = 34
+const portYGap = 8
 
-const blocks = ref<Record<"x"|"y",number>[]>([])
+const getPortPositions = (blockPositions: Record<string, {
+    x: number
+    y: number
+}>) => {
+    const portPositions: {
+        [blockID: string]: {
+            [portID: string]: {
+                x: number;
+                y: number;
+            }
+        }
+    } = {}
+
+    const getPortPosition = (type: "args" | "returnValues", blockID: string, block: Block, portID: string, i: number, { x, y }: Record<"x"|"y",number>) => {
+        if( !portPositions[blockID] ) portPositions[blockID] = {}
+        
+        const ports = block.ports[type]
+        if( !ports ) return
+
+        const portAmount = ports.length + 1
+        portPositions[blockID][portID] = {
+            x: x + (type == "returnValues" ? blockRects[blockID].width : 0),
+            y: y + blockRects[blockID].height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
+        }
+    }
+
+    Object.entries(blockPositions).forEach(([blockID, blockPosition]) => {
+        const block: Block = blockID == "trigger" ? props.project.trigger : props.project.blocks[blockID]
+
+        if( block.ports.args ) block.ports.args.forEach((portID, i) => getPortPosition("args", blockID, block, portID, i, blockPosition))
+
+        block.ports.returnValues.forEach((portID, i) => getPortPosition("returnValues", blockID, block, portID, i, blockPosition))
+    })
+
+    return portPositions
+}
+
+const getLines = (portPositions: {
+    [blockID: string]: {
+        [portID: string]: {
+            x: number;
+            y: number;
+        };
+    };
+}) => {
+    const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
+    
+    ([["trigger", props.project.trigger], ...Object.entries(props.project.blocks)] as [string, Block][]).forEach(([blockID, block]) => {
+        Object.entries(block.connectedPorts).forEach(([portID, connectedTo]) => {
+            const from = portPositions[blockID][portID]
+            Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
+                const to = portPositions[connectedBlockID][connectedPortID]
+                lines.push({ from, to })
+            })
+        })
+    })
+
+    return lines
+}
+
+const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
 
 onMounted(() => {
-    blocks.value = Object.values(getBlockPositions())
+    watch(() => props.project, () => {
+        const blockPositions = getBlockPositions()
+        const portPositions = getPortPositions(blockPositions)
+        lines.value = getLines(portPositions)
+    }, { immediate: true })
 })
 </script>

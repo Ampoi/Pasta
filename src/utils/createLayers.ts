@@ -10,11 +10,11 @@ export function createLayers(project: Project) {
         trigger: string[]
         [id: string]: string[]
     } = {
-        trigger: Object.values(project.trigger.ports).map((port) => Object.keys(port)).flat()
+        trigger: Object.values(project.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
     }
 
     Object.entries(project.blocks).forEach(([id, value]) => {
-        dependencies[id] = Object.values(value.ports).map((port) => Object.keys(port)).flat()
+        dependencies[id] = Object.values(value.connectedPorts).map((port) => Object.keys(port)).flat()
     })
 
     return createLayersFromDependencies(dependencies, true)

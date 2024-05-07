@@ -63,6 +63,9 @@ const project = reactive<Project>({
   trigger: {
     title: "trigger",
     ports: {
+      returnValues: ["a", "b"]
+    },
+    connectedPorts: {
       a: {
         A: "arg1"
       },
@@ -75,6 +78,10 @@ const project = reactive<Project>({
     A: {
       title: "Aaaa",
       ports: {
+        args: ["arg1", "arg2"],
+        returnValues: ["a", "b"]
+      },
+      connectedPorts: {
         a: {
           B: "arg1"
         }
@@ -82,7 +89,11 @@ const project = reactive<Project>({
     },
     B: {
       title: "Bbbb",
-      ports: {}
+      ports: {
+        args: ["arg1", "arg2"],
+        returnValues: ["a", "b"]
+      },
+      connectedPorts: {}
     }
   }
 })
