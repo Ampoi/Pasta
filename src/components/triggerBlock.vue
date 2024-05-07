@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row">
+  <div class="flex flex-row" ref="block">
     <div class="flex flex-col gap-2 grow bg-white p-3 rounded-xl w-[400px] border-gray-200 border-[1px] shadow-xl shadow-gray-300/40">
       <div class="flex flex-row items-center gap-2">
         <i class="bi bi-code-square text-lg"/>
@@ -30,8 +30,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
+import { updateBlockRect } from "../utils/blockRects";
 
 const props = defineProps<{
     blockID: string
@@ -43,14 +45,14 @@ type Port = {
   name: string
 }
 
-const args: Port[] =  [
-    { type: "string", name: "arg1" },
-    { type: "number", name: "arg2" },
-    { type: "number", name: "arg2" }
-]
-
 const returnValues: Port[] =  [
   { type: "string", name: "a" },
   { type: "number", name: "b" }
 ]
+
+const block = ref<HTMLElement>()
+
+onMounted(() => {
+  updateBlockRect(props.blockID, block.value)
+})
 </script>

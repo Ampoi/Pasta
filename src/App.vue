@@ -10,17 +10,8 @@
     <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md relative">
       <DraggableArea
         v-if="projectPath"
-        v-slot="{ position, size }"
         class="w-full h-full p-4">
-        <Lines
-          :blocks="project.blocks"/>
-        <div
-          class="absolute"
-          :style="{
-            top: `${-position.y}px`,
-            left: `${-position.x}px`,
-            transform: `scale(${size})`
-          }">
+        <div class="relative">
           <div class="flex flex-row gap-60 items-center">
             <div
               v-for="row in renderedBlockIDs"
@@ -36,10 +27,14 @@
                   :blockID
                   :blockSettings="project.blocks[blockID]"/>
                 <div
-                  v-else/>
+                  v-else
+                  class="h-40"/>
               </div>
             </div>
           </div>
+          <Lines
+            class="-z-10"
+            :project/>
         </div>
       </DraggableArea>
       <div
@@ -57,17 +52,14 @@
 import BlockComponent from './components/block.vue';
 import { computed, reactive, ref } from 'vue';
 import { createLayers } from "./utils/createLayers"
-import { Block } from "./model/block"
 import Lines from "./components/lines.vue"
 import DraggableArea from "./components/draggableArea.vue"
 import TriggerBlockComponent from "./components/triggerBlock.vue"
+import { Project } from "./model/project"
 
 const projectPath = ref<string>("aaaa")
 
-const project: {
-  trigger: Block
-  blocks: Record<string, Block>
-} = reactive({
+const project = reactive<Project>({
   trigger: {
     title: "trigger",
     ports: {
@@ -82,7 +74,11 @@ const project: {
   blocks: {
     A: {
       title: "Aaaa",
-      ports: {}
+      ports: {
+        a: {
+          B: "arg1"
+        }
+      }
     },
     B: {
       title: "Bbbb",
@@ -92,17 +88,6 @@ const project: {
 })
 
 const renderedBlockIDs = computed(() => {
-  const dependencies: {
-    trigger: string[]
-    [id: string]: string[]
-  } = {
-    trigger: Object.values(project.trigger.ports).map((port) => Object.keys(port)).flat()
-  }
-
-  Object.entries(project.blocks).forEach(([id, value]) => {
-    dependencies[id] = Object.values(value.ports).map((port) => Object.keys(port)).flat()
-  })
-
-  return createLayers(dependencies)
+  return createLayers(project)
 })
 </script>

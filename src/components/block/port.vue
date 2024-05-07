@@ -10,40 +10,10 @@
     </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { portPositions, portPositionUpdaters } from "../../utils/portPositions"
-
-const props = defineProps<{
+defineProps<{
     blockID: string
     type?: string
     name: string
     reverse?: boolean
 }>()
-
-const port = ref<HTMLElement>()
-
-const updatePosition = () => {
-    if(!port.value) throw new Error("ポートの要素がないです！")
-    const { top, left, width, height } = port.value.getBoundingClientRect()
-    const x = left + ( props.reverse ? 0 : width )
-    const y = top + height / 2
-
-    if( portPositions[props.blockID] ){
-        if( portPositions[props.blockID][props.name] ){
-            portPositions[props.blockID][props.name].y = y
-            portPositions[props.blockID][props.name].x = x
-        }else{
-            portPositions[props.blockID][props.name] = { x, y }
-        }
-    }else{
-        portPositions[props.blockID] = {
-            [props.name]: { x, y }
-        }
-    }
-}
-
-onMounted(() => {
-    portPositionUpdaters.push(updatePosition)
-    updatePosition()
-})
 </script>

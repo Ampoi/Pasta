@@ -7,14 +7,19 @@
         @mousemove="move"
         @wheel="resize"
         ref="zone">
-        <slot
-            :position="position"
-            :size="size"/>
+        <div
+          class="absolute"
+          :style="{
+            top: `${-position.y}px`,
+            left: `${-position.x}px`,
+            transform: `scale(${size})`
+          }">
+            <slot/>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
-import { portPositionUpdaters } from '../utils/portPositions';
 
 let isMoving = false
 const position = reactive({
@@ -31,8 +36,6 @@ const move = (event: MouseEvent) => {
     }
     mousePosition.x = event.x
     mousePosition.y = event.y
-
-    portPositionUpdaters.forEach(updater => updater())
 }
 
 const mousePosition = {
