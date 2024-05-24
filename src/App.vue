@@ -5,17 +5,29 @@
   </Suspense>
   <Launch
     v-else
-    @opened-project="updateProjectPath"/>
+    @open-project="openProject"/>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
 
 import Editor from "./pages/editor.vue"
 import Launch from "./pages/launch.vue"
+import { dialog } from '@tauri-apps/api';
+import { appWindow } from '@tauri-apps/api/window';
 
 const projectPath = ref<string | undefined>()
-function updateProjectPath(path: string){
-  projectPath.value = path
-  console.log(projectPath.value)
+
+const openProject = async () => {
+  const selectedFolder = await dialog.open({
+      directory: true,
+      multiple: false,
+      title: "プロジェクトを開く"
+  })
+
+  if( selectedFolder && typeof selectedFolder == "string" ){
+    projectPath.value = selectedFolder
+  }
 }
+
+appWindow.listen("open", openProject)
 </script>

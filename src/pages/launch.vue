@@ -14,7 +14,7 @@
           </button>
           <button
             class="py-2 px-3 border-[1px] border-zinc-700 rounded-2xl flex flex-row items-center gap-2"
-            @click="openProject">
+            @click="emit('openProject')">
             <i class="bi bi-folder2"/>
             <p>プロジェクトを開く</p>
           </button>
@@ -23,26 +23,13 @@
     </main>
 </template>
 <script setup lang="ts">
-import { dialog } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 
 const emit = defineEmits<{
-    (e: "openedProject", projectPath: string): void
+    (e: "openProject"): void
 }>()
 
 const maximizeWindow = () => {
     appWindow.maximize()
-}
-
-const openProject = async () => {
-    const selectedFolder = await dialog.open({
-        directory: true,
-        multiple: false,
-        title: "プロジェクトを開く"
-    })
-
-    if( selectedFolder && typeof selectedFolder == "string" ){
-        emit("openedProject", selectedFolder)
-    }
 }
 </script>
