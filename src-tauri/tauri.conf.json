@@ -17,7 +17,10 @@
         "open": true
       },
       "fs": {
-        "all": true
+        "all": true,
+        "scope": [
+          "$HOME/**/*"
+        ]
       },
       "dialog": {
         "open": true

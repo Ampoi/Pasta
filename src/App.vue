@@ -15,7 +15,7 @@ import Launch from "./pages/launch.vue"
 import { dialog } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 
-const projectPath = ref<string | undefined>()
+const projectPath = ref<string | null>(localStorage.getItem("latestProjectPath"))
 
 const openProject = async () => {
   const selectedFolder = await dialog.open({
@@ -26,6 +26,7 @@ const openProject = async () => {
 
   if( selectedFolder && typeof selectedFolder == "string" ){
     projectPath.value = selectedFolder
+    localStorage.setItem("latestProjectPath", selectedFolder)
   }
 }
 
