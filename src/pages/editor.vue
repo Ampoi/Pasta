@@ -47,6 +47,7 @@
         </div>
       </DraggableArea>
       <CodeEditorModal
+        v-if="!!openedCodeBlockID"
         v-model:blockID="openedCodeBlockID"/>
     </main>
   </div>
