@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-row" ref="block">
     <!--引数-->
-    <div class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3">
+    <div
+      class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
+      v-if="!isTrigger">
       <div class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex flex-row items-center gap-2">
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
@@ -14,7 +16,7 @@
       />
     </div>
     
-    <div class="flex flex-col gap-2 grow bg-zinc-900 p-3 rounded-xl w-[400px] border-zinc-700 border-[1px]">
+    <div class="flex flex-col gap-2 grow bg-zinc-900 p-3 rounded-xl w-80 border-zinc-700 border-[1px]">
       <div class="flex flex-row items-center gap-2">
         <i class="bi bi-code-square text-lg text-white"/>
         <input
@@ -50,6 +52,7 @@ import Port from "./block/port.vue"
 import { updateBlockRect } from "../utils/blockRects"
 
 const props = defineProps<{
+    isTrigger: boolean
     blockID: string
     blockSettings: Block
 }>()

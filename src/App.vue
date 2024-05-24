@@ -2,13 +2,14 @@
   <div class="w-screen h-screen flex flex-col bg-zinc-900">
     <header
       data-tauri-drag-region
-      class="flex flex-row items-center p-1.5">
+      class="flex flex-row items-center p-1.5"
+      @dblclick="maximizeWindow">
       <div class="basis-32"></div>
       <input
         type="text"
         class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-zinc-700 bg-zinc-950 basis-60 font-bold text-white">
     </header>
-    <main class="m-1 mt-0 grow border-[1px] bg-zinc-950 border-zinc-700 rounded-md relative">
+    <main class="grow border-t-[1px] bg-zinc-950 border-zinc-700 relative">
       <DraggableArea
         v-if="projectPath"
         class="w-full h-full p-4">
@@ -19,17 +20,17 @@
               class="flex flex-col gap-10">
               <div
                 v-for="blockID in row">
-                <TriggerBlockComponent
-                  v-if="blockID == 'trigger'"
-                  :blockID
-                  :blockSettings="project.trigger"/>
-                <BlockComponent
-                  v-else-if="blockID"
-                  :blockID
-                  :blockSettings="project.blocks[blockID]"/>
                 <div
-                  v-else
+                  v-if="!blockID"
                   class="h-40"/>
+                <BlockComponent
+                  v-else
+                  :isTrigger="blockID == 'trigger'"
+                  :blockID
+                  :blockSettings="
+                    blockID == 'trigger'
+                      ? project.trigger
+                      : project.blocks[blockID]"/>
               </div>
             </div>
           </div>
@@ -55,10 +56,15 @@ import { computed, reactive, ref } from 'vue';
 import { createLayers } from "./utils/createLayers"
 import Lines from "./components/lines.vue"
 import DraggableArea from "./components/draggableArea.vue"
-import TriggerBlockComponent from "./components/triggerBlock.vue"
 import { Project } from "./model/project"
+import { appWindow } from '@tauri-apps/api/window';
 
 const projectPath = ref<string>("aaaa")
+
+const maximizeWindow = (event: MouseEvent) => {
+  event.preventDefault()
+  appWindow.maximize()
+}
 
 const project = reactive<Project>({
   trigger: {
