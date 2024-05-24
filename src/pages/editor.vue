@@ -41,12 +41,13 @@
 </template>
 <script setup lang="ts">
 import BlockComponent from "../components/block.vue";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { createLayers } from "../utils/createLayers";
 import Lines from "../components/lines.vue";
 import DraggableArea from "../components/draggableArea.vue";
-import { Project } from "../model/project";
 import { appWindow } from "@tauri-apps/api/window";
+import { Project } from "../model/project";
+import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
@@ -54,10 +55,31 @@ const maximizeWindow = (event: MouseEvent) => {
 };
 
 const props = defineProps<{
-  project: Project;
-}>();
+    projectPath: string
+}>()
+
+watch(() => props.projectPath, () => {
+  window.location.reload()
+})
+
+const projectFilePath = `${props.projectPath}/pasta.json`
+
+const _project = ref<Project>(await (async () => {
+  const newProject = await readTextFile(projectFilePath)
+  return (JSON.parse(newProject) as Project) ?? Project.default
+})())
+
+const project = computed<Project>({
+    get(){
+      return _project.value
+    },
+    set(newValue){
+      _project.value = newValue
+      writeTextFile(projectFilePath, JSON.stringify(newValue))
+    }
+})
 
 const renderedBlockIDs = computed(() => {
-  return createLayers(props.project);
+  return createLayers(project.value);
 });
 </script>
