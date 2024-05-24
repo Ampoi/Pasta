@@ -15,48 +15,38 @@
         <i class="bi bi-play text-zinc-400 text-2xl" />
       </button>
     </header>
-    <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
-      <DraggableArea v-if="projectPath" class="w-full h-full p-4">
+    <DraggableArea class="grow border-t-[1px] bg-black border-zinc-700 relative p-4">
         <div class="relative">
-          <div class="flex flex-row gap-60 items-center">
+            <div class="flex flex-row gap-60 items-center">
             <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
-              <div v-for="blockID in row">
+                <div v-for="blockID in row">
                 <div v-if="!blockID" class="h-40" />
                 <BlockComponent
-                  v-else
-                  :isTrigger="blockID == 'trigger'"
-                  :blockID
-                  :blockSettings="
+                    v-else
+                    :isTrigger="blockID == 'trigger'"
+                    :blockID
+                    :blockSettings="
                     blockID == 'trigger'
-                      ? project.trigger
-                      : project.blocks[blockID]
-                  "
+                        ? project.trigger
+                        : project.blocks[blockID]
+                    "
                 />
-              </div>
+                </div>
             </div>
-          </div>
-          <Lines class="-z-10" :project />
+            </div>
+            <Lines class="-z-10" :project />
         </div>
-      </DraggableArea>
-      <div class="w-full h-full grid place-content-center" v-else>
-        <div class="flex flex-row gap-8 items-center">
-          <button>Open</button>
-          <button>Create</button>
-        </div>
-      </div>
-    </main>
+    </DraggableArea>
   </div>
 </template>
 <script setup lang="ts">
 import BlockComponent from "../components/block.vue";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { createLayers } from "../utils/createLayers";
 import Lines from "../components/lines.vue";
 import DraggableArea from "../components/draggableArea.vue";
 import { Project } from "../model/project";
 import { appWindow } from "@tauri-apps/api/window";
-
-const projectPath = ref<string>("aaaa");
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
