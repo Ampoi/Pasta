@@ -25,10 +25,11 @@
           :value="blockSettings.title"
         />
       </div>
-      <div class="grow p-4 border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2">
+      <button
+        class="grow p-4 border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2 select-none">
         <i class="bi bi-code-square text-lg"/>
         <p>コードを編集する</p>
-      </div>
+      </button>
     </div>
 
     <!--返り値-->
