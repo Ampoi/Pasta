@@ -2,14 +2,22 @@
   <div class="w-screen h-screen flex flex-col bg-zinc-900">
     <header
       data-tauri-drag-region
-      class="flex flex-row items-center py-1.5 pl-20 pr-8"
-      @dblclick="maximizeWindow"
-    >
-      <input
-        type="text"
-        :value="project.title"
-        class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-zinc-700 bg-black basis-60 font-bold text-white"
-      />
+      class="flex flex-row items-center py-1.5 pl-20 pr-8 gap-4"
+      @dblclick="maximizeWindow">
+      <button>
+        <i class="bi bi-house-door text-zinc-600 text-xl"/>
+      </button>
+      <div class="relative">
+        <input
+          type="text"
+          :value="project.title"
+          class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 bg-black basis-60 font-bold text-white"/>
+        <button
+          class="absolute right-2 top-1/2 -translate-y-1/2"
+          @click="openProjectFolder">
+          <i class="bi bi-folder2 text-zinc-600 text-xl"/>
+        </button>
+      </div>
       <div class="grow" />
       <button>
         <i class="bi bi-play text-zinc-400 text-2xl" />
@@ -48,6 +56,7 @@ import DraggableArea from "../components/draggableArea.vue";
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
+import { invoke } from "@tauri-apps/api/tauri";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
@@ -82,4 +91,8 @@ const project = computed<Project>({
 const renderedBlockIDs = computed(() => {
   return createLayers(project.value);
 });
+
+const openProjectFolder = () => {
+  invoke("open_in_finder", { path: props.projectPath })
+}
 </script>

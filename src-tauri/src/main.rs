@@ -5,8 +5,11 @@ use tauri::{Menu, Submenu, CustomMenuItem};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn open_in_finder(path: String) {
+    // macOSのFinderを開く
+    let _ = std::process::Command::new("open")
+        .arg(path)
+        .spawn();
 }
 
 fn main() {
@@ -25,7 +28,7 @@ fn main() {
             },
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![open_in_finder])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
