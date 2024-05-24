@@ -7,7 +7,7 @@
             :d="`
             M ${line.from.x} ${line.from.y} C ${line.from.x + 100} ${line.from.y},
             ${line.to.x - 100} ${line.to.y}, ${line.to.x} ${line.to.y}`"
-            stroke="#D8DCE2" fill="none" stroke-width="2"/>
+            stroke="#27272a" fill="none" stroke-width="2"/>
     </svg>
 </template>
 <script setup lang="ts">

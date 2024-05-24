@@ -1,13 +1,14 @@
 <template>
-  <div class="w-screen h-screen flex flex-col">
+  <div class="w-screen h-screen flex flex-col bg-zinc-900">
     <header
       data-tauri-drag-region
-      class="flex flex-row items-end justify-center basis-12 p-2">
+      class="flex flex-row items-center p-1.5">
+      <div class="basis-32"></div>
       <input
         type="text"
-        class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-gray-200 basis-80 text-center">
+        class="bg-transparent py-1 px-2 rounded-md outline-none border-[1px] border-zinc-700 bg-zinc-950 basis-60 font-bold text-white">
     </header>
-    <main class="m-2 mt-0 grow border-[1px] bg-gray-100 border-gray-200 rounded-md relative">
+    <main class="m-1 mt-0 grow border-[1px] bg-zinc-950 border-zinc-700 rounded-md relative">
       <DraggableArea
         v-if="projectPath"
         class="w-full h-full p-4">
