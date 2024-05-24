@@ -5,7 +5,7 @@ type DependencyMap = {
     [key: string]: string[]
 }
 
-export function createLayers(project: Project) {
+export function createLayers(project: Project["flows"][number]) {
     const dependencies: {
         trigger: string[]
         [id: string]: string[]

@@ -3,7 +3,7 @@
     <div
       class="w-full h-full"
       @click="blockID = undefined"/>
-    <div class="absolute top-4 right-4 bg-zinc-900 h-[calc(100%-2rem)] border-zinc-700 border-[1px] rounded-xl w-[calc(100%-500px)] flex flex-col gap-4 text-white p-4">
+    <div class="absolute top-4 right-4 bg-zinc-900 h-[calc(100%-2rem)] border-zinc-700 border-[1px] rounded-xl w-1/2 flex flex-col gap-4 text-white p-4">
       <div class="flex flex-row items-start">
         <h1 class="text-3xl font-semibold grow overflow-hidden text-ellipsis">{{ blockID }}</h1>
         <button @click="blockID = undefined">

@@ -18,7 +18,7 @@ import { createLayers } from '../utils/createLayers';
 import { Block } from '../model/block';
 
 const props = defineProps<{
-    project: Project
+    flow: Project["flows"][number]
 }>()
 
 const xGap = 240
@@ -26,7 +26,7 @@ const yGap = 40
 const spaceHeight = 160
 
 const getBlockPositions = () => {
-    const layers = createLayers(props.project)
+    const layers = createLayers(props.flow)
     const blockPositions: Record<string, { x: number, y: number }> = {}
     const layerHeights: number[] = []
 
@@ -97,7 +97,7 @@ const getPortPositions = (blockPositions: Record<string, {
     }
 
     Object.entries(blockPositions).forEach(([blockID, blockPosition]) => {
-        const block: Block = blockID == "trigger" ? props.project.trigger : props.project.blocks[blockID]
+        const block: Block = blockID == "trigger" ? props.flow.trigger : props.flow.blocks[blockID]
 
         if( block.ports.args ) block.ports.args.forEach((portID, i) => getPortPosition("args", blockID, block, portID, i, blockPosition))
 
@@ -117,7 +117,7 @@ const getLines = (portPositions: {
 }) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
     
-    ([["trigger", props.project.trigger], ...Object.entries(props.project.blocks)] as [string, Block][]).forEach(([blockID, block]) => {
+    ([["trigger", props.flow.trigger], ...Object.entries(props.flow.blocks)] as [string, Block][]).forEach(([blockID, block]) => {
         Object.entries(block.connectedPorts).forEach(([portID, connectedTo]) => {
             const from = portPositions[blockID][portID]
             Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
@@ -133,7 +133,7 @@ const getLines = (portPositions: {
 const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
 
 onMounted(() => {
-    watch(() => props.project, () => {
+    watch(() => props.flow, () => {
         const blockPositions = getBlockPositions()
         const portPositions = getPortPositions(blockPositions)
         lines.value = getLines(portPositions)

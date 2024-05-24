@@ -26,24 +26,11 @@
     </header>
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
       <DraggableArea class="w-full h-full p-4">
-        <div class="relative">
-          <div class="flex flex-row gap-60 items-center">
-            <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
-                <div v-for="blockID in row">
-                <div v-if="!blockID" class="h-40" />
-                <BlockComponent
-                    v-else
-                    :isTrigger="blockID == 'trigger'"
-                    :blockID
-                    :blockSettings="
-                      blockID == 'trigger'
-                          ? project.trigger
-                          : project.blocks[blockID]"
-                    @open-code-modal="openedCodeBlockID = blockID"/>
-              </div>
-            </div>
-          </div>
-          <Lines class="-z-10" :project />
+        <div class="flex flex-col gap-4">
+          <Flow
+            v-for="flow in project.flows"
+            :flow
+            @open-code-modal="(blockID) => openedCodeBlockID = blockID"/>
         </div>
       </DraggableArea>
       <CodeEditorModal
@@ -54,10 +41,8 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { createLayers } from "../utils/createLayers";
 
-import BlockComponent from "../components/block.vue";
-import Lines from "../components/lines.vue";
+import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
 import CodeEditorModal from "../components/codeEditorModal.vue";
 
@@ -95,10 +80,6 @@ const project = computed<Project>({
       writeTextFile(projectFilePath, JSON.stringify(newValue))
     }
 })
-
-const renderedBlockIDs = computed(() => {
-  return createLayers(project.value);
-});
 
 const openLaunchView = () => {
   localStorage.removeItem("latestProjectPath") //TODO:最近開いたプロジェクトパスの保存・取得・破棄アルゴリズムをまとめる
