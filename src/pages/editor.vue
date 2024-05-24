@@ -4,8 +4,9 @@
       data-tauri-drag-region
       class="flex flex-row items-center py-1.5 pl-20 pr-8 gap-4"
       @dblclick="maximizeWindow">
-      <button>
-        <i class="bi bi-house-door text-zinc-600 text-xl"/>
+      <button
+        @click="openLaunchView">
+        <i class="bi bi-house-door text-zinc-500 text-xl"/>
       </button>
       <div class="relative">
         <input
@@ -15,12 +16,12 @@
         <button
           class="absolute right-2 top-1/2 -translate-y-1/2"
           @click="openProjectFolder">
-          <i class="bi bi-folder2 text-zinc-600 text-xl"/>
+          <i class="bi bi-folder2 text-zinc-500 text-xl"/>
         </button>
       </div>
       <div class="grow" />
       <button>
-        <i class="bi bi-play text-zinc-400 text-2xl" />
+        <i class="bi bi-play text-zinc-500 text-2xl" />
       </button>
     </header>
     <DraggableArea class="grow border-t-[1px] bg-black border-zinc-700 relative p-4">
@@ -91,6 +92,11 @@ const project = computed<Project>({
 const renderedBlockIDs = computed(() => {
   return createLayers(project.value);
 });
+
+const openLaunchView = () => {
+  localStorage.removeItem("latestProjectPath") //TODO:最近開いたプロジェクトパスの保存・取得・破棄アルゴリズムをまとめる
+  window.location.reload()
+}
 
 const openProjectFolder = () => {
   invoke("open_in_finder", { path: props.projectPath })
