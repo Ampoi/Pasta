@@ -26,7 +26,8 @@
         />
       </div>
       <button
-        class="grow p-4 border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2 select-none">
+        class="grow p-4 border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2 select-none"
+        @click="emit('openCodeModal')">
         <i class="bi bi-code-square text-lg"/>
         <p>コードを編集する</p>
       </button>
@@ -56,6 +57,10 @@ const props = defineProps<{
     isTrigger: boolean
     blockID: string
     blockSettings: Block
+}>()
+
+const emit = defineEmits<{
+  (e: "openCodeModal"): void
 }>()
 
 type Port = {

@@ -27,7 +27,7 @@
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
       <DraggableArea class="w-full h-full p-4">
         <div class="relative">
-            <div class="flex flex-row gap-60 items-center">
+          <div class="flex flex-row gap-60 items-center">
             <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
                 <div v-for="blockID in row">
                 <div v-if="!blockID" class="h-40" />
@@ -36,19 +36,18 @@
                     :isTrigger="blockID == 'trigger'"
                     :blockID
                     :blockSettings="
-                    blockID == 'trigger'
-                        ? project.trigger
-                        : project.blocks[blockID]
-                    "
-                />
-                </div>
+                      blockID == 'trigger'
+                          ? project.trigger
+                          : project.blocks[blockID]"
+                    @open-code-modal="openedCodeBlockID = blockID"/>
+              </div>
             </div>
-            </div>
-            <Lines class="-z-10" :project />
+          </div>
+          <Lines class="-z-10" :project />
         </div>
       </DraggableArea>
       <CodeEditorModal
-        v-model:open="openModal"/>
+        v-model:open="isModalOpened"/>
     </main>
   </div>
 </template>
@@ -109,5 +108,12 @@ const openProjectFolder = () => {
   invoke("open_in_finder", { path: props.projectPath })
 }
 
-const openModal = ref(true)
+const openedCodeBlockID = ref<string | undefined>(undefined)
+const isModalOpened = computed<boolean>({
+  get(){ return !!openedCodeBlockID.value },
+  set(newValue){
+    if( newValue == true ) throw new Error("openがtrueに変更されることはありません")
+    openedCodeBlockID.value = undefined
+  }
+})
 </script>
