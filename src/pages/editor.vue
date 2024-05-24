@@ -24,7 +24,8 @@
         <i class="bi bi-play text-zinc-500 text-2xl" />
       </button>
     </header>
-    <DraggableArea class="grow border-t-[1px] bg-black border-zinc-700 relative p-4">
+    <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
+      <DraggableArea class="w-full h-full p-4">
         <div class="relative">
             <div class="flex flex-row gap-60 items-center">
             <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
@@ -45,15 +46,21 @@
             </div>
             <Lines class="-z-10" :project />
         </div>
-    </DraggableArea>
+      </DraggableArea>
+      <CodeEditorModal
+        v-model:open="openModal"/>
+    </main>
   </div>
 </template>
 <script setup lang="ts">
-import BlockComponent from "../components/block.vue";
 import { computed, ref, watch } from "vue";
 import { createLayers } from "../utils/createLayers";
+
+import BlockComponent from "../components/block.vue";
 import Lines from "../components/lines.vue";
 import DraggableArea from "../components/draggableArea.vue";
+import CodeEditorModal from "../components/codeEditorModal.vue";
+
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
@@ -101,4 +108,6 @@ const openLaunchView = () => {
 const openProjectFolder = () => {
   invoke("open_in_finder", { path: props.projectPath })
 }
+
+const openModal = ref(true)
 </script>
