@@ -47,7 +47,7 @@
         </div>
       </DraggableArea>
       <CodeEditorModal
-        v-model:open="isModalOpened"/>
+        v-model:blockID="openedCodeBlockID"/>
     </main>
   </div>
 </template>
@@ -109,11 +109,4 @@ const openProjectFolder = () => {
 }
 
 const openedCodeBlockID = ref<string | undefined>(undefined)
-const isModalOpened = computed<boolean>({
-  get(){ return !!openedCodeBlockID.value },
-  set(newValue){
-    if( newValue == true ) throw new Error("openがtrueに変更されることはありません")
-    openedCodeBlockID.value = undefined
-  }
-})
 </script>
