@@ -8,10 +8,10 @@
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
       <Port
-        v-for="arg in blockSettings.ports.args"
+        v-for="arg in blockData.args"
         :blockID
-        :type="arg/*.type*/"
-        :name="arg/*.name*/"
+        :type="arg.type"
+        :name="arg.name"
         :reverse="true"
       />
     </div>
@@ -39,24 +39,27 @@
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
       <Port
-        v-for="returnValue in blockSettings.ports.returnValues"
+        v-for="returnValue in blockData.returnValues"
         :blockID
-        :type="returnValue/*.type*/"
-        :name="returnValue/*.name*/"
+        :type="returnValue.type"
+        :name="returnValue.name"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watchEffect } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue"
 import { updateBlockRect } from "../utils/blockRects"
+import { getBlockData } from "../utils/getBlockData";
+import { ports } from "../utils/ports";
 
 const props = defineProps<{
     isTrigger: boolean
     blockID: string
     blockSettings: Block
+    flowIndex: number
 }>()
 
 const emit = defineEmits<{
@@ -69,6 +72,28 @@ type Port = {
 }
 
 const block = ref<HTMLElement>()
+
+const code = ref(`export default (
+    arg1: string,
+    arg2: number,
+    arg3: object
+) => {
+    console.log("hey!")
+    const a = 10
+    const b = "ewioafjoiaw"
+    return { a, b }
+}`)
+
+const blockData = computed(() => getBlockData(code.value))
+
+watchEffect(() => {
+  if( !ports[props.flowIndex] ) ports[props.flowIndex] = {}
+
+  ports[props.flowIndex][props.blockID] = {
+    args: blockData.value.args.map(arg => arg.name),
+    returnValues: blockData.value.returnValues.map(returnValue => returnValue.name)
+  }
+})
 
 onMounted(() => {
   updateBlockRect(props.blockID, block.value)

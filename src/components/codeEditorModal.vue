@@ -19,8 +19,10 @@
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { constrainedEditor } from "constrained-editor-plugin"
+//@ts-ignore
+import { constrainedEditor } from "constrained-editor-plugin" //TODO:Typescriptの型定義を作成する
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { getBlockData }  from "../utils/getBlockData"
 
 const blockID = defineModel<string | undefined>("blockID", { required: true })
 
@@ -64,52 +66,7 @@ function createModel(){
 
 const model = createModel()
 
-const blockData = computed(() => {
-  let isArgs = false
-  const args: { name: string, type: string }[] = []
-
-  const codeLines = code.value.split("\n")
-
-  const bodyLinesRange: {
-      start?: number
-      end: number
-  } = {
-      end: codeLines.length - 1
-  }
-
-  codeLines.forEach((line, row) => {
-      if( row == 0 ){
-          isArgs = true
-      }else if( line == ") => {" ){
-          isArgs = false
-          bodyLinesRange.start = row + 2
-      }else if( isArgs ){
-          const pairText = line[line.length-1] == "," ? line.slice(0, line.length-1) : line
-          const [ name, type ] = pairText.trim().split(": ")
-          args.push({name, type})
-      }
-  })
-
-  if( !bodyLinesRange.start ) throw new Error("bodyLinesの範囲の最初のインデックスを見つけられませんでした")
-
-  const returnLine = codeLines[codeLines.length-2].replace(/\s+/g,'')
-  const returnValueNames = returnLine.slice(7, returnLine.length-1).split(",")
-  const returnValues = returnValueNames.map((returnValueName) => {
-      return {
-          type: "?",
-          name: returnValueName
-      }
-  })
-
-  return {
-      args,
-      bodyLinesRange: [
-          bodyLinesRange.start, 1,
-          bodyLinesRange.end-1, codeLines[bodyLinesRange.end-2].length+1,
-      ],
-      returnValues
-  }
-})
+const blockData = computed(() => getBlockData(code.value))
 
 function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor){
     const constrainedInstance = constrainedEditor(Monaco)

@@ -28,8 +28,9 @@
       <DraggableArea class="w-full h-full p-4">
         <div class="flex flex-col gap-4">
           <Flow
-            v-for="flow in project.flows"
+            v-for="(flow, index) in project.flows"
             :flow
+            :index
             @open-code-modal="(blockID) => openedCodeBlockID = blockID"/>
         </div>
       </DraggableArea>

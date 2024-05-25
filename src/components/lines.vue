@@ -16,9 +16,11 @@ import { Project } from '../model/project';
 import { blockRects } from '../utils/blockRects';
 import { createLayers } from '../utils/createLayers';
 import { Block } from '../model/block';
+import { ports } from "../utils/ports"
 
 const props = defineProps<{
     flow: Project["flows"][number]
+    flowIndex: number
 }>()
 
 const xGap = 240
@@ -83,26 +85,35 @@ const getPortPositions = (blockPositions: Record<string, {
         }
     } = {}
 
-    const getPortPosition = (type: "args" | "returnValues", blockID: string, block: Block, portID: string, i: number, { x, y }: Record<"x"|"y",number>) => {
+    //TODO: ここらへんのリファクタリング
+    const getPortPosition = (
+        type: "args" | "returnValues",
+        blockID: string,
+        blockPorts: (typeof ports)[number][string]["args"|"returnValues"],
+        portID: string,
+        i: number,
+        { x, y }: Record<"x"|"y",number>
+    ) => {
         if( !portPositions[blockID] ) portPositions[blockID] = {}
-        
-        const ports = block.ports[type]
-        if( !ports ) return
 
-        const portAmount = ports.length + 1
+        const portAmount = blockPorts.length + 1
         portPositions[blockID][portID] = {
             x: x + (type == "returnValues" ? blockRects[blockID].width : 0),
             y: y + blockRects[blockID].height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
         }
     }
 
-    Object.entries(blockPositions).forEach(([blockID, blockPosition]) => {
-        const block: Block = blockID == "trigger" ? props.flow.trigger : props.flow.blocks[blockID]
-
-        if( block.ports.args ) block.ports.args.forEach((portID, i) => getPortPosition("args", blockID, block, portID, i, blockPosition))
-
-        block.ports.returnValues.forEach((portID, i) => getPortPosition("returnValues", blockID, block, portID, i, blockPosition))
-    })
+    const flowPorts = ports[props.flowIndex]
+    if( flowPorts ){
+        Object.entries(flowPorts).forEach(([blockID, blockPorts]) => {
+            if( !blockPositions[blockID] ) return
+    
+            if( blockPorts.args ){
+                blockPorts.args.forEach((portID, i) => getPortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID]))
+            }
+            blockPorts.returnValues.forEach((portID, i) => getPortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+        })
+    }
 
     return portPositions
 }
@@ -116,12 +127,23 @@ const getLines = (portPositions: {
     };
 }) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
+    const blockEntries = [["trigger", props.flow.trigger], ...Object.entries(props.flow.blocks)] as [string, Block][]
     
-    ([["trigger", props.flow.trigger], ...Object.entries(props.flow.blocks)] as [string, Block][]).forEach(([blockID, block]) => {
+    blockEntries.forEach(([blockID, block]) => {
         Object.entries(block.connectedPorts).forEach(([portID, connectedTo]) => {
-            const from = portPositions[blockID][portID]
+            const fromBlock = portPositions[blockID]
+            if( !fromBlock ) return
+            
+            const from = fromBlock[portID]
+            if( !from ) return
+
             Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
-                const to = portPositions[connectedBlockID][connectedPortID]
+                const toBlock = portPositions[connectedBlockID]
+                if( !toBlock ) return
+
+                const to = toBlock[connectedPortID]
+                if( !to ) return
+
                 lines.push({ from, to })
             })
         })
@@ -133,10 +155,12 @@ const getLines = (portPositions: {
 const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
 
 onMounted(() => {
-    watch(() => props.flow, () => {
+    const updateLines = () => {
         const blockPositions = getBlockPositions()
         const portPositions = getPortPositions(blockPositions)
         lines.value = getLines(portPositions)
-    }, { immediate: true })
+    }
+    watch(() => props.flow, updateLines, { immediate: true })
+    watch(ports, updateLines, { deep: true })
 })
 </script>

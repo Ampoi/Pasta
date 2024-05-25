@@ -11,12 +11,16 @@
             :blockSettings="
               blockID == 'trigger' ? flow.trigger : flow.blocks[blockID]
             "
+            :flowIndex="index"
             @open-code-modal="emit('open-code-modal', blockID)"
           />
         </div>
       </div>
     </div>
-    <Lines class="-z-10" :flow />
+    <Lines
+      class="-z-10"
+      :flow
+      :flowIndex="index"/>
   </div>
 </template>
 <script setup lang="ts">
@@ -28,6 +32,7 @@ import Block from './block.vue';
 
 const props = defineProps<{
     flow: Project["flows"][number]
+    index: number
 }>()
 
 const emit = defineEmits<{

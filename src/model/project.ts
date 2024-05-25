@@ -16,12 +16,6 @@ export const Project = {
                 {
                     "trigger": {
                         "title": "trigger",
-                        "ports": {
-                            "returnValues": [
-                                "a",
-                                "b"
-                            ]
-                        },
                         "connectedPorts": {
                             "a": {
                                 "A": "arg1"
@@ -34,16 +28,6 @@ export const Project = {
                     "blocks": {
                         "A": {
                             "title": "Aaaa",
-                            "ports": {
-                                "args": [
-                                    "arg1",
-                                    "arg2"
-                                ],
-                                "returnValues": [
-                                    "a",
-                                    "b"
-                                ]
-                            },
                             "connectedPorts": {
                                 "a": {
                                     "B": "arg1"
@@ -52,16 +36,6 @@ export const Project = {
                         },
                         "B": {
                             "title": "Bbbb",
-                            "ports": {
-                                "args": [
-                                    "arg1",
-                                    "arg2"
-                                ],
-                                "returnValues": [
-                                    "a",
-                                    "b"
-                                ]
-                            },
                             "connectedPorts": {}
                         }
                     }
