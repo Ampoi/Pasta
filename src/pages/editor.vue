@@ -32,12 +32,15 @@
             :flow
             :index
             :project-path="projectPath"
-            @open-code-modal="(blockID) => openedCodeBlockID = blockID"/>
+            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowIndex: index }"/>
         </div>
       </DraggableArea>
       <CodeEditorModal
-        v-if="!!openedCodeBlockID"
-        v-model:blockID="openedCodeBlockID"/>
+        v-if="openedCodeBlock"
+        :blockID="openedCodeBlock.id"
+        :flow-index="openedCodeBlock.flowIndex"
+        :project-path="projectPath"
+        @close="openedCodeBlock = undefined"/>
     </main>
   </div>
 </template>
@@ -88,5 +91,8 @@ const openProjectFolder = () => {
   invoke("open_in_finder", { path: props.projectPath })
 }
 
-const openedCodeBlockID = ref<string | undefined>(undefined)
+const openedCodeBlock = ref<{
+  id: string
+  flowIndex: number
+} | undefined>(undefined)
 </script>

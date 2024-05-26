@@ -2,11 +2,11 @@
   <div class="absolute top-0 left-0 w-full h-full">
     <div
       class="w-full h-full"
-      @click="blockID = undefined"/>
+      @click="emit('close')"/>
     <div class="absolute top-4 right-4 bg-zinc-900 h-[calc(100%-2rem)] border-zinc-700 border-[1px] rounded-xl w-1/2 flex flex-col gap-4 text-white p-4">
       <div class="flex flex-row items-start">
         <h1 class="text-3xl font-semibold grow overflow-hidden text-ellipsis">{{ blockID }}</h1>
-        <button @click="blockID = undefined">
+        <button @click="emit('close')">
           <i class="bi bi-x text-3xl text-zinc-500"/>
         </button>
       </div>
@@ -23,8 +23,17 @@ import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import { constrainedEditor } from "constrained-editor-plugin" //TODO:Typescriptの型定義を作成する
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { getBlockData }  from "../utils/getBlockData"
+import { createCodeRef } from "../utils/createCodeRef";
 
-const blockID = defineModel<string | undefined>("blockID", { required: true })
+const props = defineProps<{
+    blockID: string
+    flowIndex: number
+    projectPath: string
+}>()
+
+const emit = defineEmits<{
+    (e: "close"): void
+}>()
 
 window.MonacoEnvironment = {
     getWorker(id){
@@ -32,16 +41,7 @@ window.MonacoEnvironment = {
     }
 }
 
-const code = ref(`export default (
-    arg1: string,
-    arg2: number,
-    arg3: object
-) => {
-    console.log("hey!")
-    const a = 10
-    const b = "ewioafjoiaw"
-    return { a, b }
-}`)
+const { code } = createCodeRef(props.projectPath, props.flowIndex, props.blockID)
 
 function createModel(){
     const MonacoTypescript = Monaco.languages.typescript
@@ -57,7 +57,7 @@ function createModel(){
         "typescript",
         Monaco.Uri.from({
             scheme: "file",
-            path: `/${blockID}.ts`
+            path: `/${props.blockID}.ts`
         })
     )
 
