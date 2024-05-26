@@ -18,10 +18,12 @@
     
     <div class="flex flex-col gap-2 grow bg-zinc-900 p-3 rounded-xl w-80 border-zinc-700 border-[1px]">
       <div class="flex flex-row items-center gap-2">
-        <i class="bi bi-code-square text-lg text-white"/>
+        <div class="text-white bg-blue-500 size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content">
+          <Icon icon="fluent:code-text-16-filled" class="text-lg"/>
+        </div>
         <input
           type="text"
-          class="px-2 py-1 rounded-md bg-transparent outline-zinc-700 text-white"
+          class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
           :value="blockSettings.title"
         />
       </div>
@@ -54,6 +56,7 @@ import Port from "./block/port.vue"
 import { updateBlockRect } from "../utils/blockRects"
 import { getBlockData } from "../utils/getBlockData";
 import { ports } from "../utils/ports";
+import { Icon } from "@iconify/vue";
 
 const props = defineProps<{
     isTrigger: boolean
