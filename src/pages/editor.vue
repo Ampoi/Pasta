@@ -31,6 +31,7 @@
             v-for="(flow, index) in project.flows"
             :flow
             :index
+            :project-path="projectPath"
             @open-code-modal="(blockID) => openedCodeBlockID = blockID"/>
         </div>
       </DraggableArea>
@@ -71,7 +72,7 @@ const projectFilePath = `${props.projectPath}/pasta.json`
 
 const project = reactive<Project>(await (async () => {
   const newProject = await readTextFile(projectFilePath)
-  return (JSON.parse(newProject) as Project) ?? Project.default
+  return (JSON.parse(newProject) as Project) ?? Project.create()
 })())
 
 watch(project, (newValue) => {

@@ -4,16 +4,15 @@
       <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
         <div v-for="blockID in row">
           <div v-if="!blockID" class="h-40" />
-          <Block
-            v-else
-            :isTrigger="blockID == 'trigger'"
-            :blockID
-            :blockSettings="
-              blockID == 'trigger' ? flow.trigger : flow.blocks[blockID]
-            "
-            :flowIndex="index"
-            @open-code-modal="emit('open-code-modal', blockID)"
-          />
+          <Suspense v-else>
+            <Block
+              :blockID
+              :blockSettings="blockID == 'trigger' ? flow.trigger : flow.blocks[blockID]"
+              :flowIndex="index"
+              :project-path="projectPath"
+              @open-code-modal="emit('open-code-modal', blockID)"
+            />
+          </Suspense>
         </div>
       </div>
     </div>
@@ -31,8 +30,9 @@ import Lines from './lines.vue';
 import Block from './block.vue';
 
 const props = defineProps<{
-    flow: Project["flows"][number]
-    index: number
+  flow: Project["flows"][number]
+  index: number
+  projectPath: string
 }>()
 
 const emit = defineEmits<{

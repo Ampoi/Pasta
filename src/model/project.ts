@@ -1,46 +1,33 @@
 import type { Block } from "./block"
 
+type Flow = {
+    trigger: Block
+    blocks: Record<string, Block>
+}
+
+export const Flow = {
+    create(): Flow {
+        return {
+            trigger: {
+                title: "trigger",
+                connectedPorts: {},
+                type: "code"
+            },
+            blocks: {}
+        }
+    }
+}
+
 export type Project = {
     title: string
-    flows: {
-        trigger: Block
-        blocks: Record<string, Block>
-    }[]
+    flows: Flow[]
 }
 
 export const Project = {
-    get default(): Project {
+    create(): Project {
         return {
             title: "new project",
-            flows: [
-                {
-                    "trigger": {
-                        "title": "trigger",
-                        "connectedPorts": {
-                            "a": {
-                                "A": "arg1"
-                            },
-                            "b": {
-                                "B": "arg2"
-                            }
-                        }
-                    },
-                    "blocks": {
-                        "A": {
-                            "title": "Aaaa",
-                            "connectedPorts": {
-                                "a": {
-                                    "B": "arg1"
-                                }
-                            }
-                        },
-                        "B": {
-                            "title": "Bbbb",
-                            "connectedPorts": {}
-                        }
-                    }
-                }
-            ]
+            flows: []
         }
     }
 }

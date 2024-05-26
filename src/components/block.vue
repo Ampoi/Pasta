@@ -3,7 +3,7 @@
     <!--引数-->
     <div
       class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
-      v-if="!isTrigger">
+      v-if="blockID != 'trigger'">
       <div class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex flex-row items-center gap-2">
         <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
       </div>
@@ -27,12 +27,14 @@
           :value="blockSettings.title"
         />
       </div>
-      <button
-        class="grow p-4 border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-row items-center justify-center gap-2 select-none"
-        @click="emit('openCodeModal')">
-        <i class="bi bi-code-square text-lg"/>
-        <p>コードを編集する</p>
-      </button>
+      <div class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col">
+        <button
+          class="grow p-4 flex flex-row items-center justify-center gap-2 select-none"
+          @click="emit('openCodeModal')">
+          <Icon icon="fluent:code-text-edit-20-filled" class="text-lg"/>
+          <p>コードを編集する</p>
+        </button>
+      </div>
     </div>
 
     <!--返り値-->
@@ -59,10 +61,10 @@ import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
 
 const props = defineProps<{
-    isTrigger: boolean
     blockID: string
     blockSettings: Block
     flowIndex: number
+    projectPath: string
 }>()
 
 const emit = defineEmits<{
@@ -76,7 +78,7 @@ type Port = {
 
 const block = ref<HTMLElement>()
 
-const code = ref(`export default (
+const defaultCode = `export default (
     arg1: string,
     arg2: number,
     arg3: object
@@ -85,7 +87,9 @@ const code = ref(`export default (
     const a = 10
     const b = "ewioafjoiaw"
     return { a, b }
-}`)
+}`
+
+const code = ref(defaultCode)
 
 const blockData = computed(() => getBlockData(code.value))
 
