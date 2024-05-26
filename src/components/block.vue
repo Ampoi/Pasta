@@ -59,6 +59,7 @@ import { updateBlockRect } from "../utils/blockRects"
 import { getBlockData } from "../utils/getBlockData";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
+import { createCodeRef } from "../utils/createCodeRef";
 
 const props = defineProps<{
     blockID: string
@@ -77,20 +78,7 @@ type Port = {
 }
 
 const block = ref<HTMLElement>()
-
-const defaultCode = `export default (
-    arg1: string,
-    arg2: number,
-    arg3: object
-) => {
-    console.log("hey!")
-    const a = 10
-    const b = "ewioafjoiaw"
-    return { a, b }
-}`
-
-const code = ref(defaultCode)
-
+const { code } = createCodeRef(props.projectPath, props.flowIndex, props.blockID)
 const blockData = computed(() => getBlockData(code.value))
 
 watchEffect(() => {

@@ -24,16 +24,18 @@ export const getBlockData = (code: string) => {
         }
     })
 
-    if (!bodyLinesRange.start) throw new Error("bodyLinesの範囲の最初のインデックスを見つけられませんでした")
+    if (!bodyLinesRange.start) throw new Error(`${code}\nbodyLinesの範囲の最初のインデックスを見つけられませんでした`)
 
     const returnLine = codeLines[codeLines.length - 2].replace(/\s+/g, '')
     const returnValueNames = returnLine.slice(7, returnLine.length - 1).split(",")
-    const returnValues = returnValueNames.map((returnValueName) => {
-        return {
-            type: "?",
-            name: returnValueName
-        }
-    })
+    const returnValues = (returnValueNames.length == 1 && returnValueNames[0] == "")
+        ? []
+        :returnValueNames.map((returnValueName) => {
+            return {
+                type: "?",
+                name: returnValueName
+            }
+        })
 
     return {
         args,
