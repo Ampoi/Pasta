@@ -11,7 +11,7 @@
       <div class="relative">
         <input
           type="text"
-          :value="project.title"
+          v-model="project.title"
           class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 bg-black basis-60 font-bold text-white"/>
         <button
           class="absolute right-2 top-1/2 -translate-y-1/2"
@@ -41,7 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 
 import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
@@ -67,19 +67,13 @@ watch(() => props.projectPath, () => {
 
 const projectFilePath = `${props.projectPath}/pasta.json`
 
-const _project = ref<Project>(await (async () => {
+const project = reactive<Project>(await (async () => {
   const newProject = await readTextFile(projectFilePath)
   return (JSON.parse(newProject) as Project) ?? Project.default
 })())
 
-const project = computed<Project>({
-    get(){
-      return _project.value
-    },
-    set(newValue){
-      _project.value = newValue
-      writeTextFile(projectFilePath, JSON.stringify(newValue))
-    }
+watch(project, (newValue) => {
+  writeTextFile(projectFilePath, JSON.stringify(newValue))
 })
 
 const openLaunchView = () => {
