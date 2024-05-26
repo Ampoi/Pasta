@@ -6,7 +6,7 @@
       @dblclick="maximizeWindow">
       <button
         @click="openLaunchView">
-        <i class="bi bi-house-door text-zinc-500 text-xl"/>
+        <Icon icon="fluent:home-16-regular" class="text-zinc-500 text-xl"/>
       </button>
       <div class="relative">
         <input
@@ -26,7 +26,7 @@
     </header>
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
       <DraggableArea class="w-full h-full p-4">
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-20">
           <Flow
             v-for="(flow, index) in project.flows"
             :flow
