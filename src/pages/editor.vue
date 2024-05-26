@@ -16,12 +16,12 @@
         <button
           class="absolute right-2 top-1/2 -translate-y-1/2"
           @click="openProjectFolder">
-          <i class="bi bi-folder2 text-zinc-500 text-xl"/>
+          <Icon icon="fluent:folder-16-regular" class="text-zinc-500 text-xl"/>
         </button>
       </div>
       <div class="grow" />
       <button>
-        <i class="bi bi-play text-zinc-500 text-2xl" />
+        <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
       </button>
     </header>
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
@@ -51,6 +51,8 @@ import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import { invoke } from "@tauri-apps/api/tauri";
+
+import { Icon } from "@iconify/vue";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
