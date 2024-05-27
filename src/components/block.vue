@@ -4,9 +4,7 @@
     <div
       class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
       v-if="blockID != 'trigger'">
-      <div class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex flex-row items-center gap-2">
-        <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
-      </div>
+      <Port :defaultPort="true"/>
       <Port
         v-for="arg in blockData.args"
         :blockID
@@ -39,9 +37,7 @@
 
     <!--返り値-->
     <div class="flex flex-col items-start gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3">
-      <div class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex flex-row items-center gap-2">
-        <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
-      </div>
+      <Port :defaultPort="true"/>
       <Port
         v-for="returnValue in blockData.returnValues"
         :blockID

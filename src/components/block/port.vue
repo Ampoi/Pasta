@@ -1,5 +1,11 @@
 <template>
     <div
+        v-if="defaultPort"
+        class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex flex-row items-center gap-2">
+        <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
+    </div>
+    <div
+        v-else
         class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] flex items-center gap-2 select-none"
         :class="reverse ? 'flex-row-reverse' : 'flex-row'"
         ref="port">
@@ -11,9 +17,14 @@
 </template>
 <script setup lang="ts">
 defineProps<{
-    blockID: string
-    type?: string
+    reverse: boolean
+    type: string
     name: string
-    reverse?: boolean
+    defaultPort?: false
+} | {
+    reverse?: undefined
+    type?: undefined
+    name?: undefined
+    defaultPort: true
 }>()
 </script>
