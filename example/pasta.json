@@ -6,56 +6,35 @@
                 "title": "trigger",
                 "connectedPorts": {
                     "a": {
-                        "A": "arg1"
+                        "A": "a"
                     },
                     "b": {
-                        "B": "arg2"
+                        "B": "a"
                     }
                 },
                 "type": "code"
             },
             "blocks": {
                 "A": {
-                    "title": "Aaaa",
+                    "title": "AAAAAAA",
                     "connectedPorts": {
                         "a": {
-                            "B": "arg1"
+                            "C": "a"
                         }
                     },
                     "type": "code"
                 },
                 "B": {
                     "title": "Bbbb",
-                    "connectedPorts": {},
-                    "type": "code"
-                }
-            }
-        },
-        {
-            "trigger": {
-                "title": "trigger",
-                "connectedPorts": {
-                    "a": {
-                        "A": "arg1"
-                    },
-                    "b": {
-                        "B": "arg2"
-                    }
-                },
-                "type": "code"
-            },
-            "blocks": {
-                "A": {
-                    "title": "Aaaa",
                     "connectedPorts": {
                         "a": {
-                            "B": "arg1"
+                            "C": "b"
                         }
                     },
                     "type": "code"
                 },
-                "B": {
-                    "title": "Bbbb",
+                "C": {
+                    "title": "B+C",
                     "connectedPorts": {},
                     "type": "code"
                 }
