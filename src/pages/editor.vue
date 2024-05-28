@@ -28,9 +28,8 @@
       <DraggableArea class="w-full h-full p-4">
         <div class="flex flex-col gap-20">
           <Flow
-            v-for="(flow, index) in project.flows"
-            :flow
-            :index
+            v-for="flowID in flowIDs"
+            :flowID
             :project-path="projectPath"
             @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowIndex: index }"/>
         </div>
@@ -53,7 +52,7 @@ import CodeEditorModal from "../components/codeEditorModal.vue";
 
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
-import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
+import { readDir, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import { Icon } from "@iconify/vue";
@@ -81,6 +80,16 @@ const project = reactive<Project>(await (async () => {
 watch(project, (newValue) => {
   writeTextFile(projectFilePath, JSON.stringify(newValue))
 })
+
+const flowIDs = reactive<string[]>(await (async () => {
+  const fileEntries = await readDir(`${props.projectPath}/flows`)
+  const directoryNames = fileEntries
+    .filter(entry => entry.children)
+    .map(entry => entry.name)
+    .filter((name): name is string => !!name)
+  
+  return directoryNames
+})())
 
 const openLaunchView = () => {
   localStorage.removeItem("latestProjectPath") //TODO:最近開いたプロジェクトパスの保存・取得・破棄アルゴリズムをまとめる

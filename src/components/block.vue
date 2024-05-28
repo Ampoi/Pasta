@@ -67,7 +67,7 @@ import { Icon } from "@iconify/vue";
 const props = defineProps<{
   blockID: string;
   blockSettings: Block;
-  flowIndex: number;
+  flowID: string;
   projectPath: string;
 }>();
 

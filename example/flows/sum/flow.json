@@ -1,0 +1,37 @@
+{
+    "trigger": {
+        "title": "trigger",
+        "connectedPorts": {
+            "result": {
+                "A": "a",
+                "B": "a"
+            }
+        },
+        "type": "sum"
+    },
+    "blocks": {
+        "A": {
+            "title": "AAAAAAA",
+            "connectedPorts": {
+                "result": {
+                    "C": "a"
+                }
+            },
+            "type": "sum"
+        },
+        "B": {
+            "title": "Bbbb",
+            "connectedPorts": {
+                "result": {
+                    "C": "b"
+                }
+            },
+            "type": "sum"
+        },
+        "C": {
+            "title": "B+C",
+            "connectedPorts": {},
+            "type": "sum"
+        }
+    }
+}

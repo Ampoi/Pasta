@@ -12,15 +12,15 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { Project } from '../model/project';
 import { blockRects } from '../utils/blockRects';
 import { createLayers } from '../utils/createLayers';
 import { Block } from '../model/block';
 import { ports } from "../utils/ports"
+import { Flow } from '../model/flow';
 
 const props = defineProps<{
-    flow: Project["flows"][number]
-    flowIndex: number
+    flow: Flow
+    flowID: string
 }>()
 
 const xGap = 240
