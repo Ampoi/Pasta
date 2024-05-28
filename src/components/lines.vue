@@ -41,24 +41,25 @@ const getBlockPositions = async () => {
     const layerHeights: number[] = []
 
     let widthSum = 0
-    console.log(layers)
-    await Promise.all(layers.map(async (layer) => {
+    for( const layer of layers ){
         let heightSum = 0
         let maxWidth = 0
-        await Promise.all(layer.map(async (blockID) => {
+        
+        for( const blockID of layer ){
             if( blockID ){
                 const blockRect = await getBlockRect(blockID)
-                console.log(blockRect, blockID)
-
+                blockPositions[blockID] = { x: widthSum, y: heightSum }
+    
                 if( maxWidth < blockRect.width ) maxWidth = blockRect.width
                 heightSum += blockRect.height + yGap
+            }else{
+                heightSum += spaceHeight + yGap
             }
-            heightSum += spaceHeight + yGap
-        }))
-
-        layerHeights.push(heightSum)
+        }
+        
         widthSum += maxWidth + xGap
-    }))
+        layerHeights.push(heightSum)
+    }
 
     const maxLayerHeight = layerHeights.reduce((max, height) => {
         return max < height ? height : max
@@ -79,7 +80,7 @@ const getBlockPositions = async () => {
 const portHeight = 34
 const portYGap = 8
 
-const getPortPositions = (blockPositions: Record<string, {
+const getPortPositions = async (blockPositions: Record<string, {
     x: number
     y: number
 }>) => {
@@ -114,14 +115,15 @@ const getPortPositions = (blockPositions: Record<string, {
 
     const flowPorts = ports[props.flowID]
     if( flowPorts ){
-        Object.entries(flowPorts).forEach(([blockID, blockPorts]) => {
+        await Promise.all(Object.entries(flowPorts).map(async ([blockID, blockPorts]) => {
             if( !blockPositions[blockID] ) return
     
-            if( blockPorts.args ){
-                blockPorts.args.forEach((portID, i) => updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID]))
-            }
-            blockPorts.returnValues.forEach((portID, i) => updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
-        })
+            console.log(blockPorts.args)
+            await Promise.all([
+                ...(blockPorts.args ? blockPorts.args.map(async (portID, i) => await updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID])) : []),
+                ...blockPorts.returnValues.map(async (portID, i) => await updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+            ])
+        }))
     }
 
     return portPositions
@@ -164,7 +166,7 @@ const getLines = (portPositions: {
 const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
 const updateLines = async () => {
     const blockPositions = await getBlockPositions()
-    const portPositions = getPortPositions(blockPositions)
+    const portPositions = await getPortPositions(blockPositions)
     lines.value = getLines(portPositions)
 }
 

@@ -69,8 +69,7 @@ updateFlow()
 const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})
 
 const getBlockRect = (blockID: string, callback: Callback<BlockRect>) => {
-  console.log("get!")
-  console.log(blocks[blockID].getBlockRect(callback))
+  blocks[blockID].getBlockRect(callback)
 }
 
 const renderedBlockIDs = computed(() => {
