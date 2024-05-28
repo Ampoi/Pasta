@@ -118,7 +118,6 @@ const getPortPositions = async (blockPositions: Record<string, {
         await Promise.all(Object.entries(flowPorts).map(async ([blockID, blockPorts]) => {
             if( !blockPositions[blockID] ) return
     
-            console.log(blockPorts.args)
             await Promise.all([
                 ...(blockPorts.args ? blockPorts.args.map(async (portID, i) => await updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID])) : []),
                 ...blockPorts.returnValues.map(async (portID, i) => await updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))

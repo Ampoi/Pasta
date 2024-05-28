@@ -175,7 +175,6 @@ onMounted(() => {
     getBlockRectQue()
     getBlockRectQue = undefined
   }
-  console.log("mounted!wow!")
 })
 
 defineExpose<BlockExposedData>({
