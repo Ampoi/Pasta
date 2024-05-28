@@ -69,7 +69,11 @@ updateFlow()
 const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})
 
 const getBlockRect = (blockID: string, callback: Callback<BlockRect>) => {
-  blocks[blockID].getBlockRect(callback)
+  try {
+    blocks[blockID].getBlockRect(callback)
+  } catch (error) {
+    console.warn(`an error occurred on blockID: ${blockID}:\n${error}`)
+  }
 }
 
 const renderedBlockIDs = computed(() => {

@@ -68,26 +68,21 @@
   </div>
 </template>
 <script setup lang="ts">
-import { /*computed, */ onMounted, ref, watchEffect } from "vue";
-import { Block, BlockExposedData } from "../model/block";
+import { onMounted, ref, watchEffect } from "vue";
+import { Block, BlockExposedData, BlockData } from "../model/block";
 import Port from "./block/port.vue";
-//import { getBlockData } from "../utils/getBlockData";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
 import { BlockRect } from "../model/block";
 import { Callback } from "../model/utils";
-//import { createCodeRef } from "../utils/createCodeRef";
+import { readTextFile } from "@tauri-apps/api/fs";
 
 const props = defineProps<{
   blockID: string;
   blockSettings: Block;
   flowID: string;
   projectPath: string;
-}>();
-
-//const emit = defineEmits<{
-//  (e: "openCodeModal"): void;
-//}>();
+}>()
 
 type Port = {
   type: string;
@@ -95,52 +90,18 @@ type Port = {
 };
 
 const block = ref<HTMLElement>();
-//const { code } = createCodeRef(props.projectPath, props.flowIndex, props.blockID)
-type Value = {
-  name: string;
-  type: string;
-};
-type BlockData = {
-  name: string;
-  description: string;
-  icon: {
-    value: string;
-    color: string;
-  };
-  input: Value[];
-  output: Value[];
-  settings: Value[];
-  execute: (
-    input: Record<string, unknown>,
-    settings: Record<string, unknown>
-  ) => Record<string, unknown>;
-};
 
-const blockData = ref<BlockData | undefined>({
-  name: "加算",
-  description: "2つの数値を足し合わせます。",
-  icon: {
-    value: "fluent:add-12-filled",
-    color: "#FF8F1B",
-  },
-  input: [
-    { name: "a", type: "number" },
-    { name: "b", type: "number" },
-  ],
-  output: [{ name: "result", type: "number" }],
-  settings: [
-    {
-      name: "bias",
-      type: "string",
-    },
-  ],
-  execute: ({ a, b }) => {
-    //@ts-ignore
-    const result = a + b;
-    return { result };
-  },
-});
-//const blockData = computed(() => getBlockData(code.value))
+const blockPath = `${props.projectPath}/blocks/${props.blockSettings.type}/block.json`;
+const blockData = ref<BlockData | undefined>();
+(async () => {
+  try {
+    const fileText = await readTextFile(blockPath);
+    const fileJSON = JSON.parse(fileText) as BlockData;
+    blockData.value = fileJSON;
+  } catch (error) {
+    console.warn(error);
+  }
+})()
 
 watchEffect(() => {
   if (!ports[props.flowID]) ports[props.flowID] = {};
