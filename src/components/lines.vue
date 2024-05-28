@@ -13,9 +13,10 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
-import { Block } from '../model/block';
+import { Block, BlockRect } from '../model/block';
 import { ports } from "../utils/ports"
 import { Flow } from '../model/flow';
+import { Callback } from '../model/utils';
 
 const props = defineProps<{
     flow: Flow
@@ -27,13 +28,11 @@ const yGap = 40
 const spaceHeight = 160
 
 const emit = defineEmits<{
-    (e: "getBlockRect", blockID: string, callback: (rect: Record<"height" | "width", number>) => void): void
+    (e: "getBlockRect", blockID: string, callback: Callback<BlockRect>): void
 }>()
 
 const getBlockRect = async (blockID: string) => {
-    return new Promise<Record<"height" | "width", number>>((resolve) => {
-        emit("getBlockRect", blockID, resolve)
-    })
+    return new Promise<BlockRect>((resolve) => emit("getBlockRect", blockID, resolve))
 }
 
 const getBlockPositions = async () => {

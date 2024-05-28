@@ -69,11 +69,13 @@
 </template>
 <script setup lang="ts">
 import { /*computed, */ onMounted, ref, watchEffect } from "vue";
-import { Block } from "../model/block";
+import { Block, BlockExposedData } from "../model/block";
 import Port from "./block/port.vue";
 //import { getBlockData } from "../utils/getBlockData";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
+import { BlockRect } from "../model/block";
+import { Callback } from "../model/utils";
 //import { createCodeRef } from "../utils/createCodeRef";
 
 const props = defineProps<{
@@ -154,7 +156,7 @@ watchEffect(() => {
 let isMounted = false
 let getBlockRectQue: (() => void) | undefined = undefined
 
-const getBlockRect = (callback: (rect: Record<"height"|"width", number>) => void ) => {
+const getBlockRect = (callback: Callback<BlockRect> ) => {
   if( !isMounted ){
     getBlockRectQue = () => getBlockRect(callback)
   }else{
@@ -176,7 +178,7 @@ onMounted(() => {
   console.log("mounted!wow!")
 })
 
-defineExpose({
+defineExpose<BlockExposedData>({
   id: props.blockID,
   getBlockRect
 })

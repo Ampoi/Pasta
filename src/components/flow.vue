@@ -30,6 +30,8 @@ import Lines from './lines.vue';
 import Block from './block.vue';
 import { Flow } from "../model/flow"
 import { readTextFile } from '@tauri-apps/api/fs';
+import { BlockRect, BlockExposedData } from '../model/block';
+import { Callback } from "../model/utils"
 
 const props = defineProps<{
   id: string
@@ -64,9 +66,9 @@ const updateFlow = async () => {
 }
 updateFlow()
 
-const blocks = reactive<Record<string, { getBlockRect: ( callback: (rect: Record<"height" | "width", number>) => void) => void }>>({})
+const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})
 
-const getBlockRect = (blockID: string, callback: (rect: Record<"height" | "width", number>) => void) => {
+const getBlockRect = (blockID: string, callback: Callback<BlockRect>) => {
   console.log("get!")
   console.log(blocks[blockID].getBlockRect(callback))
 }
