@@ -1,6 +1,6 @@
 import { readTextFile } from "@tauri-apps/api/fs"
 import { ref } from "vue"
-import { getBlockData } from "./getBlockData"
+import { getCodeData } from "./getCodeData"
 
 export const createCodeRef = (projectPath: string, flowIndex: string, blockID: string) => {
     const defaultCode = [
@@ -14,12 +14,8 @@ export const createCodeRef = (projectPath: string, flowIndex: string, blockID: s
     const updateCode = async () => {
       try {
         const fileCode = await readTextFile(blockFilePath)
-        try {
-          getBlockData(fileCode)
-          code.value = fileCode
-        }catch(e){
-          code.value = defaultCode
-        }
+        getCodeData(fileCode)
+        code.value = fileCode
       }catch(e){
         code.value = defaultCode
       }

@@ -22,7 +22,7 @@ import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 //@ts-ignore
 import { constrainedEditor } from "constrained-editor-plugin" //TODO:Typescriptの型定義を作成する
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { getBlockData }  from "../utils/getBlockData"
+import { getCodeData }  from "../utils/getCodeData"
 import { createCodeRef } from "../utils/createCodeRef";
 
 const props = defineProps<{
@@ -66,7 +66,7 @@ function createModel(){
 
 const model = createModel()
 
-const blockData = computed(() => getBlockData(code.value))
+const blockData = computed(() => getCodeData(code.value))
 
 function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor){
     const constrainedInstance = constrainedEditor(Monaco)

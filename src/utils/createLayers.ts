@@ -1,19 +1,19 @@
-import { Project } from "../model/project"
+import { Flow } from "../model/flow"
 
 type DependencyMap = {
     trigger: string[]
     [key: string]: string[]
 }
 
-export function createLayers(project: Project["flows"][number]) {
+export function createLayers(flow: Flow) {
     const dependencies: {
         trigger: string[]
         [id: string]: string[]
     } = {
-        trigger: Object.values(project.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
+        trigger: Object.values(flow.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
     }
 
-    Object.entries(project.blocks).forEach(([id, value]) => {
+    Object.entries(flow.blocks).forEach(([id, value]) => {
         dependencies[id] = Object.values(value.connectedPorts).map((port) => Object.keys(port)).flat()
     })
 

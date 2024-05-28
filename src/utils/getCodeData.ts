@@ -1,4 +1,4 @@
-export const getBlockData = (code: string) => {
+export const getCodeData = (code: string) => {
     let isArgs = false
     const args: { name: string, type: string }[] = []
 
