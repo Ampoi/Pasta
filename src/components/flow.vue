@@ -11,7 +11,7 @@
               :flowID="id"
               :project-path="projectPath"
               @open-code-modal="emit('open-code-modal', blockID)"
-              ref="block"/>
+              :ref="(el: any) => { blocks[el.id] = el }"/>
           </Suspense>
         </div>
       </div>
@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import Block from './block.vue';
@@ -64,13 +64,11 @@ const updateFlow = async () => {
 }
 updateFlow()
 
-const block = ref()
-onMounted(() =>{
-  console.log(block.value)
-})
+const blocks = reactive<Record<string, { getBlockRect: ( callback: (rect: Record<"height" | "width", number>) => void) => void }>>({})
 
-const getBlockRect = (blockID: string) => {
-  return { height: 0, width: 0 }
+const getBlockRect = (blockID: string, callback: (rect: Record<"height" | "width", number>) => void) => {
+  console.log("get!")
+  console.log(blocks[blockID].getBlockRect(callback))
 }
 
 const renderedBlockIDs = computed(() => {

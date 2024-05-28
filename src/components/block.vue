@@ -68,7 +68,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { /*computed, */ ref, watchEffect } from "vue";
+import { /*computed, */ onMounted, ref, watchEffect } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue";
 //import { getBlockData } from "../utils/getBlockData";
@@ -151,13 +151,33 @@ watchEffect(() => {
   };
 });
 
-const updateBlockRect = (blockID: string, element?: HTMLElement) => {
-  if (!element) throw new Error("Element not found for blockID: " + blockID)
-  return {
-    height: element.clientHeight,
-    width: element.clientWidth,
+let isMounted = false
+let getBlockRectQue: (() => void) | undefined = undefined
+
+const getBlockRect = (callback: (rect: Record<"height"|"width", number>) => void ) => {
+  if( !isMounted ){
+    getBlockRectQue = () => getBlockRect(callback)
+  }else{
+    const blockElement = block.value;
+    if( !blockElement ) throw new Error("blockElement is not defined")
+    callback({
+      height: blockElement.clientHeight,
+      width: blockElement.clientWidth,
+    })
   }
 }
 
-defineExpose({ updateBlockRect })
+onMounted(() => {
+  isMounted = true
+  if( getBlockRectQue ){
+    getBlockRectQue()
+    getBlockRectQue = undefined
+  }
+  console.log("mounted!wow!")
+})
+
+defineExpose({
+  id: props.blockID,
+  getBlockRect
+})
 </script>
