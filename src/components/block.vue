@@ -91,7 +91,7 @@ type Port = {
 
 const block = ref<HTMLElement>();
 
-const blockPath = `${props.projectPath}/blocks/${props.blockSettings.type}/block.json`;
+const blockPath = `${props.projectPath}/blocks/${props.blockSettings.type}/main.json`;
 const blockData = ref<BlockData | undefined>();
 (async () => {
   try {

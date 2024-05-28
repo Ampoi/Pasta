@@ -55,7 +55,7 @@ const isFlow = (flow: unknown): flow is Flow => {
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
-    const flowPath = `${props.projectPath}/flows/${props.id}/flow.json`
+    const flowPath = `${props.projectPath}/flows/${props.id}/main.json`
     const fileText = await readTextFile(flowPath)
     const fileJSON = JSON.parse(fileText)
     if( !isFlow(fileJSON) ) throw new Error(`Invalid Flow: ${flowPath}`)
