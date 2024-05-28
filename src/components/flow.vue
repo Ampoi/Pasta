@@ -11,7 +11,7 @@
               :flowID="id"
               :project-path="projectPath"
               @open-code-modal="emit('open-code-modal', blockID)"
-            />
+              ref="block"/>
           </Suspense>
         </div>
       </div>
@@ -19,11 +19,12 @@
     <Lines
       class="-z-10"
       :flow
-      :flowID="id"/>
+      :flowID="id"
+      @getBlockRect="getBlockRect"/>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import Block from './block.vue';
@@ -62,6 +63,15 @@ const updateFlow = async () => {
   }
 }
 updateFlow()
+
+const block = ref()
+onMounted(() =>{
+  console.log(block.value)
+})
+
+const getBlockRect = (blockID: string) => {
+  return { height: 0, width: 0 }
+}
 
 const renderedBlockIDs = computed(() => {
   return createLayers(flow.value);

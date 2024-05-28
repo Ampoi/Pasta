@@ -12,7 +12,6 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { blockRects } from '../utils/blockRects';
 import { createLayers } from '../utils/createLayers';
 import { Block } from '../model/block';
 import { ports } from "../utils/ports"
@@ -27,34 +26,40 @@ const xGap = 240
 const yGap = 40
 const spaceHeight = 160
 
-const getBlockPositions = () => {
+const emit = defineEmits<{
+    (e: "getBlockRect", blockID: string, callback: (rect: Record<"height" | "width", number>) => void): void
+}>()
+
+const getBlockRect = async (blockID: string) => {
+    return new Promise<Record<"height" | "width", number>>((resolve) => {
+        emit("getBlockRect", blockID, resolve)
+    })
+}
+
+const getBlockPositions = async () => {
     const layers = createLayers(props.flow)
     const blockPositions: Record<string, { x: number, y: number }> = {}
     const layerHeights: number[] = []
 
     let widthSum = 0
     console.log(layers)
-    layers.forEach((layer) => {
+    await Promise.all(layers.map(async (layer) => {
         let heightSum = 0
-        layer.forEach((blockID) => {
+        let maxWidth = 0
+        await Promise.all(layer.map(async (blockID) => {
             if( blockID ){
-                blockPositions[blockID] = {
-                    x: widthSum,
-                    y: heightSum
-                }
-                console.log(blockRects[blockID], blockID)
-                heightSum += blockRects[blockID].height + yGap
+                const blockRect = await getBlockRect(blockID)
+                console.log(blockRect, blockID)
+
+                if( maxWidth < blockRect.width ) maxWidth = blockRect.width
+                heightSum += blockRect.height + yGap
             }
             heightSum += spaceHeight + yGap
-        })
+        }))
 
         layerHeights.push(heightSum)
-
-        widthSum += layer.reduce((max, blockID) => {
-            if( !blockID ) return max
-            return max < blockRects[blockID].width ? blockRects[blockID].width : max
-        }, 0) + xGap
-    })
+        widthSum += maxWidth + xGap
+    }))
 
     const maxLayerHeight = layerHeights.reduce((max, height) => {
         return max < height ? height : max
@@ -89,7 +94,7 @@ const getPortPositions = (blockPositions: Record<string, {
     } = {}
 
     //TODO: ここらへんのリファクタリング
-    const getPortPosition = (
+    const updatePortPosition = async (
         type: "args" | "returnValues",
         blockID: string,
         blockPorts: (typeof ports)[number][string]["args"|"returnValues"],
@@ -100,9 +105,11 @@ const getPortPositions = (blockPositions: Record<string, {
         if( !portPositions[blockID] ) portPositions[blockID] = {}
 
         const portAmount = blockPorts.length + 1
+        const blockRect = await getBlockRect(blockID)
+        
         portPositions[blockID][portID] = {
-            x: x + (type == "returnValues" ? blockRects[blockID].width : 0),
-            y: y + blockRects[blockID].height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
+            x: x + (type == "returnValues" ? blockRect.width : 0),
+            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
         }
     }
 
@@ -112,9 +119,9 @@ const getPortPositions = (blockPositions: Record<string, {
             if( !blockPositions[blockID] ) return
     
             if( blockPorts.args ){
-                blockPorts.args.forEach((portID, i) => getPortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID]))
+                blockPorts.args.forEach((portID, i) => updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID]))
             }
-            blockPorts.returnValues.forEach((portID, i) => getPortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+            blockPorts.returnValues.forEach((portID, i) => updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
         })
     }
 
@@ -156,13 +163,13 @@ const getLines = (portPositions: {
 }
 
 const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
+const updateLines = async () => {
+    const blockPositions = await getBlockPositions()
+    const portPositions = getPortPositions(blockPositions)
+    lines.value = getLines(portPositions)
+}
 
 onMounted(() => {
-    const updateLines = () => {
-        const blockPositions = getBlockPositions()
-        const portPositions = getPortPositions(blockPositions)
-        lines.value = getLines(portPositions)
-    }
     watch(() => props.flow, updateLines, { immediate: true })
     watch(ports, updateLines, { deep: true })
 })
