@@ -162,5 +162,6 @@ onMounted(() => {
     }
     watch(() => props.flow, updateLines, { immediate: true })
     watch(ports, updateLines, { deep: true })
+    console.log(ports)
 })
 </script>

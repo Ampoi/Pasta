@@ -5,38 +5,36 @@
             "trigger": {
                 "title": "trigger",
                 "connectedPorts": {
-                    "a": {
-                        "A": "a"
-                    },
-                    "b": {
+                    "result": {
+                        "A": "a",
                         "B": "a"
                     }
                 },
-                "type": "code"
+                "type": "sum"
             },
             "blocks": {
                 "A": {
                     "title": "AAAAAAA",
                     "connectedPorts": {
-                        "a": {
+                        "result": {
                             "C": "a"
                         }
                     },
-                    "type": "code"
+                    "type": "sum"
                 },
                 "B": {
                     "title": "Bbbb",
                     "connectedPorts": {
-                        "a": {
+                        "result": {
                             "C": "b"
                         }
                     },
-                    "type": "code"
+                    "type": "sum"
                 },
                 "C": {
                     "title": "B+C",
                     "connectedPorts": {},
-                    "type": "code"
+                    "type": "sum"
                 }
             }
         }
