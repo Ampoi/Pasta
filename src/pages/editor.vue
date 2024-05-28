@@ -29,15 +29,15 @@
         <div class="flex flex-col gap-20">
           <Flow
             v-for="flowID in flowIDs"
-            :flowID
+            :id="flowID"
             :project-path="projectPath"
-            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowIndex: index }"/>
+            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID: flowID }"/>
         </div>
       </DraggableArea>
       <CodeEditorModal
         v-if="openedCodeBlock"
         :blockID="openedCodeBlock.id"
-        :flow-index="openedCodeBlock.flowIndex"
+        :flowID="openedCodeBlock.flowID"
         :project-path="projectPath"
         @close="openedCodeBlock = undefined"/>
     </main>
@@ -102,6 +102,6 @@ const openProjectFolder = () => {
 
 const openedCodeBlock = ref<{
   id: string
-  flowIndex: number
+  flowID: string
 } | undefined>(undefined)
 </script>

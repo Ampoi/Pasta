@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 
 export const ports = reactive<{
-    [flowIndex: number]: {
+    [flowID: string]: {
         [blockID: string]: Record<"args" | "returnValues", string[]>
     }
 }>({})

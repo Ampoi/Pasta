@@ -33,6 +33,7 @@ const getBlockPositions = () => {
     const layerHeights: number[] = []
 
     let widthSum = 0
+    console.log(layers)
     layers.forEach((layer) => {
         let heightSum = 0
         layer.forEach((blockID) => {
@@ -41,8 +42,10 @@ const getBlockPositions = () => {
                     x: widthSum,
                     y: heightSum
                 }
+                console.log(blockRects[blockID], blockID)
+                heightSum += blockRects[blockID].height + yGap
             }
-            heightSum += ( blockID ? blockRects[blockID].height : spaceHeight ) + yGap
+            heightSum += spaceHeight + yGap
         })
 
         layerHeights.push(heightSum)
@@ -103,7 +106,7 @@ const getPortPositions = (blockPositions: Record<string, {
         }
     }
 
-    const flowPorts = ports[props.flowIndex]
+    const flowPorts = ports[props.flowID]
     if( flowPorts ){
         Object.entries(flowPorts).forEach(([blockID, blockPorts]) => {
             if( !blockPositions[blockID] ) return
@@ -162,6 +165,5 @@ onMounted(() => {
     }
     watch(() => props.flow, updateLines, { immediate: true })
     watch(ports, updateLines, { deep: true })
-    console.log(ports)
 })
 </script>

@@ -43,7 +43,7 @@ const isFlow = (flow: unknown): flow is Flow => {
   if(!(
     (typeof flow == "object" && flow != null) &&
     ("trigger" in flow && "blocks" in flow) &&
-    (flow.blocks instanceof Array)
+    !(flow.blocks instanceof Array)
   )) return false
 
   return true
@@ -52,9 +52,10 @@ const isFlow = (flow: unknown): flow is Flow => {
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
-    const fileText = await readTextFile(`${props.projectPath}/flows/${props.flowID}/flow.json`)
+    const flowPath = `${props.projectPath}/flows/${props.id}/flow.json`
+    const fileText = await readTextFile(flowPath)
     const fileJSON = JSON.parse(fileText)
-    if( !isFlow(fileJSON) ) throw new Error("Invalid Flow")
+    if( !isFlow(fileJSON) ) throw new Error(`Invalid Flow: ${flowPath}`)
     flow.value = fileJSON
   }catch(e){
     console.warn(`flowの更新中にエラーが発生しました:\n${e}`)

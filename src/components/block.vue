@@ -55,7 +55,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { /*computed, */onMounted, ref, watchEffect } from "vue";
+import { /*computed, */onMounted, ref, watch, watchEffect } from "vue";
 import { Block } from "../model/block";
 import Port from "./block/port.vue";
 import { updateBlockRect } from "../utils/blockRects";
@@ -126,17 +126,19 @@ const blockData = ref<BlockData | undefined>({
 //const blockData = computed(() => getBlockData(code.value))
 
 watchEffect(() => {
-  if (!ports[props.flowIndex]) ports[props.flowIndex] = {};
+  if (!ports[props.flowID]) ports[props.flowID] = {};
   
   const input = blockData.value?.input ?? [];
   const output = blockData.value?.output ?? [];
-  ports[props.flowIndex][props.blockID] = {
+  ports[props.flowID][props.blockID] = {
     args: input.map((arg) => arg.name),
     returnValues: output.map((returnValue) => returnValue.name),
   };
 });
 
 onMounted(() => {
-  updateBlockRect(props.blockID, block.value);
-});
+  watch(blockData, () => {
+    updateBlockRect(props.blockID, block.value)
+  }, { immediate: true })
+})
 </script>
