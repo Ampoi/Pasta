@@ -2,12 +2,12 @@
     "trigger": {
         "title": "trigger",
         "connectedPorts": {
-            "result": {
+            "default": {
                 "A": "a",
                 "B": "a"
             }
         },
-        "type": "sum"
+        "type": "onExecute"
     },
     "blocks": {
         "A": {

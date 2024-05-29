@@ -1,0 +1,9 @@
+{
+    "name": "実行時",
+    "description": "実行時に呼び出します。",
+    "icon": {
+        "value": "fluent:play-16-filled",
+        "color": "#A01FF0"
+    },
+    "output": []
+}

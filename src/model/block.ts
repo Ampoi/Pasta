@@ -22,14 +22,19 @@ type Value = {
 };
 
 export type BlockData = {
-    name: string;
-    description: string;
+    name: string
+    description: string
     icon: {
-        value: string;
-        color: string;
-    };
-    input: Value[];
-    output: Value[];
-    settings: Value[];
-    executeMainFilePath: string;
-};
+        value: string
+        color: string
+    }
+    output: Value[]
+    settings?: Value[]
+    executeMainFilePath: string
+} & ({
+    trigger: true
+    input?: undefined
+} | {
+    trigger: false
+    input: Value[]
+});

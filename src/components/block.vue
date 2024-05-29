@@ -36,7 +36,7 @@
       </div>
       <div
         class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center"
-        v-if="blockData && 0 < blockData.settings.length"
+        v-if="blockData && 0 < (blockData.settings?.length ?? 0)"
       >
         <div
           v-for="setting in blockData?.settings"
@@ -68,7 +68,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import { Block, BlockExposedData, BlockData } from "../model/block";
 import Port from "./block/port.vue";
 import { ports } from "../utils/ports";
@@ -91,17 +91,18 @@ type Port = {
 
 const block = ref<HTMLElement>();
 
-const blockPath = `${props.projectPath}/blocks/${props.blockSettings.type}/main.json`;
+const blockPath = computed(() => `${props.projectPath}/blocks/${props.blockSettings.type}/main.json`);
 const blockData = ref<BlockData | undefined>();
-(async () => {
+watch(() => props.blockSettings, async () => {
   try {
-    const fileText = await readTextFile(blockPath);
+    console.log(props.blockSettings)
+    const fileText = await readTextFile(blockPath.value);
     const fileJSON = JSON.parse(fileText) as BlockData;
     blockData.value = fileJSON;
   } catch (error) {
     console.warn(error);
   }
-})()
+}, { immediate: true })()
 
 watchEffect(() => {
   if (!ports[props.flowID]) ports[props.flowID] = {};

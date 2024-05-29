@@ -93,6 +93,22 @@ const getPortPositions = async (blockPositions: Record<string, {
         }
     } = {}
 
+    const updateDefaultPortPosition = async (
+        type: "args" | "returnValues",
+        blockID: string,
+        blockPorts: (typeof ports)[number][string]["args"|"returnValues"],
+        { x, y }: Record<"x"|"y",number>
+    ) => {
+        const blockRect = await getBlockRect(blockID)
+        const portAmount = blockPorts.length + 1
+        
+        if( !portPositions[blockID] ) portPositions[blockID] = {}
+        portPositions[blockID].default = {
+            x: x + (type == "returnValues" ? blockRect.width : 0),
+            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + portHeight/2
+        }
+    }
+
     //TODO: ここらへんのリファクタリング
     const updatePortPosition = async (
         type: "args" | "returnValues",
@@ -119,8 +135,14 @@ const getPortPositions = async (blockPositions: Record<string, {
             if( !blockPositions[blockID] ) return
     
             await Promise.all([
-                ...(blockPorts.args ? blockPorts.args.map(async (portID, i) => await updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID])) : []),
-                ...blockPorts.returnValues.map(async (portID, i) => await updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+                ...[
+                    updateDefaultPortPosition("args", blockID, blockPorts.returnValues, blockPositions[blockID]),
+                    (blockPorts.args ? blockPorts.args.map(async (portID, i) => await updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID])) : [])
+                ],
+                ...[
+                    updateDefaultPortPosition("returnValues", blockID, blockPorts.returnValues, blockPositions[blockID]),
+                    blockPorts.returnValues.map(async (portID, i) => await updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+                ]
             ])
         }))
     }
