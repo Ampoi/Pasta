@@ -86,9 +86,11 @@ const getPortPositions = async (blockPositions: Record<string, {
 }>) => {
     const portPositions: {
         [blockID: string]: {
-            [portID: string]: {
-                x: number;
-                y: number;
+            [type in "returnValues" | "args"]?: {
+                [portID: string]: {
+                    x: number;
+                    y: number;
+                }
             }
         }
     } = {}
@@ -103,7 +105,9 @@ const getPortPositions = async (blockPositions: Record<string, {
         const portAmount = blockPorts.length + 1
         
         if( !portPositions[blockID] ) portPositions[blockID] = {}
-        portPositions[blockID].default = {
+        if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
+
+        (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}}).default = {
             x: x + (type == "returnValues" ? blockRect.width : 0),
             y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + portHeight/2
         }
@@ -118,12 +122,13 @@ const getPortPositions = async (blockPositions: Record<string, {
         i: number,
         { x, y }: Record<"x"|"y",number>
     ) => {
-        if( !portPositions[blockID] ) portPositions[blockID] = {}
-
         const portAmount = blockPorts.length + 1
         const blockRect = await getBlockRect(blockID)
         
-        portPositions[blockID][portID] = {
+        if( !portPositions[blockID] ) portPositions[blockID] = {}
+        if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
+
+        (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}})[portID] = {
             x: x + (type == "returnValues" ? blockRect.width : 0),
             y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
         }
@@ -152,10 +157,12 @@ const getPortPositions = async (blockPositions: Record<string, {
 
 const getLines = (portPositions: {
     [blockID: string]: {
-        [portID: string]: {
-            x: number;
-            y: number;
-        };
+        [type in "args" | "returnValues"]?: {
+            [portID: string]: {
+                x: number;
+                y: number;
+            }
+        }
     };
 }) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
@@ -166,14 +173,14 @@ const getLines = (portPositions: {
             const fromBlock = portPositions[blockID]
             if( !fromBlock ) return
             
-            const from = fromBlock[portID]
+            const from = fromBlock.returnValues?.[portID]
             if( !from ) return
 
             Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
                 const toBlock = portPositions[connectedBlockID]
                 if( !toBlock ) return
 
-                const to = toBlock[connectedPortID]
+                const to = toBlock.args?.[connectedPortID]
                 if( !to ) return
 
                 lines.push({ from, to })

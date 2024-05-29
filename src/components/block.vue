@@ -5,14 +5,16 @@
       class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
       v-if="blockID != 'trigger'"
     >
-      <Port :defaultPort="true" />
+      <Port
+        :defaultPort="true"
+        @click="() => onPortClick('default')"/>
       <Port
         v-for="arg in blockData?.input"
         :blockID
         :type="arg.type"
         :name="arg.name"
         :reverse="true"
-      />
+        @click="() => onPortClick(arg.name)"/>
     </div>
 
     <div
@@ -57,13 +59,15 @@
     <div
       class="flex flex-col items-start gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
     >
-      <Port :defaultPort="true" />
+      <Port
+        :defaultPort="true"
+        @click="() => onPortClick('default')"/>
       <Port
         v-for="returnValue in blockData?.output"
         :blockID
         :type="returnValue.type"
         :name="returnValue.name"
-      />
+        @click="() => onPortClick(returnValue.name)"/>
     </div>
   </div>
 </template>
@@ -138,6 +142,27 @@ onMounted(() => {
     getBlockRectQue = undefined
   }
 })
+
+const selectedPort = defineModel<{
+  blockID: string
+  portID: string
+} | null>("selectedPort")
+
+const onPortClick = (portID: string) => {
+  //console.log(props.blockID, portID)
+  selectedPort.value = {
+    blockID: props.blockID,
+    portID
+  }
+}
+
+const isPortSelected = (portID: string): boolean => {
+  return (
+    !!(selectedPort.value) &&
+    (props.blockID == selectedPort.value.blockID) &&
+    (portID == selectedPort.value.portID)
+  )
+}
 
 defineExpose<BlockExposedData>({
   id: props.blockID,

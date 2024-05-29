@@ -79,4 +79,9 @@ const getBlockRect = (blockID: string, callback: Callback<BlockRect>) => {
 const renderedBlockIDs = computed(() => {
   return createLayers(flow.value);
 });
+
+const selectedPort = ref<{
+  blockID: string
+  portID: string
+} | null>(null)
 </script>

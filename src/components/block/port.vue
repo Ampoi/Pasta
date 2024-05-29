@@ -1,6 +1,10 @@
 <template>
     <div
         class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] select-none"
+        :class="{
+            'border-blue-500 border-2': selected,
+        }"
+        @click="emit('click')"
         ref="port">
         <div
             v-if="defaultPort"
@@ -18,6 +22,8 @@
 </template>
 <script setup lang="ts">
 defineProps<{
+    selected: boolean
+} & ({
     reverse: boolean
     type: string
     name: string
@@ -27,5 +33,9 @@ defineProps<{
     type?: undefined
     name?: undefined
     defaultPort: true
+})>()
+
+const emit = defineEmits<{
+    (e: "click"): void
 }>()
 </script>
