@@ -7,14 +7,16 @@
     >
       <Port
         :defaultPort="true"
-        @click="() => onPortClick('default')"/>
+        @click="() => onPortClick('arg', 'default')"
+        :selected="isPortSelected('arg', 'default')"/>
       <Port
         v-for="arg in blockData?.input"
         :blockID
         :type="arg.type"
         :name="arg.name"
         :reverse="true"
-        @click="() => onPortClick(arg.name)"/>
+        @click="() => onPortClick('arg', arg.name)"
+        :selected="isPortSelected('arg', arg.name)"/>
     </div>
 
     <div
@@ -61,13 +63,15 @@
     >
       <Port
         :defaultPort="true"
-        @click="() => onPortClick('default')"/>
+        @click="() => onPortClick('returnValue', 'default')"
+        :selected="isPortSelected('returnValue', 'default')"/>
       <Port
         v-for="returnValue in blockData?.output"
         :blockID
         :type="returnValue.type"
         :name="returnValue.name"
-        @click="() => onPortClick(returnValue.name)"/>
+        @click="() => onPortClick('returnValue', returnValue.name)"
+        :selected="isPortSelected('returnValue', returnValue.name)"/>
     </div>
   </div>
 </template>
@@ -144,21 +148,23 @@ onMounted(() => {
 })
 
 const selectedPort = defineModel<{
+  type: "arg" | "returnValue"
   blockID: string
   portID: string
 } | null>("selectedPort")
 
-const onPortClick = (portID: string) => {
-  //console.log(props.blockID, portID)
+const onPortClick = (type: "arg" | "returnValue", portID: string) => {
   selectedPort.value = {
+    type,
     blockID: props.blockID,
     portID
   }
 }
 
-const isPortSelected = (portID: string): boolean => {
+const isPortSelected = (type: "arg" | "returnValue", portID: string): boolean => { //TODO:"arg" | "returnValue"をまとめる
   return (
     !!(selectedPort.value) &&
+    (type == selectedPort.value.type) &&
     (props.blockID == selectedPort.value.blockID) &&
     (portID == selectedPort.value.portID)
   )

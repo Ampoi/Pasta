@@ -11,7 +11,8 @@
               :flowID="id"
               :project-path="projectPath"
               @open-code-modal="emit('open-code-modal', blockID)"
-              :ref="(el: any) => { blocks[el.id] = el }"/>
+              :ref="(el: any) => { blocks[el.id] = el }"
+              v-model:selected-port="selectedPort"/>
           </Suspense>
         </div>
       </div>
@@ -81,6 +82,7 @@ const renderedBlockIDs = computed(() => {
 });
 
 const selectedPort = ref<{
+  type: "arg" | "returnValue"
   blockID: string
   portID: string
 } | null>(null)
