@@ -97,7 +97,6 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
   ) return
 
   const oldFlow = flow.value
-  console.log(from, to)
   const newFlow = {
       ...oldFlow,
       blocks: {
@@ -107,6 +106,7 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
           connectedPorts: {
             ...oldFlow.blocks[from.blockID].connectedPorts,
             [from.portID]: {
+              ...oldFlow.blocks[from.blockID].connectedPorts[from.portID],
               [to.blockID]: to.portID
             }
           }

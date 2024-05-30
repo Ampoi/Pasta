@@ -107,7 +107,6 @@ const blockPath = computed(() => `${props.projectPath}/blocks/${props.blockSetti
 const blockData = ref<BlockData | undefined>();
 watch(() => props.blockSettings, async () => {
   try {
-    console.log(props.blockSettings)
     const fileText = await readTextFile(blockPath.value);
     const fileJSON = JSON.parse(fileText) as BlockData;
     blockData.value = fileJSON;
