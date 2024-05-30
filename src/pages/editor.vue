@@ -12,13 +12,17 @@
         <input
           type="text"
           v-model="project.title"
-          class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 bg-black basis-60 font-bold text-white"/>
+          class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 basis-60 font-bold text-white"/>
         <button
           class="absolute right-2 top-1/2 -translate-y-1/2"
           @click="openProjectFolder">
           <Icon icon="fluent:folder-16-regular" class="text-zinc-500 text-xl"/>
         </button>
       </div>
+      <FlowSelector
+        :flowIDs="flowIDs"
+        v-model:flowID="flowID"
+        class="-ml-2"/>
       <div class="grow" />
       <button>
         <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
@@ -26,12 +30,13 @@
     </header>
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
       <DraggableArea class="w-full h-full p-4">
-        <div class="flex flex-col gap-20">
+        <div
+          v-for="id in flowIDs">
           <Flow
-            v-for="flowID in flowIDs"
-            :id="flowID"
+            v-if="id === flowID"
+            :id="id"
             :project-path="projectPath"
-            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID: flowID }"/>
+            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID: id }"/>
         </div>
       </DraggableArea>
       <CodeEditorModal
@@ -49,6 +54,7 @@ import { reactive, ref, watch } from "vue";
 import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
 import CodeEditorModal from "../components/codeEditorModal.vue";
+import FlowSelector from "../components/editor/flowSelector.vue";
 
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
@@ -90,6 +96,8 @@ const flowIDs = reactive<string[]>(await (async () => {
   
   return directoryNames
 })())
+
+const flowID = ref<string>(flowIDs[0])
 
 const openLaunchView = () => {
   localStorage.removeItem("latestProjectPath") //TODO:最近開いたプロジェクトパスの保存・取得・破棄アルゴリズムをまとめる
