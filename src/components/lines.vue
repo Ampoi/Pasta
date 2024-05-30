@@ -166,7 +166,7 @@ const getLines = (portPositions: {
     };
 }) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
-    const blockEntries = [["trigger", props.flow.trigger], ...Object.entries(props.flow.blocks)] as [string, Block][]
+    const blockEntries = Object.entries(props.flow.blocks) as [string, Block][]
     
     blockEntries.forEach(([blockID, block]) => {
         Object.entries(block.connectedPorts).forEach(([portID, connectedTo]) => {

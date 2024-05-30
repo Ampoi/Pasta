@@ -1,15 +1,15 @@
 {
-    "trigger": {
-        "title": "trigger",
-        "connectedPorts": {
-            "default": {
-                "A": "a",
-                "B": "a"
-            }
-        },
-        "type": "onExecute"
-    },
     "blocks": {
+        "trigger": {
+            "title": "trigger",
+            "connectedPorts": {
+                "default": {
+                    "A": "a",
+                    "B": "a"
+                }
+            },
+            "type": "onExecute"
+        },
         "A": {
             "title": "AAAAAAA",
             "connectedPorts": {

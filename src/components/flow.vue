@@ -7,7 +7,7 @@
           <Suspense v-else>
             <Block
               :blockID
-              :blockSettings="blockID == 'trigger' ? flow.trigger : flow.blocks[blockID]"
+              :blockSettings="flow.blocks[blockID]"
               :flowID="id"
               :project-path="projectPath"
               @open-code-modal="emit('open-code-modal', blockID)"
@@ -47,7 +47,7 @@ const emit = defineEmits<{
 const isFlow = (flow: unknown): flow is Flow => {
   if(!(
     (typeof flow == "object" && flow != null) &&
-    ("trigger" in flow && "blocks" in flow) &&
+    ("blocks" in flow) &&
     !(flow.blocks instanceof Array)
   )) return false
 
@@ -98,20 +98,7 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
 
   const oldFlow = flow.value
   console.log(from, to)
-  const newFlow = (from.blockID == "trigger")
-    ? {
-      ...oldFlow,
-      trigger: {
-        ...oldFlow.trigger,
-        connectedPorts: {
-          ...oldFlow.trigger.connectedPorts,
-          [from.portID]: {
-            [to.blockID]: to.portID
-          }
-        }
-      }
-    }
-    : {
+  const newFlow = {
       ...oldFlow,
       blocks: {
         ...oldFlow.blocks,

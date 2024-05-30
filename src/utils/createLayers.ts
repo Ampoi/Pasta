@@ -10,7 +10,7 @@ export function createLayers(flow: Flow) {
         trigger: string[]
         [id: string]: string[]
     } = {
-        trigger: Object.values(flow.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
+        trigger: Object.values(flow.blocks.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
     }
 
     Object.entries(flow.blocks).forEach(([id, value]) => {
