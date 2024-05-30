@@ -22,9 +22,7 @@
         "B": {
             "title": "Bbbb",
             "connectedPorts": {
-                "result": {
-                    "C": "b"
-                }
+                "result": {}
             },
             "type": "sum"
         },

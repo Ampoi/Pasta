@@ -1,8 +1,9 @@
 <template>
     <div
-        class="bg-zinc-900 p-1.5 rounded-xl border-zinc-700 border-[1px] select-none"
+        class="bg-zinc-900 p-1.5 rounded-xl select-none"
         :class="{
             'border-blue-500 border-2': selected,
+            'border-zinc-700 border-[1px]': !selected
         }"
         @click="emit('click')"
         ref="port">

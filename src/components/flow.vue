@@ -12,7 +12,8 @@
               :project-path="projectPath"
               @open-code-modal="emit('open-code-modal', blockID)"
               :ref="(el: any) => { blocks[el.id] = el }"
-              v-model:selected-port="selectedPort"/>
+              v-model:selected-port="selectedPort"
+              @connect-ports="connectPorts"/>
           </Suspense>
         </div>
       </div>
@@ -81,9 +82,50 @@ const renderedBlockIDs = computed(() => {
   return createLayers(flow.value);
 });
 
-const selectedPort = ref<{
+type PortPlace = {
   type: "arg" | "returnValue"
   blockID: string
   portID: string
-} | null>(null)
+}
+
+const selectedPort = ref<PortPlace | null>(null)
+
+const connectPorts = (from: PortPlace, to: PortPlace) => {
+  if(
+    from.blockID == to.blockID ||
+    from.type == to.type
+  ) return
+
+  const oldFlow = flow.value
+  console.log(from, to)
+  const newFlow = (from.blockID == "trigger")
+    ? {
+      ...oldFlow,
+      trigger: {
+        ...oldFlow.trigger,
+        connectedPorts: {
+          ...oldFlow.trigger.connectedPorts,
+          [from.portID]: {
+            [to.blockID]: to.portID
+          }
+        }
+      }
+    }
+    : {
+      ...oldFlow,
+      blocks: {
+        ...oldFlow.blocks,
+        [from.blockID]: {
+          ...oldFlow.blocks[from.blockID],
+          connectedPorts: {
+            ...oldFlow.blocks[from.blockID].connectedPorts,
+            [from.portID]: {
+              [to.blockID]: to.portID
+            }
+          }
+        }
+      }
+    }
+  flow.value = newFlow
+}
 </script>

@@ -92,6 +92,10 @@ const props = defineProps<{
   projectPath: string;
 }>()
 
+const emit = defineEmits<{
+  (e: "connectPorts", from: PortPlace, to: PortPlace): void
+}>()
+
 type Port = {
   type: string;
   name: string;
@@ -147,28 +151,40 @@ onMounted(() => {
   }
 })
 
-const selectedPort = defineModel<{
+type PortPlace = {
   type: "arg" | "returnValue"
   blockID: string
   portID: string
-} | null>("selectedPort")
+}
+
+const selectedPort = defineModel<PortPlace | null>("selectedPort")
 
 const onPortClick = (type: "arg" | "returnValue", portID: string) => {
-  selectedPort.value = {
+  const clickedPort = {
     type,
     blockID: props.blockID,
     portID
   }
+
+  if( !selectedPort.value ){
+    selectedPort.value = clickedPort
+  }else{
+    if( clickedPort.type == "arg" ){
+      emit("connectPorts", selectedPort.value, clickedPort)
+    }else{
+      emit("connectPorts", clickedPort, selectedPort.value)
+    }
+    selectedPort.value = null
+  }
 }
 
-const isPortSelected = (type: "arg" | "returnValue", portID: string): boolean => { //TODO:"arg" | "returnValue"をまとめる
-  return (
-    !!(selectedPort.value) &&
-    (type == selectedPort.value.type) &&
-    (props.blockID == selectedPort.value.blockID) &&
-    (portID == selectedPort.value.portID)
-  )
-}
+//TODO:"arg" | "returnValue"をまとめる
+const isPortSelected = (type: "arg" | "returnValue", portID: string): boolean => (
+  !!(selectedPort.value) &&
+  (type == selectedPort.value.type) &&
+  (props.blockID == selectedPort.value.blockID) &&
+  (portID == selectedPort.value.portID)
+)
 
 defineExpose<BlockExposedData>({
   id: props.blockID,
