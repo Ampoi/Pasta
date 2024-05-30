@@ -34,6 +34,7 @@ import { Flow } from "../model/flow"
 import { readTextFile, writeTextFile } from '@tauri-apps/api/fs';
 import { BlockRect, BlockExposedData } from '../model/block';
 import { Callback } from "../model/utils"
+import { PortPlace, addPortConnection } from '../utils/connectPorts';
 
 const props = defineProps<{
   id: string
@@ -66,6 +67,7 @@ const updateFlow = async () => {
     console.warn(`flowの更新中にエラーが発生しました:\n${e}`)
   }
 }
+
 updateFlow().then(() => {
   watch(flow, async () => {
     try{
@@ -90,37 +92,12 @@ const renderedBlockIDs = computed(() => {
   return createLayers(flow.value);
 });
 
-type PortPlace = {
-  type: "arg" | "returnValue"
-  blockID: string
-  portID: string
-}
-
 const selectedPort = ref<PortPlace | null>(null)
 
 const connectPorts = (from: PortPlace, to: PortPlace) => {
-  if(
-    from.blockID == to.blockID ||
-    from.type == to.type
-  ) return
-
-  const oldFlow = flow.value
-  const newFlow = {
-      ...oldFlow,
-      blocks: {
-        ...oldFlow.blocks,
-        [from.blockID]: {
-          ...oldFlow.blocks[from.blockID],
-          connectedPorts: {
-            ...oldFlow.blocks[from.blockID].connectedPorts,
-            [from.portID]: {
-              ...oldFlow.blocks[from.blockID].connectedPorts[from.portID],
-              [to.blockID]: to.portID
-            }
-          }
-        }
-      }
-    }
-  flow.value = newFlow
+  const newFlow = addPortConnection(flow.value, from, to)
+  if( newFlow ) {
+    flow.value = newFlow
+  }
 }
 </script>

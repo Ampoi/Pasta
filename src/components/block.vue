@@ -84,6 +84,7 @@ import { Icon } from "@iconify/vue";
 import { BlockRect } from "../model/block";
 import { Callback } from "../model/utils";
 import { readTextFile } from "@tauri-apps/api/fs";
+import { PortPlace } from "../utils/connectPorts";
 
 const props = defineProps<{
   blockID: string;
@@ -149,12 +150,6 @@ onMounted(() => {
     getBlockRectQue = undefined
   }
 })
-
-type PortPlace = {
-  type: "arg" | "returnValue"
-  blockID: string
-  portID: string
-}
 
 const selectedPort = defineModel<PortPlace | null>("selectedPort")
 
