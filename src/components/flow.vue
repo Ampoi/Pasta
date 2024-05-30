@@ -55,11 +55,11 @@ const isFlow = (flow: unknown): flow is Flow => {
   return true
 }
 
-const flowPath = `${props.projectPath}/flows/${props.id}/main.json`
+const flowPath = computed(() => `${props.projectPath}/flows/${props.id}/main.json`)
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
-    const fileText = await readTextFile(flowPath)
+    const fileText = await readTextFile(flowPath.value)
     const fileJSON = JSON.parse(fileText)
     if( !isFlow(fileJSON) ) throw new Error(`Invalid Flow: ${flowPath}`)
     flow.value = fileJSON
@@ -71,11 +71,16 @@ const updateFlow = async () => {
 updateFlow().then(() => {
   watch(flow, async () => {
     try{
-      await writeTextFile(flowPath, JSON.stringify(flow.value))
+      await writeTextFile(flowPath.value, JSON.stringify(flow.value))
     }catch(e){
       console.warn(`flowの保存中にエラーが発生しました:\n${e}`)
     }
   })
+})
+
+watch(() => props.id, async () => {
+  await updateFlow()
+  console.log("wow")
 })
 
 const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})

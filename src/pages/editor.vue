@@ -30,14 +30,10 @@
     </header>
     <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
       <DraggableArea class="w-full h-full p-4">
-        <div
-          v-for="id in flowIDs">
-          <Flow
-            v-if="id === flowID"
-            :id="id"
-            :project-path="projectPath"
-            @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID: id }"/>
-        </div>
+        <Flow
+          :id="flowID"
+          :project-path="projectPath"
+          @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"/>
       </DraggableArea>
       <CodeEditorModal
         v-if="openedCodeBlock"
