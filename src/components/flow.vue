@@ -26,12 +26,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import Block from './block.vue';
 import { Flow } from "../model/flow"
-import { readTextFile } from '@tauri-apps/api/fs';
+import { readTextFile, writeTextFile } from '@tauri-apps/api/fs';
 import { BlockRect, BlockExposedData } from '../model/block';
 import { Callback } from "../model/utils"
 
@@ -54,10 +54,10 @@ const isFlow = (flow: unknown): flow is Flow => {
   return true
 }
 
+const flowPath = `${props.projectPath}/flows/${props.id}/main.json`
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
-    const flowPath = `${props.projectPath}/flows/${props.id}/main.json`
     const fileText = await readTextFile(flowPath)
     const fileJSON = JSON.parse(fileText)
     if( !isFlow(fileJSON) ) throw new Error(`Invalid Flow: ${flowPath}`)
@@ -66,7 +66,15 @@ const updateFlow = async () => {
     console.warn(`flowの更新中にエラーが発生しました:\n${e}`)
   }
 }
-updateFlow()
+updateFlow().then(() => {
+  watch(flow, async () => {
+    try{
+      await writeTextFile(flowPath, JSON.stringify(flow.value))
+    }catch(e){
+      console.warn(`flowの保存中にエラーが発生しました:\n${e}`)
+    }
+  })
+})
 
 const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})
 
