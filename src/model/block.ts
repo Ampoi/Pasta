@@ -29,7 +29,6 @@ export type BlockData = {
         color: string
     }
     output: Value[]
-    settings?: Value[]
     executeMainFilePath: string
 } & ({
     trigger: true

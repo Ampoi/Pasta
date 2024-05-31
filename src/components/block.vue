@@ -40,12 +40,10 @@
       </div>
       <div
         class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center"
-        v-if="blockData && 0 < (blockData.settings?.length ?? 0)"
-      >
+        v-if="blockData && 0 < (blockData.input?.length ?? 0)">
         <div
-          v-for="setting in blockData?.settings"
-          class="flex flex-row gap-2 items-center text-sm p-2"
-        >
+          v-for="setting in blockData.input"
+          class="flex flex-row gap-2 items-center text-sm p-2">
           <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
             {{ setting.name }}
           </p>
