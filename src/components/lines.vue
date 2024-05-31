@@ -86,7 +86,7 @@ const getPortPositions = async (blockPositions: Record<string, {
 }>) => {
     const portPositions: {
         [blockID: string]: {
-            [type in "returnValues" | "args"]?: {
+            [type in "inputs" | "outputs"]?: {
                 [portID: string]: {
                     x: number;
                     y: number;
@@ -96,9 +96,9 @@ const getPortPositions = async (blockPositions: Record<string, {
     } = {}
 
     const updateDefaultPortPosition = async (
-        type: "args" | "returnValues",
+        type: "inputs" | "outputs",
         blockID: string,
-        blockPorts: (typeof ports)[number][string]["args"|"returnValues"],
+        blockPorts: (typeof ports)[number][string]["inputs"|"outputs"],
         { x, y }: Record<"x"|"y",number>
     ) => {
         const blockRect = await getBlockRect(blockID)
@@ -108,16 +108,16 @@ const getPortPositions = async (blockPositions: Record<string, {
         if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
 
         (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}}).default = {
-            x: x + (type == "returnValues" ? blockRect.width : 0),
+            x: x + (type == "outputs" ? blockRect.width : 0),
             y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + portHeight/2
         }
     }
 
     //TODO: ここらへんのリファクタリング
     const updatePortPosition = async (
-        type: "args" | "returnValues",
+        type: "inputs" | "outputs",
         blockID: string,
-        blockPorts: (typeof ports)[number][string]["args"|"returnValues"],
+        blockPorts: (typeof ports)[number][string]["inputs"|"outputs"],
         portID: string,
         i: number,
         { x, y }: Record<"x"|"y",number>
@@ -129,7 +129,7 @@ const getPortPositions = async (blockPositions: Record<string, {
         if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
 
         (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}})[portID] = {
-            x: x + (type == "returnValues" ? blockRect.width : 0),
+            x: x + (type == "outputs" ? blockRect.width : 0),
             y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
         }
     }
@@ -141,12 +141,12 @@ const getPortPositions = async (blockPositions: Record<string, {
     
             await Promise.all([
                 ...[
-                    updateDefaultPortPosition("args", blockID, blockPorts.returnValues, blockPositions[blockID]),
-                    (blockPorts.args ? blockPorts.args.map(async (portID, i) => await updatePortPosition("args", blockID, blockPorts.args, portID, i, blockPositions[blockID])) : [])
+                    updateDefaultPortPosition("inputs", blockID, blockPorts.outputs, blockPositions[blockID]),
+                    (blockPorts.inputs ? blockPorts.inputs.map(async (portID, i) => await updatePortPosition("inputs", blockID, blockPorts.inputs, portID, i, blockPositions[blockID])) : [])
                 ],
                 ...[
-                    updateDefaultPortPosition("returnValues", blockID, blockPorts.returnValues, blockPositions[blockID]),
-                    blockPorts.returnValues.map(async (portID, i) => await updatePortPosition("returnValues", blockID, blockPorts.returnValues, portID, i, blockPositions[blockID]))
+                    updateDefaultPortPosition("outputs", blockID, blockPorts.outputs, blockPositions[blockID]),
+                    blockPorts.outputs.map(async (portID, i) => await updatePortPosition("outputs", blockID, blockPorts.outputs, portID, i, blockPositions[blockID]))
                 ]
             ])
         }))
@@ -157,7 +157,7 @@ const getPortPositions = async (blockPositions: Record<string, {
 
 const getLines = (portPositions: {
     [blockID: string]: {
-        [type in "args" | "returnValues"]?: {
+        [type in "inputs" | "outputs"]?: {
             [portID: string]: {
                 x: number;
                 y: number;
@@ -173,14 +173,14 @@ const getLines = (portPositions: {
             const fromBlock = portPositions[blockID]
             if( !fromBlock ) return
             
-            const from = fromBlock.returnValues?.[portID]
+            const from = fromBlock.outputs?.[portID]
             if( !from ) return
 
             Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
                 const toBlock = portPositions[connectedBlockID]
                 if( !toBlock ) return
 
-                const to = toBlock.args?.[connectedPortID]
+                const to = toBlock.inputs?.[connectedPortID]
                 if( !to ) return
 
                 lines.push({ from, to })
@@ -195,7 +195,8 @@ const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
 const updateLines = async () => {
     const blockPositions = await getBlockPositions()
     const portPositions = await getPortPositions(blockPositions)
-    lines.value = getLines(portPositions)
+    const newLines = getLines(portPositions)
+    lines.value = newLines
 }
 
 onMounted(() => {

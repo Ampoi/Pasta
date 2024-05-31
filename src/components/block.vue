@@ -7,16 +7,16 @@
     >
       <Port
         :defaultPort="true"
-        @click="() => onPortClick('arg', 'default')"
-        :selected="isPortSelected('arg', 'default')"/>
+        @click="() => onPortClick('input', 'default')"
+        :selected="isPortSelected('input', 'default')"/>
       <Port
-        v-for="arg in blockData?.input"
+        v-for="input in blockData?.inputs"
         :blockID
-        :type="arg.type"
-        :name="arg.name"
+        :type="input.type"
+        :name="input.name"
         :reverse="true"
-        @click="() => onPortClick('arg', arg.name)"
-        :selected="isPortSelected('arg', arg.name)"/>
+        @click="() => onPortClick('input', input.name)"
+        :selected="isPortSelected('input', input.name)"/>
     </div>
 
     <div
@@ -39,11 +39,11 @@
         />
       </div>
       <div
-        class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center"
-        v-if="blockData && 0 < (blockData.input?.length ?? 0)">
+        class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center p-2 gap-2"
+        v-if="blockData && 0 < (blockData.inputs?.length ?? 0)">
         <div
-          v-for="setting in blockData.input"
-          class="flex flex-row gap-2 items-center text-sm p-2">
+          v-for="setting in blockData.inputs"
+          class="flex flex-row gap-2 items-center text-sm">
           <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
             {{ setting.name }}
           </p>
@@ -61,15 +61,15 @@
     >
       <Port
         :defaultPort="true"
-        @click="() => onPortClick('returnValue', 'default')"
-        :selected="isPortSelected('returnValue', 'default')"/>
+        @click="() => onPortClick('output', 'default')"
+        :selected="isPortSelected('output', 'default')"/>
       <Port
-        v-for="returnValue in blockData?.output"
+        v-for="output in blockData?.outputs"
         :blockID
-        :type="returnValue.type"
-        :name="returnValue.name"
-        @click="() => onPortClick('returnValue', returnValue.name)"
-        :selected="isPortSelected('returnValue', returnValue.name)"/>
+        :type="output.type"
+        :name="output.name"
+        @click="() => onPortClick('output', output.name)"
+        :selected="isPortSelected('output', output.name)"/>
     </div>
   </div>
 </template>
@@ -102,7 +102,7 @@ type Port = {
 
 const block = ref<HTMLElement>();
 
-const blockPath = computed(() => `${props.projectPath}/blocks/${props.blockSettings.type}/main.json`);
+const blockPath = computed(() => `${props.projectPath}/blocks/${props.blockSettings.type}/block.json`);
 const blockData = ref<BlockData | undefined>();
 watch(() => props.blockSettings, async () => {
   try {
@@ -117,11 +117,12 @@ watch(() => props.blockSettings, async () => {
 watchEffect(() => {
   if (!ports[props.flowID]) ports[props.flowID] = {};
 
-  const input = blockData.value?.input ?? [];
-  const output = blockData.value?.output ?? [];
+  const inputs = blockData.value?.inputs ?? [];
+  const outputs = blockData.value?.outputs ?? [];
+
   ports[props.flowID][props.blockID] = {
-    args: input.map((arg) => arg.name),
-    returnValues: output.map((returnValue) => returnValue.name),
+    inputs: inputs.map((input) => input.name),
+    outputs: outputs.map((output) => output.name),
   };
 });
 
@@ -151,7 +152,7 @@ onMounted(() => {
 
 const selectedPort = defineModel<PortPlace | null>("selectedPort")
 
-const onPortClick = (type: "arg" | "returnValue", portID: string) => {
+const onPortClick = (type: "input" | "output", portID: string) => {
   const clickedPort = {
     type,
     blockID: props.blockID,
@@ -161,7 +162,7 @@ const onPortClick = (type: "arg" | "returnValue", portID: string) => {
   if( !selectedPort.value ){
     selectedPort.value = clickedPort
   }else{
-    if( clickedPort.type == "arg" ){
+    if( clickedPort.type == "input" ){
       emit("connectPorts", selectedPort.value, clickedPort)
     }else{
       emit("connectPorts", clickedPort, selectedPort.value)
@@ -170,8 +171,7 @@ const onPortClick = (type: "arg" | "returnValue", portID: string) => {
   }
 }
 
-//TODO:"arg" | "returnValue"をまとめる
-const isPortSelected = (type: "arg" | "returnValue", portID: string): boolean => (
+const isPortSelected = (type: "input" | "output", portID: string): boolean => (
   !!(selectedPort.value) &&
   (type == selectedPort.value.type) &&
   (props.blockID == selectedPort.value.blockID) &&

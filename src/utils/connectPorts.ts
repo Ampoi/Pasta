@@ -1,7 +1,7 @@
 import { Flow } from "../model/flow"
 
 export type PortPlace = {
-    type: "arg" | "returnValue"
+    type: "input" | "output"
     blockID: string
     portID: string
 }

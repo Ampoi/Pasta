@@ -27,13 +27,13 @@ export const getCodeData = (code: string) => {
     if (!bodyLinesRange.start) throw new Error(`${code}\nbodyLinesの範囲の最初のインデックスを見つけられませんでした`)
 
     const returnLine = codeLines[codeLines.length - 2].replace(/\s+/g, '')
-    const returnValueNames = returnLine.slice(7, returnLine.length - 1).split(",")
-    const returnValues = (returnValueNames.length == 1 && returnValueNames[0] == "")
+    const outputNames = returnLine.slice(7, returnLine.length - 1).split(",")
+    const outputs = (outputNames.length == 1 && outputNames[0] == "")
         ? []
-        :returnValueNames.map((returnValueName) => {
+        :outputNames.map((outputName) => {
             return {
                 type: "?",
-                name: returnValueName
+                name: outputName
             }
         })
 
@@ -43,6 +43,6 @@ export const getCodeData = (code: string) => {
             bodyLinesRange.start, 1,
             bodyLinesRange.end - 1, codeLines[bodyLinesRange.end - 2].length + 1,
         ],
-        returnValues
+        outputs
     }
 }

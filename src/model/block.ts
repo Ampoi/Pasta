@@ -28,12 +28,12 @@ export type BlockData = {
         value: string
         color: string
     }
-    output: Value[]
+    outputs: Value[]
     executeMainFilePath: string
 } & ({
     trigger: true
-    input?: undefined
+    inputs?: undefined
 } | {
     trigger: false
-    input: Value[]
+    inputs: Value[]
 });
