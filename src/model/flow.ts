@@ -12,7 +12,6 @@ export const Flow = {
             blocks: {
                 trigger: {
                     title: "trigger",
-                    connectedPorts: {},
                     type: "onExecute"
                 }
             }

@@ -169,22 +169,34 @@ const getLines = (portPositions: {
     const blockEntries = Object.entries(props.flow.blocks) as [string, Block][]
     
     blockEntries.forEach(([blockID, block]) => {
-        Object.entries(block.connectedPorts).forEach(([portID, connectedTo]) => {
-            const fromBlock = portPositions[blockID]
-            if( !fromBlock ) return
-            
-            const from = fromBlock.outputs?.[portID]
-            if( !from ) return
+        if( !block.inputs ) return
 
-            Object.entries(connectedTo).forEach(([connectedBlockID, connectedPortID]) => {
-                const toBlock = portPositions[connectedBlockID]
-                if( !toBlock ) return
+        Object.entries(block.inputs).forEach(([portID, input]) => {
+            try {
+                const { fromBlockID, fromPortID } = input.type == "port" ? {
+                    fromBlockID: input.value.blockID,
+                    fromPortID: input.value.portID
+                } : {
+                    fromBlockID: input.defaultPortBlockID,
+                    fromPortID: "default"
+                }
+    
+                const fromBlockPortPositions = portPositions[fromBlockID]
+                if( !fromBlockPortPositions ) return
+    
+                const from = fromBlockPortPositions.outputs?.[fromPortID]
+                if( !from ) return
 
-                const to = toBlock.inputs?.[connectedPortID]
-                if( !to ) return
-
+                const toBlockPortPositions = portPositions[blockID]
+                if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${blockID}`)
+                
+                const to = toBlockPortPositions.inputs?.[portID]
+                if( !to ) throw new Error(`${portID} is not in outputs of ${blockID}`)
+    
                 lines.push({ from, to })
-            })
+            }catch ( error ){
+                console.warn(error)
+            }
         })
     })
 

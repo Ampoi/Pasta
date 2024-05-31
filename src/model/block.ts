@@ -9,9 +9,17 @@ export type Block = {
     title: string
     description?: string
     type: "code" | string
-    connectedPorts: {
-        [portID: string]: {
-            [blockID: string]: string
+    inputs?: {
+        [inputID: string]: {
+            type: "setting"
+            value: any
+            defaultPortBlockID: string
+        } |  {
+            type: "port"
+            value: {
+                blockID: string
+                portID: string
+            }
         }
     }
 }

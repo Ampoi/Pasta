@@ -1,36 +1,51 @@
 import { Flow } from "../model/flow"
 
 type DependencyMap = {
-    trigger: string[]
     [key: string]: string[]
 }
 
-export function createLayers(flow: Flow) {
-    const dependencies: {
-        trigger: string[]
-        [id: string]: string[]
-    } = {
-        trigger: Object.values(flow.blocks.trigger.connectedPorts).map((port) => Object.keys(port)).flat()
-    }
+export function createLayers(flow: Flow, withSpacers = true) {
+    const dependencies = createDependencies(flow)
+    const layers = createLayersFromDependencies(dependencies, withSpacers)
+
+    return layers
+}
+
+function createDependencies(flow: Flow) {
+    const dependencies: DependencyMap = {}
 
     Object.entries(flow.blocks).forEach(([id, value]) => {
-        dependencies[id] = Object.values(value.connectedPorts).map((port) => Object.keys(port)).flat()
+        if( !value.inputs ) return
+
+        const connectFromSet = new Set<string>()
+
+        Object.values(value.inputs).forEach((input) => {
+            if( input.type == "port" ) {
+                connectFromSet.add(input.value.blockID)
+            }else{
+                connectFromSet.add(input.defaultPortBlockID)
+            }
+        })
+
+        dependencies[id] = Array.from(connectFromSet)
     })
 
-    return createLayersFromDependencies(dependencies, true)
+    return dependencies
 }
 
 function createLayersFromDependencies(
     dependencies: DependencyMap,
     withSpacers = false
 ) {
-    type Map = { [key: string]: Map | string }
+    type Map = { [blockID: string]: Map | string }
 
     const maxDepths: { [key: string]: number } = {}
     Object.keys(dependencies).forEach((key) => { maxDepths[key] = 0 })
 
     function makeMap(id: string, depth: number) {
-        const children = dependencies[id]
+        const children = Object.entries(dependencies)
+            .map(([blockID, parents]) => parents.includes(id) ? blockID : null)
+            .filter((blockID): blockID is string => !!blockID)
 
         const map: Map = {}
         children.forEach((child) => {
