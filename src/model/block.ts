@@ -5,22 +5,24 @@ export type BlockExposedData = {
     getBlockRect: (callback: (rect: BlockRect) => void) => void
 }
 
+export type Input = {
+    type: "setting"
+    value: any
+    defaultPortBlockID: string
+} |  {
+    type: "port"
+    value: {
+        blockID: string
+        portID: string
+    }
+}
+
 export type Block = {
     title: string
     description?: string
     type: "code" | string
     inputs?: {
-        [inputID: string]: {
-            type: "setting"
-            value: any
-            defaultPortBlockID: string
-        } |  {
-            type: "port"
-            value: {
-                blockID: string
-                portID: string
-            }
-        }
+        [inputID: string]: Input
     }
 }
 
