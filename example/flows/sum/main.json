@@ -1,1 +1,0 @@
-{"blocks":{"trigger":{"title":"trigger","connectedPorts":{"default":{"A":"b","B":"a"}},"type":"onExecute"},"A":{"title":"AAAAAAA","connectedPorts":{"result":{"C":"a"}},"type":"sum"},"B":{"title":"Bbbb","connectedPorts":{"result":{"C":"b"}},"type":"sum"},"C":{"title":"B+C","connectedPorts":{},"type":"sum"}}}
