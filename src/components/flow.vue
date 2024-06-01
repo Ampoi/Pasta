@@ -49,8 +49,8 @@ const emit = defineEmits<{
 const isFlow = (flow: unknown): flow is Flow => {
   if(!(
     (typeof flow == "object" && flow != null) &&
-    ("blocks" in flow) &&
-    !(flow.blocks instanceof Array)
+    ("nodes" in flow) &&
+    !(flow.nodes instanceof Array)
   )) return false
 
   return true
