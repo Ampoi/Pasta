@@ -1,37 +1,9 @@
-export type BlockRect = Record<"height" | "width", number>
-
-export type BlockExposedData = {
-    id: string
-    getBlockRect: (callback: (rect: BlockRect) => void) => void
-}
-
-export type Input = {
-    type: "setting"
-    value: any
-    defaultPortBlockID: string
-} |  {
-    type: "port"
-    value: {
-        blockID: string
-        portID: string
-    }
-}
-
-export type Block = {
-    title: string
-    description?: string
-    type: "code" | string
-    inputs?: {
-        [inputID: string]: Input
-    }
-}
-
 type Value = {
     name: string;
     type: string;
 };
 
-export type BlockData = {
+export type Block = {
     name: string
     description: string
     icon: {

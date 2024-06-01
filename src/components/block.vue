@@ -75,11 +75,12 @@
 </template>
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, watchEffect } from "vue";
-import { Block, BlockExposedData, BlockData } from "../model/block";
+import { Node } from "../model/node";
+import { Block } from "../model/block";
 import Port from "./block/port.vue";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
-import { BlockRect } from "../model/block";
+import { Rect } from "../model/utils";
 import { Callback } from "../model/utils";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { PortPlace } from "../utils/connectPorts";
@@ -87,7 +88,7 @@ import { projectPath } from "../utils/projectPath";
 
 const props = defineProps<{
   blockID: string;
-  blockSettings: Block;
+  blockSettings: Node;
   flowID: string;
 }>()
 
@@ -102,11 +103,11 @@ type Port = {
 
 const block = ref<HTMLElement>();
 const blockPath = computed(() => `${projectPath.value}/blocks/${props.blockSettings.type}/block.json`);
-const blockData = ref<BlockData | undefined>();
+const blockData = ref<Block | undefined>();
 watch(() => props.blockSettings, async () => {
   try {
     const fileText = await readTextFile(blockPath.value);
-    const fileJSON = JSON.parse(fileText) as BlockData;
+    const fileJSON = JSON.parse(fileText) as Block;
     blockData.value = fileJSON;
   } catch (error) {
     console.warn(error);
@@ -128,7 +129,7 @@ watchEffect(() => {
 let isMounted = false
 let getBlockRectQue: (() => void) | undefined = undefined
 
-const getBlockRect = (callback: Callback<BlockRect> ) => {
+const getBlockRect = (callback: Callback<Rect> ) => {
   if( !isMounted ){
     getBlockRectQue = () => getBlockRect(callback)
   }else{
@@ -177,7 +178,7 @@ const isPortSelected = (type: "input" | "output", portID: string): boolean => (
   (portID == selectedPort.value.portID)
 )
 
-defineExpose<BlockExposedData>({
+defineExpose({
   id: props.blockID,
   getBlockRect
 })

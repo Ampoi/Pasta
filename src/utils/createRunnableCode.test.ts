@@ -1,10 +1,10 @@
 import { Flow } from "../model/flow"
 import { test } from 'vitest'
 import { createRunnableCode } from "./createRunnableCode"
-import { BlockData } from "../model/block"
+import { Block } from "../model/block"
 
 const flow: Flow = {
-    "blocks": {
+    "nodes": {
         "trigger": {
             "title": "trigger",
             "type": "onExecute"
@@ -64,7 +64,7 @@ const flow: Flow = {
     }
 }
 
-const blocks: { [blockID: string]: BlockData } = {
+const blocks: { [blockID: string]: Block } = {
     sum: {
         "name": "加算",
         "description": "2つの数値を足し合わせます。",

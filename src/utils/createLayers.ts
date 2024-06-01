@@ -14,7 +14,7 @@ export function createLayers(flow: Flow, withSpacers = true) {
 function createDependencies(flow: Flow) {
     const dependencies: DependencyMap = {}
 
-    Object.entries(flow.blocks).forEach(([id, value]) => {
+    Object.entries(flow.nodes).forEach(([id, value]) => {
         if( !value.inputs ) return
 
         const connectFromSet = new Set<string>()

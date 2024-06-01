@@ -1,4 +1,4 @@
-import { Block, Input } from "../model/block"
+import { Node, Input } from "../model/node"
 import { Flow } from "../model/flow"
 
 export type PortPlace = {
@@ -15,7 +15,7 @@ export const addPortConnection = (flow: Flow, from: PortPlace, to: PortPlace) =>
 
     const newInput: Input = from.portID == "default" ? {
         type: "setting",
-        value: flow.blocks[to.blockID].inputs?.default?.value,
+        value: flow.nodes[to.blockID].inputs?.default?.value,
         defaultPortBlockID: from.blockID
     } : {
         type: "port",
@@ -25,18 +25,18 @@ export const addPortConnection = (flow: Flow, from: PortPlace, to: PortPlace) =>
         }
     }
 
-    const newBlock: Block = {
-        ...flow.blocks[to.blockID],
+    const newBlock: Node = {
+        ...flow.nodes[to.blockID],
         inputs: {
-            ...flow.blocks[to.blockID].inputs,
+            ...flow.nodes[to.blockID].inputs,
             [to.portID]: newInput
         }
     }
 
     const newFlow: Flow = {
         ...flow,
-        blocks: {
-            ...flow.blocks,
+        nodes: {
+            ...flow.nodes,
             [to.blockID]: newBlock
         }
     }

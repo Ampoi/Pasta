@@ -1,15 +1,15 @@
-import { Block } from "./block"
+import { Node } from "./node"
 
 export type Flow = {
-    blocks: {
-        trigger: Block
-    } & Record<string, Block>
+    nodes: {
+        trigger: Node
+    } & Record<string, Node>
 }
 
 export const Flow = {
     create(): Flow {
         return {
-            blocks: {
+            nodes: {
                 trigger: {
                     title: "trigger",
                     type: "onExecute"

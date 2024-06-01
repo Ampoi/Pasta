@@ -13,10 +13,11 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
-import { Block, BlockRect } from '../model/block';
+import { Rect } from '../model/utils';
 import { ports } from "../utils/ports"
 import { Flow } from '../model/flow';
 import { Callback } from '../model/utils';
+import { Node } from '../model/node';
 
 const props = defineProps<{
     flow: Flow
@@ -28,11 +29,11 @@ const yGap = 40
 const spaceHeight = 160
 
 const emit = defineEmits<{
-    (e: "getBlockRect", blockID: string, callback: Callback<BlockRect>): void
+    (e: "getBlockRect", blockID: string, callback: Callback<Rect>): void
 }>()
 
 const getBlockRect = async (blockID: string) => {
-    return new Promise<BlockRect>((resolve) => emit("getBlockRect", blockID, resolve))
+    return new Promise<Rect>((resolve) => emit("getBlockRect", blockID, resolve))
 }
 
 const getBlockPositions = async () => {
@@ -166,7 +167,7 @@ const getLines = (portPositions: {
     };
 }) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
-    const blockEntries = Object.entries(props.flow.blocks) as [string, Block][]
+    const blockEntries = Object.entries(props.flow.nodes) as [string, Node][]
     
     blockEntries.forEach(([blockID, block]) => {
         if( !block.inputs ) return

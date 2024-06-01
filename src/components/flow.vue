@@ -5,9 +5,9 @@
         <div v-for="blockID in row">
           <div v-if="!blockID" class="h-40" />
           <Suspense v-else>
-            <Block
+            <BlockComponent
               :blockID
-              :blockSettings="flow.blocks[blockID]"
+              :blockSettings="flow.nodes[blockID]"
               :flowID="id"
               @open-code-modal="emit('open-code-modal', blockID)"
               :ref="(el: any) => { blocks[el.id] = el }"
@@ -28,14 +28,15 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
-import Block from './block.vue';
+import BlockComponent from './block.vue';
 import { Flow } from "../model/flow"
 import { readDir, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
-import { BlockRect, BlockExposedData, BlockData } from '../model/block';
+import { Block } from '../model/block';
 import { Callback } from "../model/utils"
 import { PortPlace, addPortConnection } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
+import { Rect } from "../model/utils"
 
 const props = defineProps<{
   id: string
@@ -83,9 +84,9 @@ watch(() => props.id, async () => {
   console.log("wow")
 })
 
-const blocks = reactive<{ [blockID: string]: BlockExposedData }>({})
+const blocks = reactive<{ [blockID: string]: InstanceType<typeof BlockComponent> }>({})
 
-const getBlockRect = (blockID: string, callback: Callback<BlockRect>) => {
+const getBlockRect = (blockID: string, callback: Callback<Rect>) => {
   try {
     blocks[blockID].getBlockRect(callback)
   } catch (error) {
@@ -122,14 +123,14 @@ const getAllBlockNames = async (): Promise<string[]> => {
   }
 }
 
-const getAllBlocks = async (): Promise<Record<string, BlockData>> => {
+const getAllBlocks = async (): Promise<Record<string, Block>> => {
   const blockNames = await getAllBlockNames()
-  const blocks: Record<string, BlockData> = {}
+  const blocks: Record<string, Block> = {}
   for (const blockName of blockNames) {
     const blockPath = `${blocksPath.value}/${blockName}/block.json`
     try {
       const fileText = await readTextFile(blockPath)
-      const fileJSON = JSON.parse(fileText) as BlockData
+      const fileJSON = JSON.parse(fileText) as Block
       blocks[blockName] = fileJSON
     } catch (error) {
       console.warn(`an error occurred on blockName: ${blockName}:\n${error}`)

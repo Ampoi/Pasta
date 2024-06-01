@@ -1,9 +1,9 @@
-import { BlockData } from "../model/block"
+import { Block } from "../model/block"
 import { Flow } from "../model/flow"
 import { createLayers } from "./createLayers"
 import { getAlphabet } from "./getAlphabet"
 
-const getMainCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
+const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
     let mainCodeLines: string[]  = []
     
     const layers = createLayers(flow, false).slice(1) as string[][]
@@ -18,7 +18,7 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
 
     for( const layer of layers ){
         for( const blockID of layer ){
-            const block = flow.blocks[blockID]
+            const block = flow.nodes[blockID]
             const input: Record<string, any> = {}
             if( block.inputs ){
                 Object.entries(block.inputs).forEach(([portID, port]) => {
@@ -59,7 +59,7 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
     }
 }
 
-export const createRunnableCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
+export const createRunnableCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
     const { usedBlockIDs, mainCode } = getMainCode(flow, blocks)
     
     let importCode = usedBlockIDs.map((blockID) => `import ${blockID} from "../blocks/${blockID}/main"`).join("\n") + "\n\n"
