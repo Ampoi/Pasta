@@ -24,7 +24,8 @@
         v-model:flowID="flowID"
         class="-ml-2"/>
       <div class="grow" />
-      <button>
+      <button
+        @click="runCode">
         <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
       </button>
     </header>
@@ -33,7 +34,8 @@
         <Flow
           :id="flowID"
           :project-path="projectPath"
-          @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"/>
+          @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"
+          ref="flowComponent"/>
       </DraggableArea>
       <CodeEditorModal
         v-if="openedCodeBlock"
@@ -108,4 +110,10 @@ const openedCodeBlock = ref<{
   id: string
   flowID: string
 } | undefined>(undefined)
+
+const flowComponent = ref<InstanceType<typeof Flow> | null>()
+const runCode = () => {
+  if( !flowComponent.value ) throw new Error("flowComponent is not defined")
+  flowComponent.value.runFlow()
+}
 </script>

@@ -19,13 +19,11 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
     for( const layer of layers ){
         for( const blockID of layer ){
             const block = flow.blocks[blockID]
-
             const input: Record<string, any> = {}
-
             if( block.inputs ){
                 Object.entries(block.inputs).forEach(([portID, port]) => {
                     if( port.type === "setting" ){
-                        input[portID] = typeof port.value == "string" ? `"${port.value}"` : port.value.toString()
+                        input[portID] = typeof port.value == "string" ? `"${port.value}"` : port.value
                     }else{
                         input[portID] = variableIDs[port.value.blockID][port.value.portID]
                     }

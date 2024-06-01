@@ -31,10 +31,11 @@ import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import Block from './block.vue';
 import { Flow } from "../model/flow"
-import { readTextFile, writeTextFile } from '@tauri-apps/api/fs';
-import { BlockRect, BlockExposedData } from '../model/block';
+import { readDir, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
+import { BlockRect, BlockExposedData, BlockData } from '../model/block';
 import { Callback } from "../model/utils"
 import { PortPlace, addPortConnection } from '../utils/connectPorts';
+import { createRunnableCode } from '../utils/createRunnableCode';
 
 const props = defineProps<{
   id: string
@@ -105,4 +106,44 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
     flow.value = newFlow
   }
 }
+
+const blocksPath = computed(() => `${props.projectPath}/blocks`)
+
+const getAllBlockNames = async (): Promise<string[]> => {
+  try {
+    const entries = await readDir(blocksPath.value);
+    const directories = entries
+      .filter(entry => entry.children !== undefined)
+      .map(entry => entry.name)
+      .filter((name): name is string => !!name)
+    return directories;
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return [];
+  }
+}
+
+const getAllBlocks = async (): Promise<Record<string, BlockData>> => {
+  const blockNames = await getAllBlockNames()
+  const blocks: Record<string, BlockData> = {}
+  for (const blockName of blockNames) {
+    const blockPath = `${blocksPath.value}/${blockName}/block.json`
+    try {
+      const fileText = await readTextFile(blockPath)
+      const fileJSON = JSON.parse(fileText) as BlockData
+      blocks[blockName] = fileJSON
+    } catch (error) {
+      console.warn(`an error occurred on blockName: ${blockName}:\n${error}`)
+    }
+  }
+  return blocks
+}
+
+const runFlow = async () => {
+  const blocks = await getAllBlocks()
+  const code = createRunnableCode(flow.value, blocks)
+  console.log(code)
+}
+
+defineExpose({ runFlow })
 </script>
