@@ -141,7 +141,7 @@ const getAllBlocks = async (): Promise<Record<string, BlockData>> => {
 const runFlow = async () => {
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
-  console.log(code)
+  await writeTextFile(`${projectPath.value}/pasta/${props.id}.ts`, code) //TODO:`.pasta`にする
 }
 
 defineExpose({ runFlow })
