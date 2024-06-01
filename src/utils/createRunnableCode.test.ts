@@ -1,6 +1,7 @@
 import { Flow } from "../model/flow"
 import { test } from 'vitest'
 import { createRunnableCode } from "./createRunnableCode"
+import { BlockData } from "../model/block"
 
 const flow: Flow = {
     "blocks": {
@@ -63,7 +64,35 @@ const flow: Flow = {
     }
 }
 
+const blocks: { [blockID: string]: BlockData } = {
+    sum: {
+        "name": "加算",
+        "description": "2つの数値を足し合わせます。",
+        "icon": {
+            "value": "fluent:add-12-filled",
+            "color": "#FF8F1B"
+        },
+        "trigger": false,
+        "inputs": [
+            {
+                "name": "a",
+                "type": "number"
+            },
+            {
+                "name": "b",
+                "type": "number"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "result",
+                "type": "number"
+            }
+        ]
+    }
+}
+
 test('createCode', () => {
-    const code = createRunnableCode(flow)
+    const code = createRunnableCode(flow, blocks)
     console.log(code)
 })

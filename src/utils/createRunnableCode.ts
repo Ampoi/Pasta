@@ -1,35 +1,9 @@
+import { BlockData } from "../model/block"
 import { Flow } from "../model/flow"
 import { createLayers } from "./createLayers"
 import { getAlphabet } from "./getAlphabet"
 
-const blocks = {
-    "sum": {
-        "name": "加算",
-        "description": "2つの数値を足し合わせます。",
-        "icon": {
-            "value": "fluent:add-12-filled",
-            "color": "#FF8F1B"
-        },
-        "inputs": [
-            {
-                "name": "a",
-                "type": "number"
-            },
-            {
-                "name": "b",
-                "type": "number"
-            }
-        ],
-        "outputs": [
-            {
-                "name": "result",
-                "type": "number"
-            }
-        ]
-    }
-}
-
-const getMainCode = (flow: Flow) => {
+const getMainCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
     let mainCodeLines: string[]  = []
     
     const layers = createLayers(flow, false).slice(1) as string[][]
@@ -87,8 +61,8 @@ const getMainCode = (flow: Flow) => {
     }
 }
 
-export const createRunnableCode = (flow: Flow) => {
-    const { usedBlockIDs, mainCode } = getMainCode(flow)
+export const createRunnableCode = (flow: Flow, blocks: { [blockID: string]: BlockData }) => {
+    const { usedBlockIDs, mainCode } = getMainCode(flow, blocks)
     
     let importCode = usedBlockIDs.map((blockID) => `import ${blockID} from "../blocks/${blockID}/main"`).join("\n") + "\n\n"
     const code = importCode + mainCode

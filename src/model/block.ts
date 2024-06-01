@@ -39,7 +39,6 @@ export type BlockData = {
         color: string
     }
     outputs: Value[]
-    executeMainFilePath: string
 } & ({
     trigger: true
     inputs?: undefined
