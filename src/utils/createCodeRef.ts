@@ -2,14 +2,14 @@ import { readTextFile } from "@tauri-apps/api/fs"
 import { ref } from "vue"
 import { getCodeData } from "./getCodeData"
 
-export const createCodeRef = (projectID: string, flowIndex: string, blockID: string) => {
+export const createCodeRef = (projectPath: string, flowIndex: string, blockID: string) => {
     const defaultCode = [
       "export default (",
       ") => {",
       "  return {}",
       "}"
     ].join("\n")
-    const blockFilePath = `${projectID}/flows/${flowIndex}/code/${blockID}.ts`
+    const blockFilePath = `${projectPath}/flows/${flowIndex}/code/${blockID}.ts`
     const code = ref(defaultCode)
     const updateCode = async () => {
       try {

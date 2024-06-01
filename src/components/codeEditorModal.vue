@@ -24,11 +24,11 @@ import { constrainedEditor } from "constrained-editor-plugin" //TODO:Typescript�
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { getCodeData }  from "../utils/getCodeData"
 import { createCodeRef } from "../utils/createCodeRef";
+import { projectPath } from "../utils/projectPath";
 
 const props = defineProps<{
     blockID: string
     flowID: string
-    projectID: string
 }>()
 
 const emit = defineEmits<{
@@ -41,7 +41,8 @@ window.MonacoEnvironment = {
     }
 }
 
-const { code } = createCodeRef(props.projectID, props.flowID, props.blockID)
+if( !projectPath.value ) throw new Error("プロジェクトIDが設定されていません！")
+const { code } = createCodeRef(projectPath.value, props.flowID, props.blockID)
 
 function createModel(){
     const MonacoTypescript = Monaco.languages.typescript

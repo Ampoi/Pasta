@@ -33,7 +33,6 @@
       <DraggableArea class="w-full h-full p-4">
         <Flow
           :id="flowID"
-          :projectID="projectID"
           @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"
           ref="flowComponent"/>
       </DraggableArea>
@@ -41,7 +40,6 @@
         v-if="openedCodeBlock"
         :blockID="openedCodeBlock.id"
         :flowID="openedCodeBlock.flowID"
-        :projectID="projectID"
         @close="openedCodeBlock = undefined"/>
     </main>
   </div>
@@ -61,21 +59,18 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import { Icon } from "@iconify/vue";
 import { projectID } from "../utils/projectID";
+import { projectPath } from "../utils/projectPath"
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
   appWindow.maximize();
 };
 
-const props = defineProps<{
-    projectID: string
-}>()
-
-watch(() => props.projectID, () => {
+watch(projectPath, () => {
   window.location.reload()
 })
 
-const projectFilePath = `${props.projectID}/pasta.json`
+const projectFilePath = `${projectPath}/pasta.json`
 
 const project = reactive<Project>(await (async () => {
   const newProject = await readTextFile(projectFilePath)
@@ -87,7 +82,7 @@ watch(project, (newValue) => {
 })
 
 const flowIDs = reactive<string[]>(await (async () => {
-  const fileEntries = await readDir(`${props.projectID}/flows`)
+  const fileEntries = await readDir(`${projectPath}/flows`)
   const directoryNames = fileEntries
     .filter(entry => entry.children)
     .map(entry => entry.name)
@@ -104,7 +99,7 @@ const openLaunchView = () => {
 }
 
 const openProjectFolder = () => {
-  invoke("open_in_finder", { path: props.projectID })
+  invoke("open_in_finder", { path: projectPath })
 }
 
 const openedCodeBlock = ref<{

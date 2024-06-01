@@ -83,12 +83,12 @@ import { BlockRect } from "../model/block";
 import { Callback } from "../model/utils";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { PortPlace } from "../utils/connectPorts";
+import { projectPath } from "../utils/projectPath";
 
 const props = defineProps<{
   blockID: string;
   blockSettings: Block;
   flowID: string;
-  projectID: string;
 }>()
 
 const emit = defineEmits<{
@@ -101,8 +101,7 @@ type Port = {
 };
 
 const block = ref<HTMLElement>();
-
-const blockPath = computed(() => `${props.projectID}/blocks/${props.blockSettings.type}/block.json`);
+const blockPath = computed(() => `${projectPath.value}/blocks/${props.blockSettings.type}/block.json`);
 const blockData = ref<BlockData | undefined>();
 watch(() => props.blockSettings, async () => {
   try {
