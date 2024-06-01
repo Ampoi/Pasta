@@ -28,7 +28,7 @@ import { createCodeRef } from "../utils/createCodeRef";
 const props = defineProps<{
     blockID: string
     flowID: string
-    projectPath: string
+    projectID: string
 }>()
 
 const emit = defineEmits<{
@@ -41,7 +41,7 @@ window.MonacoEnvironment = {
     }
 }
 
-const { code } = createCodeRef(props.projectPath, props.flowID, props.blockID)
+const { code } = createCodeRef(props.projectID, props.flowID, props.blockID)
 
 function createModel(){
     const MonacoTypescript = Monaco.languages.typescript

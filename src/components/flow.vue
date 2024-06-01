@@ -9,7 +9,7 @@
               :blockID
               :blockSettings="flow.blocks[blockID]"
               :flowID="id"
-              :project-path="projectPath"
+              :projectID="projectID"
               @open-code-modal="emit('open-code-modal', blockID)"
               :ref="(el: any) => { blocks[el.id] = el }"
               v-model:selected-port="selectedPort"
@@ -39,7 +39,7 @@ import { createRunnableCode } from '../utils/createRunnableCode';
 
 const props = defineProps<{
   id: string
-  projectPath: string
+  projectID: string
 }>()
 
 const emit = defineEmits<{
@@ -56,7 +56,7 @@ const isFlow = (flow: unknown): flow is Flow => {
   return true
 }
 
-const flowPath = computed(() => `${props.projectPath}/flows/${props.id}/main.json`)
+const flowPath = computed(() => `${props.projectID}/flows/${props.id}/main.json`)
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
@@ -107,7 +107,7 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
   }
 }
 
-const blocksPath = computed(() => `${props.projectPath}/blocks`)
+const blocksPath = computed(() => `${props.projectID}/blocks`)
 
 const getAllBlockNames = async (): Promise<string[]> => {
   try {

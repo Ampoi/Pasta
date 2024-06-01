@@ -33,7 +33,7 @@
       <DraggableArea class="w-full h-full p-4">
         <Flow
           :id="flowID"
-          :project-path="projectPath"
+          :projectID="projectID"
           @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"
           ref="flowComponent"/>
       </DraggableArea>
@@ -41,7 +41,7 @@
         v-if="openedCodeBlock"
         :blockID="openedCodeBlock.id"
         :flowID="openedCodeBlock.flowID"
-        :project-path="projectPath"
+        :projectID="projectID"
         @close="openedCodeBlock = undefined"/>
     </main>
   </div>
@@ -60,6 +60,7 @@ import { readDir, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import { Icon } from "@iconify/vue";
+import { projectID } from "../utils/projectID";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
@@ -67,14 +68,14 @@ const maximizeWindow = (event: MouseEvent) => {
 };
 
 const props = defineProps<{
-    projectPath: string
+    projectID: string
 }>()
 
-watch(() => props.projectPath, () => {
+watch(() => props.projectID, () => {
   window.location.reload()
 })
 
-const projectFilePath = `${props.projectPath}/pasta.json`
+const projectFilePath = `${props.projectID}/pasta.json`
 
 const project = reactive<Project>(await (async () => {
   const newProject = await readTextFile(projectFilePath)
@@ -86,7 +87,7 @@ watch(project, (newValue) => {
 })
 
 const flowIDs = reactive<string[]>(await (async () => {
-  const fileEntries = await readDir(`${props.projectPath}/flows`)
+  const fileEntries = await readDir(`${props.projectID}/flows`)
   const directoryNames = fileEntries
     .filter(entry => entry.children)
     .map(entry => entry.name)
@@ -98,12 +99,12 @@ const flowIDs = reactive<string[]>(await (async () => {
 const flowID = ref<string>(flowIDs[0])
 
 const openLaunchView = () => {
-  localStorage.removeItem("latestProjectPath") //TODO:最近開いたプロジェクトパスの保存・取得・破棄アルゴリズムをまとめる
+  projectID.value = null
   window.location.reload()
 }
 
 const openProjectFolder = () => {
-  invoke("open_in_finder", { path: props.projectPath })
+  invoke("open_in_finder", { path: props.projectID })
 }
 
 const openedCodeBlock = ref<{

@@ -19,7 +19,7 @@
       "fs": {
         "all": true,
         "scope": [
-          "$HOME/**/*"
+          "$APPDATA/**/*"
         ]
       },
       "dialog": {
@@ -28,6 +28,9 @@
       "window": {
         "startDragging": true,
         "maximize": true
+      },
+      "path": {
+        "all": true
       }
     },
     "windows": [

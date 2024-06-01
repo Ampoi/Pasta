@@ -1,21 +1,19 @@
 <template>
-  <Suspense v-if="projectPath">
+  <Suspense v-if="projectID">
     <Editor
-      :projectPath/>
+      :projectID/>
   </Suspense>
   <Launch
     v-else
     @open-project="openProject"/>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
-
 import Editor from "./pages/editor.vue"
 import Launch from "./pages/launch.vue"
 import { dialog } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
-
-const projectPath = ref<string | null>(localStorage.getItem("latestProjectPath"))
+import { appDataDir } from '@tauri-apps/api/path';
+import { projectID } from "./utils/projectID"
 
 const openProject = async () => {
   const selectedFolder = await dialog.open({
@@ -25,10 +23,11 @@ const openProject = async () => {
   })
 
   if( selectedFolder && typeof selectedFolder == "string" ){
-    projectPath.value = selectedFolder
-    localStorage.setItem("latestProjectPath", selectedFolder)
+    projectID.value = selectedFolder
   }
 }
+
+appDataDir().then(path => console.log(path))
 
 appWindow.listen("open", openProject)
 </script>

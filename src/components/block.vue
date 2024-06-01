@@ -88,7 +88,7 @@ const props = defineProps<{
   blockID: string;
   blockSettings: Block;
   flowID: string;
-  projectPath: string;
+  projectID: string;
 }>()
 
 const emit = defineEmits<{
@@ -102,7 +102,7 @@ type Port = {
 
 const block = ref<HTMLElement>();
 
-const blockPath = computed(() => `${props.projectPath}/blocks/${props.blockSettings.type}/block.json`);
+const blockPath = computed(() => `${props.projectID}/blocks/${props.blockSettings.type}/block.json`);
 const blockData = ref<BlockData | undefined>();
 watch(() => props.blockSettings, async () => {
   try {
