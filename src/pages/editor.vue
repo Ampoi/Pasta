@@ -70,7 +70,7 @@ watch(projectPath, () => {
   window.location.reload()
 })
 
-const projectFilePath = `${projectPath}/pasta.json`
+const projectFilePath = `${projectPath.value}/pasta.json`
 
 const project = reactive<Project>(await (async () => {
   const newProject = await readTextFile(projectFilePath)
@@ -82,7 +82,7 @@ watch(project, (newValue) => {
 })
 
 const flowIDs = reactive<string[]>(await (async () => {
-  const fileEntries = await readDir(`${projectPath}/flows`)
+  const fileEntries = await readDir(`${projectPath.value}/flows`)
   const directoryNames = fileEntries
     .filter(entry => entry.children)
     .map(entry => entry.name)
@@ -99,7 +99,7 @@ const openLaunchView = () => {
 }
 
 const openProjectFolder = () => {
-  invoke("open_in_finder", { path: projectPath })
+  invoke("open_in_finder", { path: projectPath.value })
 }
 
 const openedCodeBlock = ref<{

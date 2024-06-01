@@ -1,6 +1,6 @@
 import { computed } from "vue"
 
-const localStorageSaveID = "latestProjectPath"
+const localStorageSaveID = "latestProjectID"
 export const projectID = computed<string | null>({
     get() {
         return localStorage.getItem(localStorageSaveID)

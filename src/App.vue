@@ -12,19 +12,22 @@ import Editor from "./pages/editor.vue"
 import Launch from "./pages/launch.vue"
 import { dialog } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
-import { appDataDir } from '@tauri-apps/api/path';
+import { appDataDir, basename } from '@tauri-apps/api/path';
 import { projectID } from "./utils/projectID"
 
 const openProject = async () => {
-  const selectedFolder = await dialog.open({
+  const projects = `${await appDataDir()}/projects`
+
+  const selectedFolderPath = await dialog.open({
       directory: true,
       multiple: false,
-      title: "プロジェクトを開く"
+      title: "プロジェクトを開く",
+      defaultPath: projects,
   })
+  if( !selectedFolderPath || typeof selectedFolderPath != "string" ) return
 
-  if( selectedFolder && typeof selectedFolder == "string" ){
-    projectID.value = selectedFolder
-  }
+  const selectedProjectID = await basename(selectedFolderPath)
+  projectID.value = selectedProjectID
 }
 
 appDataDir().then(path => console.log(path))

@@ -55,7 +55,7 @@ const isFlow = (flow: unknown): flow is Flow => {
   return true
 }
 
-const flowPath = computed(() => `${projectPath}/flows/${props.id}/main.json`)
+const flowPath = computed(() => `${projectPath.value}/flows/${props.id}/main.json`)
 const flow = ref(Flow.create())
 const updateFlow = async () => {
   try {
@@ -106,7 +106,7 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
   }
 }
 
-const blocksPath = computed(() => `${projectPath}/blocks`)
+const blocksPath = computed(() => `${projectPath.value}/blocks`)
 
 const getAllBlockNames = async (): Promise<string[]> => {
   try {
