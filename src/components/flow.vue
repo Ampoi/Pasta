@@ -9,7 +9,6 @@
               :blockID
               :blockSettings="flow.nodes[blockID]"
               :flowID="id"
-              @open-code-modal="emit('open-code-modal', blockID)"
               :ref="(el: any) => { blocks[el.id] = el }"
               v-model:selected-port="selectedPort"
               @connect-ports="connectPorts"/>
@@ -41,10 +40,6 @@ import { invoke } from '@tauri-apps/api';
 
 const props = defineProps<{
   id: string
-}>()
-
-const emit = defineEmits<{
-  (e: "open-code-modal", blockID: string): void
 }>()
 
 const isFlow = (flow: unknown): flow is Flow => {
@@ -140,6 +135,8 @@ const getAllBlocks = async (): Promise<Record<string, Block>> => {
   return blocks
 }
 
+const modalOpenedTab = defineModel<string | undefined>("modalOpenedTab")
+
 const runFlow = async () => {
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
@@ -148,6 +145,7 @@ const runFlow = async () => {
     projectPath: projectPath.value,
     flowId: props.id
   })
+  modalOpenedTab.value = "logs"
 }
 
 defineExpose({ runFlow })

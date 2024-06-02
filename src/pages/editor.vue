@@ -37,14 +37,12 @@
       <DraggableArea class="w-full h-full p-4">
         <Flow
           :id="flowID"
-          @open-code-modal="(blockID) => openedCodeBlock = { id: blockID, flowID }"
+          v-model:modal-opened-tab="modalOpenedTab"
           ref="flowComponent"/>
       </DraggableArea>
-      <CodeEditorModal
-        v-if="openedCodeBlock"
-        :blockID="openedCodeBlock.id"
-        :flowID="openedCodeBlock.flowID"
-        @close="openedCodeBlock = undefined"/>
+      <Modal
+        v-if="modalOpenedTab"
+        v-model:opened-tab="modalOpenedTab"/>
     </main>
   </div>
 </template>
@@ -53,8 +51,8 @@ import { reactive, ref, watch } from "vue";
 
 import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
-import CodeEditorModal from "../components/codeEditorModal.vue";
 import FlowSelector from "../components/editor/flowSelector.vue";
+import Modal from "../components/modal.vue";
 
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
@@ -106,10 +104,8 @@ const openProjectFolder = () => {
   invoke("open_in_finder", { path: projectPath.value })
 }
 
-const openedCodeBlock = ref<{
-  id: string
-  flowID: string
-} | undefined>(undefined)
+const modalTabs = ["code", "logs"] as const
+const modalOpenedTab = ref<typeof modalTabs[number]>()
 
 const installDependencies = () => {
   invoke("install_typescript", { path: projectPath.value })
