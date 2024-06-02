@@ -63,9 +63,9 @@
         :defaultPort="true"
         @click="() => onPortClick('output', 'default')"/>
       <Port
-        v-for="output in blockData?.inputs"
+        v-for="output in blockData?.outputs"
         :selected="isPortSelected('output', output.name)"
-        :reverse="true"
+        :reverse="false"
         :type="output.type"
         :name="output.name"
         @click="() => onPortClick('output', output.name)"/>
