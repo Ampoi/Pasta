@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::io::BufRead;
+
 use tauri::{Menu, Submenu, CustomMenuItem};
 
 #[tauri::command]
@@ -22,14 +24,25 @@ fn install_typescript(path: String) {
 }
 
 #[tauri::command]
-fn run_flow(project_path: String, flow_id: String) {
+fn run_flow(window: tauri::Window, project_path: String, flow_id: String) {
     std::env::set_current_dir(&project_path).expect("Failed to change directory");
-
-    let _ = std::process::Command::new("npm")
+    let mut command = std::process::Command::new("npm")
         .arg("run")
         .arg("start")
         .arg(format!("./pasta/{}", &flow_id))
-        .spawn();
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .expect("failed to execute process");
+
+    let stdout = command.stdout.take().unwrap();
+    let reader = std::io::BufReader::new(stdout);
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            println!("{}", line);
+            window.emit("run_flow_output", line).unwrap();
+        }
+    }
 }
 
 fn main() {

@@ -29,14 +29,14 @@ import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import BlockComponent from './block.vue';
 import { Flow } from "../model/flow"
-import { readDir, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
-import { Block } from '../model/block';
+import { readTextFile, writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
 import { PortPlace, addPortConnection } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
+import { getAllBlocks } from '../utils/getAllBlocks';
 
 const props = defineProps<{
   id: string
@@ -103,49 +103,17 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
   }
 }
 
-const blocksPath = computed(() => `${projectPath.value}/blocks`)
-
-const getAllBlockNames = async (): Promise<string[]> => {
-  try {
-    const entries = await readDir(blocksPath.value);
-    const directories = entries
-      .filter(entry => entry.children !== undefined)
-      .map(entry => entry.name)
-      .filter((name): name is string => !!name)
-    return directories;
-  } catch (error) {
-    console.error('Error reading directory:', error);
-    return [];
-  }
-}
-
-const getAllBlocks = async (): Promise<Record<string, Block>> => {
-  const blockNames = await getAllBlockNames()
-  const blocks: Record<string, Block> = {}
-  for (const blockName of blockNames) {
-    const blockPath = `${blocksPath.value}/${blockName}/block.json`
-    try {
-      const fileText = await readTextFile(blockPath)
-      const fileJSON = JSON.parse(fileText) as Block
-      blocks[blockName] = fileJSON
-    } catch (error) {
-      console.warn(`an error occurred on blockName: ${blockName}:\n${error}`)
-    }
-  }
-  return blocks
-}
-
 const modalOpenedTab = defineModel<string | undefined>("modalOpenedTab")
 
 const runFlow = async () => {
+  modalOpenedTab.value = "logs"
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
   await writeTextFile(`${projectPath.value}/pasta/${props.id}.ts`, code) //TODO:`.pasta`にする
-  invoke("run_flow", {
+  await invoke("run_flow", {
     projectPath: projectPath.value,
     flowId: props.id
   })
-  modalOpenedTab.value = "logs"
 }
 
 defineExpose({ runFlow })

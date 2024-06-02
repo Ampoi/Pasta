@@ -13,8 +13,12 @@
         </button>
       </div>
       <div class="border-t-[1px] border-zinc-700 p-2 grow">
-        <div class="w-full h-full bg-black border-zinc-700 border-[1px] rounded-md p-2 font-mono text-white">
-          Wow Log!
+        <div class="text-sm flex flex-col gap-2 w-full h-full bg-black border-zinc-700 border-[1px] rounded-md py-2 px-3 font-mono text-white">
+          <div
+            v-for="log in logs"
+            class="bg-zinc-900 border-zinc-700 border-[1px] rounded-md py-2 px-3 whitespace-pre-line">
+            {{ log.message }}
+          </div>
         </div>
       </div>
     </div>
@@ -22,8 +26,18 @@
 </template>
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import { listen } from '@tauri-apps/api/event';
+import { useLogs } from '../utils/useLogs';
 
 const openedTab = defineModel<string | undefined>("openedTab")
+const { logs, addLog } = useLogs()
+
+listen<string>("run_flow_output", (event) => {
+  addLog({
+    id: event.id,
+    message: event.payload
+  })
+})
 
 const close = () => {
   openedTab.value = undefined
