@@ -73,9 +73,11 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }, triggerOu
     }
 
     return {
-        mainCode: `const main = ({${
-            Object.entries(variableIDs.trigger).map(([outputID, variableName]) => `${outputID}: ${variableName}`).join(", ")
-        }}) => {\n${
+        mainCode: `const main = (${
+            Object.keys(variableIDs.trigger).length == 0 ? "" : `{${
+                Object.entries(variableIDs.trigger).map(([outputID, variableName]) => `${outputID}: ${variableName}`).join(", ")
+            }}`
+        }) => {\n${
             mainCodeLines.map(line => `\t${line}`).join("\n")
         }\n}`,
         usedBlockIDs: Array.from(usedBlockTypes)

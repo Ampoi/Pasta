@@ -14,11 +14,9 @@ const flow: Flow = {
             "type": "sum",
             "inputs": {
                 "a": {
-                    "type": "port",
-                    "value": {
-                        "blockID": "trigger",
-                        "portID": "config"
-                    }
+                    "type": "setting",
+                    "value": 20,
+                    "defaultPortBlockID": "trigger"
                 },
                 "b": {
                     "type": "setting",
@@ -100,12 +98,7 @@ const blocks: { [blockID: string]: Block } = {
             "color": "#475569"
         },
         "trigger": true,
-        "outputs": [
-            {
-                name: "config",
-                type: "number"
-            }
-        ]
+        "outputs": []
     }
 }
 

@@ -37,6 +37,7 @@ import { PortPlace, addPortConnection } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
+import { invoke } from '@tauri-apps/api';
 
 const props = defineProps<{
   id: string
@@ -143,6 +144,10 @@ const runFlow = async () => {
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
   await writeTextFile(`${projectPath.value}/pasta/${props.id}.ts`, code) //TODO:`.pasta`にする
+  invoke("run_flow", {
+    projectPath: projectPath.value,
+    flowId: props.id
+  })
 }
 
 defineExpose({ runFlow })

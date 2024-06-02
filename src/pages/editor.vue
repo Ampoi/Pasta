@@ -2,13 +2,13 @@
   <div class="w-screen h-screen flex flex-col bg-zinc-900">
     <header
       data-tauri-drag-region
-      class="flex flex-row items-center py-1.5 pl-20 pr-8 gap-4"
+      class="flex flex-row items-center py-1.5 pl-20 pr-8 gap-8"
       @dblclick="maximizeWindow">
       <button
         @click="openLaunchView">
         <Icon icon="fluent:home-16-regular" class="text-zinc-500 text-xl"/>
       </button>
-      <div class="relative">
+      <div class="relative -ml-4">
         <input
           type="text"
           v-model="project.title"
@@ -22,8 +22,12 @@
       <FlowSelector
         :flowIDs="flowIDs"
         v-model:flowID="flowID"
-        class="-ml-2"/>
+        class="-ml-5"/>
       <div class="grow" />
+      <button
+        @click="installDependencies">
+        <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
+      </button>
       <button
         @click="runCode">
         <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
@@ -106,6 +110,10 @@ const openedCodeBlock = ref<{
   id: string
   flowID: string
 } | undefined>(undefined)
+
+const installDependencies = () => {
+  invoke("install_typescript", { path: projectPath.value })
+}
 
 const flowComponent = ref<InstanceType<typeof Flow> | null>()
 const runCode = () => {
