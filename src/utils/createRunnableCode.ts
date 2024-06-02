@@ -3,18 +3,38 @@ import { Flow } from "../model/flow"
 import { createLayers } from "./createLayers"
 import { getAlphabet } from "./getAlphabet"
 
-const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
+class UniqueVariable {
+    private n = 0
+
+    public create(){
+        const alphabet = getAlphabet(this.n)
+        this.n++
+        return alphabet
+    }
+
+    public reset(){
+        this.n = 0
+    }
+}
+
+const uniqueVariable = new UniqueVariable()
+
+const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }, triggerOutputs: { type: string, name: string }[] ) => {
     let mainCodeLines: string[]  = []
     
     const layers = createLayers(flow, false).slice(1) as string[][]
     const usedBlockTypes = new Set<string>()
 
-    let n = 0
     const variableIDs: {
         [blockID: string]: {
             [outputID: string]: string
         }
     } = {}
+
+    variableIDs.trigger = {}
+    triggerOutputs.forEach((output) => {
+        variableIDs.trigger[output.name] = uniqueVariable.create()
+    })
 
     for( const layer of layers ){
         for( const blockID of layer ){
@@ -39,8 +59,7 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
             
             const outputVariables: { [output: string]: string } = {}
             blockTemplate.outputs.forEach((output) => {
-                outputVariables[output.name] = getAlphabet(n)
-                n++
+                outputVariables[output.name] = uniqueVariable.create()
             })
 
             variableIDs[blockID] = outputVariables
@@ -54,13 +73,34 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
     }
 
     return {
-        mainCode: `const main = () => {\n${mainCodeLines.map(line => `\t${line}`).join("\n")}\n}`,
+        mainCode: `const main = ({${
+            Object.entries(variableIDs.trigger).map(([outputID, variableName]) => `${outputID}: ${variableName}`).join(", ")
+        }}) => {\n${
+            mainCodeLines.map(line => `\t${line}`).join("\n")
+        }\n}`,
         usedBlockIDs: Array.from(usedBlockTypes)
     }
 }
 
+const getExecuteCode = (flow: Flow, blocks: Record<string, Block>) => {
+    const triggerBlockID = flow.nodes.trigger.type
+    if( typeof triggerBlockID != "string" ) throw new Error("Trigger block id is not string");
+
+    const triggerBlock = blocks[triggerBlockID]
+    if( !triggerBlock ) throw new Error("Trigger block is not found");
+
+    if( triggerBlock.trigger == false ) throw new Error("Trigger block is not trigger type");
+    
+    return { triggerBlockID, triggerOutputs: triggerBlock.outputs }
+}
+
 export const createRunnableCode = (flow: Flow, blocks: { [blockID: string]: Block }) => {
-    const { usedBlockIDs, mainCode } = getMainCode(flow, blocks)
+    uniqueVariable.reset()
+    
+    const { triggerBlockID, triggerOutputs } = getExecuteCode(flow, blocks)
+    const { usedBlockIDs: usedBlockIDsInMainCode, mainCode } = getMainCode(flow, blocks, triggerOutputs)
+
+    const usedBlockIDs = [triggerBlockID, ...usedBlockIDsInMainCode]
     
     let importCode = usedBlockIDs.map((blockID) => `import ${blockID} from "../blocks/${blockID}/main"`).join("\n") + "\n\n"
     const code = importCode + mainCode

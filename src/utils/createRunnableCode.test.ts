@@ -14,9 +14,11 @@ const flow: Flow = {
             "type": "sum",
             "inputs": {
                 "a": {
-                    "type": "setting",
-                    "value": 10,
-                    "defaultPortBlockID": "trigger"
+                    "type": "port",
+                    "value": {
+                        "blockID": "trigger",
+                        "portID": "config"
+                    }
                 },
                 "b": {
                     "type": "setting",
@@ -87,6 +89,21 @@ const blocks: { [blockID: string]: Block } = {
             {
                 "name": "result",
                 "type": "number"
+            }
+        ]
+    },
+    onExecute: {
+        "name": "実行時に実行する",
+        "description": "実行時に実行します",
+        "icon": {
+            "value": "fluent:play-16-regular",
+            "color": "#475569"
+        },
+        "trigger": true,
+        "outputs": [
+            {
+                name: "config",
+                type: "number"
             }
         ]
     }
