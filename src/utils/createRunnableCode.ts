@@ -102,8 +102,9 @@ export const createRunnableCode = (flow: Flow, blocks: { [blockID: string]: Bloc
 
     const usedBlockIDs = [triggerBlockID, ...usedBlockIDsInMainCode]
     
-    let importCode = usedBlockIDs.map((blockID) => `import ${blockID} from "../blocks/${blockID}/main"`).join("\n") + "\n\n"
-    const code = importCode + mainCode
+    const importCode = usedBlockIDs.map((blockID) => `import ${blockID} from "../blocks/${blockID}/main"`).join("\n") + "\n\n"
+    const executeCode = `${triggerBlockID}(main)`
+    const code = importCode + mainCode + "\n\n" + executeCode
 
     return code
 }
