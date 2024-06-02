@@ -34,7 +34,7 @@
         <input
           type="text"
           class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
-          :value="node.title"
+          v-model="node.title"
         />
       </div>
       <div
@@ -42,13 +42,13 @@
         v-if="blockData && 0 < (blockData.inputs?.length ?? 0)">
         <div
           v-for="setting in blockData.inputs"
-          class="flex flex-row gap-2 items-center text-sm">
+          class="flex flex-row gap-2 items-center">
           <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
             {{ setting.name }}
           </p>
           <input
             type="number"
-            class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow"
+            class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow text-sm"
           />
         </div>
       </div>
