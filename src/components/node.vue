@@ -2,12 +2,13 @@
   <div class="flex flex-row" ref="block">
     <!--引数-->
     <div
-      class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
+      class="flex flex-col gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
       v-if="nodeID != 'trigger'"
     >
       <Port
         :selected="isPortSelected('input', 'default')"
         :defaultPort="true"
+        :reverse="true"
         @click="() => onPortClick('input', 'default')"/>
       <Port
         v-for="input in blockData?.inputs"
@@ -56,11 +57,12 @@
 
     <!--返り値-->
     <div
-      class="flex flex-col items-start gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
+      class="flex flex-col gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
     >
       <Port
         :selected="isPortSelected('output', 'default')"
         :defaultPort="true"
+        :reverse="false"
         @click="() => onPortClick('output', 'default')"/>
       <Port
         v-for="output in blockData?.outputs"
