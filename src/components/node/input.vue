@@ -4,7 +4,8 @@
             <Port
                 v-if="nodeID != 'trigger'"
                 :nodeID
-                name="default"
+                :name
+                :type
                 v-model:selectedPort="selectedPort"
                 portType="input"/>
         </td>
