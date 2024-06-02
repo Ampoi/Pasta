@@ -32,17 +32,16 @@
             />
           </td>
         </tr>
-        <InputList
-          v-if="nodeID != 'trigger'"
-          v-for="(input, index) in block?.inputs"
+        <InputListItem
+          v-if="nodeID != 'trigger' && block && block.inputs"
+          v-for="(input, index) in block.inputs"
           :nodeID
           v-model:selectedPort="selectedPort"
           portType="input"
-          :type="input.type"
-          :name="input.name"
           :block="block"
           :index
-          :input/>
+          :blockInput="input"
+          v-model:node="node"/>
       </tbody>
     </table>
 
@@ -74,7 +73,7 @@ import { Callback } from "../model/utils";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { PortPlace } from "../utils/connectPorts";
 import { projectPath } from "../utils/projectPath";
-import InputList from "./node/input.vue";
+import InputListItem from "./node/inputListItem.vue";
 import Port from "./node/port.vue";
 
 const props = defineProps<{
