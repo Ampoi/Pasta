@@ -11,7 +11,11 @@
               v-model:selectedPort="selectedPort"
               portType="input"/>
           </td>
-          <td class="flex flex-row -ml-3 items-center gap-2 pt-3 pb-2 bg-zinc-900 px-4 border-t-[1px] border-x-[1px] border-zinc-700 rounded-t-xl -mr-3">
+          <td
+            class="flex flex-row -ml-3 items-center gap-2 py-3 bg-zinc-900 px-4 border-t-[1px] border-x-[1px] border-zinc-700 rounded-t-xl -mr-3"
+            :class="{
+              'rounded-b-xl border-b-[1px]': (block?.inputs?.length ?? 0) == 0
+            }">
             <div
               class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
               :style="{ background: block?.icon.color }"
@@ -28,32 +32,17 @@
             />
           </td>
         </tr>
-        <tr
-          v-for="(input, index) in block?.inputs">
-          <td>
-            <Port
-              v-if="nodeID != 'trigger'"
-              :nodeID
-              v-model:selectedPort="selectedPort"
-              portType="input"
-              :type="input.type"
-              :name="input.name"/>
-          </td>
-          <td
-            class="flex flex-row gap-2 items-center -ml-3 px-4 py-1 bg-zinc-900 text-zinc-500 border-x-[1px] border-zinc-700 -mr-3"
-            :class="{ 'rounded-b-xl border-b-[1px] pb-3': (block && block.inputs ? (block.inputs.length - 1) : 0) == index }">
-            <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
-              {{ input.name }}
-            </p>
-            <button>
-              <Icon icon="fluent:arrow-circle-right-12-filled"/>
-            </button>
-            <input
-              type="number"
-              class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow text-sm"
-            />
-          </td>
-        </tr>
+        <InputList
+          v-if="nodeID != 'trigger'"
+          v-for="(input, index) in block?.inputs"
+          :nodeID
+          v-model:selectedPort="selectedPort"
+          portType="input"
+          :type="input.type"
+          :name="input.name"
+          :block="block"
+          :index
+          :input/>
       </tbody>
     </table>
 
@@ -78,7 +67,6 @@
 import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import { Node } from "../model/node";
 import { Block } from "../model/block";
-import Port from "./node/port.vue";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
 import { Rect } from "../model/utils";
@@ -86,6 +74,8 @@ import { Callback } from "../model/utils";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { PortPlace } from "../utils/connectPorts";
 import { projectPath } from "../utils/projectPath";
+import InputList from "./node/input.vue";
+import Port from "./node/port.vue";
 
 const props = defineProps<{
   nodeID: string;
@@ -95,11 +85,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "connectPorts", from: PortPlace, to: PortPlace): void
 }>()
-
-type Port = {
-  type: string;
-  name: string;
-};
 
 const blockElement = ref<HTMLElement>();
 const blockPath = computed(() => `${projectPath.value}/blocks/${node.value.type}/block.json`);
