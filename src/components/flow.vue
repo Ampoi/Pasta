@@ -28,8 +28,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import BlockComponent from './block.vue';
-import { Flow } from "../model/flow"
-import { readTextFile, writeTextFile } from '@tauri-apps/api/fs';
+import { writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
 import { PortPlace, addPortConnection } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
@@ -37,47 +36,15 @@ import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
+import { useFlow } from '../hooks/useFlow';
 
 const props = defineProps<{
   id: string
 }>()
 
-const isFlow = (flow: unknown): flow is Flow => {
-  if(!(
-    (typeof flow == "object" && flow != null) &&
-    ("nodes" in flow) &&
-    !(flow.nodes instanceof Array)
-  )) return false
-
-  return true
-}
-
-const flowPath = computed(() => `${projectPath.value}/flows/${props.id}/main.json`)
-const flow = ref(Flow.create())
-const updateFlow = async () => {
-  try {
-    const fileText = await readTextFile(flowPath.value)
-    const fileJSON = JSON.parse(fileText)
-    if( !isFlow(fileJSON) ) throw new Error(`Invalid Flow: ${flowPath}`)
-    flow.value = fileJSON
-  }catch(e){
-    console.warn(`flowの更新中にエラーが発生しました:\n${e}`)
-  }
-}
-
-updateFlow().then(() => {
-  watch(flow, async () => {
-    try{
-      await writeTextFile(flowPath.value, JSON.stringify(flow.value))
-    }catch(e){
-      console.warn(`flowの保存中にエラーが発生しました:\n${e}`)
-    }
-  })
-})
-
-watch(() => props.id, async () => {
-  await updateFlow()
-  console.log("wow")
+const { flow, flowID } = useFlow(props.id)
+watch(() => props.id, (newID) => {
+  flowID.value = newID
 })
 
 const blocks = reactive<{ [blockID: string]: InstanceType<typeof BlockComponent> }>({})
