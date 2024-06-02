@@ -2,7 +2,7 @@
     <div
         class="flex flex-row items-center"
         :class="{
-            'flex-row-reverse': !reverse
+            'flex-row-reverse': portType != 'input'
         }">
         <div
             class="h-[2px] grow min-w-2 bg-zinc-800"/>
@@ -12,15 +12,15 @@
                 'border-blue-500': selected,
                 'border-zinc-700': !selected
             }"
-            @click="emit('click')"
+            @click="onClick"
             ref="port">
             <div
-                v-if="defaultPort"
+                v-if="props.name == 'default'"
                 class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
             <div
                 v-else
                 class="flex items-center gap-2"
-                :class="reverse ? 'flex-row-reverse' : 'flex-row'">
+                :class="portType == 'input' ? 'flex-row-reverse' : 'flex-row'">
                 <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-500 grid place-content-center">
                     {{ type ? type[0].toUpperCase(): "?" }}
                 </div>
@@ -30,20 +30,52 @@
     </div>
 </template>
 <script setup lang="ts">
-defineProps<{
-    selected: boolean
-    reverse: boolean
+import { computed } from "vue";
+import { type PortPlace } from "../../utils/connectPorts";
+
+const props = defineProps<{
+    portType: "input" | "output"
+    nodeID: string
 } & ({
-    type: string
-    name: string
-    defaultPort?: false
-} | {
+    name: "default"
     type?: undefined
-    name?: undefined
-    defaultPort: true
+} | {
+    name: string
+    type: string
 })>()
 
 const emit = defineEmits<{
-    (e: "click"): void
+    (e: "connectPorts", from: PortPlace, to: PortPlace): void
 }>()
+
+const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
+
+const selected = computed<boolean>(() => {
+    return (
+        !!(selectedPort.value) &&
+        (props.portType == selectedPort.value.type) &&
+        (props.nodeID == selectedPort.value.blockID) &&
+        (props.name == selectedPort.value.portID)
+    )
+})
+
+const onClick = () => {
+  const clickedPort: PortPlace = {
+    type: props.portType,
+    blockID: props.nodeID,
+    portID: props.name ?? "default"
+  }
+  console.log(clickedPort)
+
+  if( !selectedPort.value ){
+    selectedPort.value = clickedPort
+  }else{
+    if( clickedPort.type == "input" ){
+      emit("connectPorts", selectedPort.value, clickedPort)
+    }else{
+      emit("connectPorts", clickedPort, selectedPort.value)
+    }
+    selectedPort.value = null
+  }
+}
 </script>

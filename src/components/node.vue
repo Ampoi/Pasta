@@ -6,17 +6,19 @@
       v-if="nodeID != 'trigger'"
     >
       <Port
-        :selected="isPortSelected('input', 'default')"
-        :defaultPort="true"
-        :reverse="true"
-        @click="() => onPortClick('input', 'default')"/>
+        :nodeID
+        name="default"
+        v-model:selectedPort="selectedPort"
+        portType="input"
+        @connectPorts="connectPorts"/>
       <Port
         v-for="input in blockData?.inputs"
-        :selected="isPortSelected('input', input.name)"
-        :reverse="true"
+        :nodeID
+        v-model:selectedPort="selectedPort"
+        portType="input"
         :type="input.type"
         :name="input.name"
-        @click="() => onPortClick('input', input.name)"/>
+        @connectPorts="connectPorts"/>
     </div>
 
     <div
@@ -60,17 +62,19 @@
       class="flex flex-col gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
     >
       <Port
-        :selected="isPortSelected('output', 'default')"
-        :defaultPort="true"
-        :reverse="false"
-        @click="() => onPortClick('output', 'default')"/>
+        :nodeID
+        name="default"
+        v-model:selectedPort="selectedPort"
+        portType="output"
+        @connectPorts="connectPorts"/>
       <Port
         v-for="output in blockData?.outputs"
-        :selected="isPortSelected('output', output.name)"
-        :reverse="false"
+        :nodeID
+        v-model:selectedPort="selectedPort"
+        portType="output"
         :type="output.type"
         :name="output.name"
-        @click="() => onPortClick('output', output.name)"/>
+        @connectPorts="connectPorts"/>
     </div>
   </div>
 </template>
@@ -152,33 +156,10 @@ onMounted(() => {
   }
 })
 
-const selectedPort = defineModel<PortPlace | null>("selectedPort")
-
-const onPortClick = (type: "input" | "output", portID: string) => {
-  const clickedPort = {
-    type,
-    blockID: props.nodeID,
-    portID
-  }
-
-  if( !selectedPort.value ){
-    selectedPort.value = clickedPort
-  }else{
-    if( clickedPort.type == "input" ){
-      emit("connectPorts", selectedPort.value, clickedPort)
-    }else{
-      emit("connectPorts", clickedPort, selectedPort.value)
-    }
-    selectedPort.value = null
-  }
+const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
+const connectPorts = (from: PortPlace, to: PortPlace) => {
+  emit("connectPorts", from, to)
 }
-
-const isPortSelected = (type: "input" | "output", portID: string): boolean => (
-  !!(selectedPort.value) &&
-  (type == selectedPort.value.type) &&
-  (props.nodeID == selectedPort.value.blockID) &&
-  (portID == selectedPort.value.portID)
-)
 
 defineExpose({
   id: props.nodeID,
