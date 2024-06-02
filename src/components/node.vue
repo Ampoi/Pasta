@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row" ref="block">
+  <div class="flex flex-row" ref="blockElement">
     <!--引数-->
     <div
       class="flex flex-col gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
@@ -11,7 +11,7 @@
         v-model:selectedPort="selectedPort"
         portType="input"/>
       <Port
-        v-for="input in blockData?.inputs"
+        v-for="input in block?.inputs"
         :nodeID
         v-model:selectedPort="selectedPort"
         portType="input"
@@ -25,10 +25,10 @@
       <div class="flex flex-row items-center gap-2">
         <div
           class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
-          :style="{ background: blockData?.icon.color }"
+          :style="{ background: block?.icon.color }"
         >
           <Icon
-            :icon="blockData?.icon.value ?? 'fluent:question-16-filled'"
+            :icon="block?.icon.value ?? 'fluent:question-16-filled'"
             class="text-lg"
           />
         </div>
@@ -40,13 +40,16 @@
       </div>
       <div
         class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center p-2 gap-2"
-        v-if="blockData && 0 < (blockData.inputs?.length ?? 0)">
+        v-if="block && 0 < (block.inputs?.length ?? 0)">
         <div
-          v-for="setting in blockData.inputs"
+          v-for="setting in block.inputs"
           class="flex flex-row gap-2 items-center">
           <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
             {{ setting.name }}
           </p>
+          <button>
+            <Icon icon="fluent:arrow-circle-right-12-filled"/>
+          </button>
           <input
             type="number"
             class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow text-sm"
@@ -65,7 +68,7 @@
         v-model:selectedPort="selectedPort"
         portType="output"/>
       <Port
-        v-for="output in blockData?.outputs"
+        v-for="output in block?.outputs"
         :nodeID
         v-model:selectedPort="selectedPort"
         portType="output"
@@ -92,8 +95,6 @@ const props = defineProps<{
   flowID: string;
 }>()
 
-const node = defineModel<Node>("node", { required: true })
-
 const emit = defineEmits<{
   (e: "connectPorts", from: PortPlace, to: PortPlace): void
 }>()
@@ -103,14 +104,16 @@ type Port = {
   name: string;
 };
 
-const block = ref<HTMLElement>();
+const blockElement = ref<HTMLElement>();
 const blockPath = computed(() => `${projectPath.value}/blocks/${node.value.type}/block.json`);
-const blockData = ref<Block | undefined>();
+const block = ref<Block | undefined>();
+
+const node = defineModel<Node>("node", { required: true })
 watch(node, async () => {
   try {
     const fileText = await readTextFile(blockPath.value);
     const fileJSON = JSON.parse(fileText) as Block;
-    blockData.value = fileJSON;
+    block.value = fileJSON;
   } catch (error) {
     console.warn(error);
   }
@@ -119,8 +122,8 @@ watch(node, async () => {
 watchEffect(() => {
   if (!ports[props.flowID]) ports[props.flowID] = {};
 
-  const inputs = blockData.value?.inputs ?? [];
-  const outputs = blockData.value?.outputs ?? [];
+  const inputs = block.value?.inputs ?? [];
+  const outputs = block.value?.outputs ?? [];
 
   ports[props.flowID][props.nodeID] = {
     inputs: inputs.map((input) => input.name),
@@ -135,11 +138,11 @@ const getNodeRect = (callback: Callback<Rect> ) => {
   if( !isMounted ){
     getNodeRectQue = () => getNodeRect(callback)
   }else{
-    const blockElement = block.value;
-    if( !blockElement ) throw new Error("blockElement is not defined")
+    const blockElementValue = blockElement.value;
+    if( !blockElementValue ) throw new Error("blockElement is not defined")
     callback({
-      height: blockElement.clientHeight,
-      width: blockElement.clientWidth,
+      height: blockElementValue.clientHeight,
+      width: blockElementValue.clientWidth,
     })
   }
 }
