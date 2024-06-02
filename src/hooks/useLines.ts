@@ -68,24 +68,6 @@ const getPortPositions = async (
         }
     } = {}
 
-    const updateDefaultPortPosition = async (
-        type: "inputs" | "outputs",
-        blockID: string,
-        blockPorts: (typeof ports)[number][string]["inputs"|"outputs"],
-        { x, y }: Record<"x"|"y",number>
-    ) => {
-        const blockRect = await getBlockRect(blockID)
-        const portAmount = blockPorts.length + 1
-        
-        if( !portPositions[blockID] ) portPositions[blockID] = {}
-        if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
-
-        (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}}).default = {
-            x: x + (type == "outputs" ? blockRect.width : 0),
-            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + portHeight/2
-        }
-    }
-
     //TODO: ここらへんのリファクタリング
     const updatePortPosition = async (
         type: "inputs" | "outputs",
@@ -103,7 +85,7 @@ const getPortPositions = async (
 
         (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}})[portID] = {
             x: x + (type == "outputs" ? blockRect.width : 0),
-            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + ( portHeight + portYGap ) * (i+1) + portHeight/2
+            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + (portHeight + portYGap) * i + portHeight/2
         }
     }
 
@@ -113,14 +95,8 @@ const getPortPositions = async (
             if( !blockPositions[blockID] ) return
     
             await Promise.all([
-                ...[
-                    updateDefaultPortPosition("inputs", blockID, blockPorts.outputs, blockPositions[blockID]),
-                    (blockPorts.inputs ? blockPorts.inputs.map(async (portID, i) => await updatePortPosition("inputs", blockID, blockPorts.inputs, portID, i, blockPositions[blockID])) : [])
-                ],
-                ...[
-                    updateDefaultPortPosition("outputs", blockID, blockPorts.outputs, blockPositions[blockID]),
-                    blockPorts.outputs.map(async (portID, i) => await updatePortPosition("outputs", blockID, blockPorts.outputs, portID, i, blockPositions[blockID]))
-                ]
+                ...["default", ...blockPorts.inputs].map(async (portID, i) => await updatePortPosition("inputs", blockID, blockPorts.inputs, portID, i, blockPositions[blockID])),
+                ...["default", ...blockPorts.outputs].map(async (portID, i) => await updatePortPosition("outputs", blockID, blockPorts.outputs, portID, i, blockPositions[blockID]))
             ])
         }))
     }
@@ -146,14 +122,17 @@ const getLines = (
     
     blockEntries.forEach(([blockID, block]) => {
         if( !block.inputs ) return
+        let isBlockDefaultPortsConnected = false
 
         Object.entries(block.inputs).forEach(([portID, input]) => {
+            if( input.type == "setting" && isBlockDefaultPortsConnected ) return
+
             try {
                 const { fromBlockID, fromPortID } = input.type == "port" ? {
                     fromBlockID: input.value.blockID,
                     fromPortID: input.value.portID
                 } : {
-                    fromBlockID: input.defaultPortBlockID,
+                    fromBlockID: block.defaultPortBlockID as string,
                     fromPortID: "default"
                 }
     
@@ -165,9 +144,12 @@ const getLines = (
 
                 const toBlockPortPositions = portPositions[blockID]
                 if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${blockID}`)
-                
-                const to = toBlockPortPositions.inputs?.[portID]
+
+                const toPortID = input.type == "setting" ? "default" : portID
+                const to = toBlockPortPositions.inputs?.[toPortID]
                 if( !to ) throw new Error(`${portID} is not in outputs of ${blockID}`)
+
+                if( input.type == "setting" ) isBlockDefaultPortsConnected = true
     
                 lines.push({ from, to })
             }catch ( error ){

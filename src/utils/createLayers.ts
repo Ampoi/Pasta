@@ -14,16 +14,16 @@ export function createLayers(flow: Flow, withSpacers = true) {
 function createDependencies(flow: Flow) {
     const dependencies: DependencyMap = {}
 
-    Object.entries(flow.nodes).forEach(([id, value]) => {
-        if( !value.inputs ) return
+    Object.entries(flow.nodes).forEach(([id, node]) => {
+        if( !node.inputs ) return
 
         const connectFromSet = new Set<string>()
 
-        Object.values(value.inputs).forEach((input) => {
+        Object.values(node.inputs).forEach((input) => {
             if( input.type == "port" ) {
                 connectFromSet.add(input.value.blockID)
             }else{
-                connectFromSet.add(input.defaultPortBlockID)
+                connectFromSet.add(node.defaultPortBlockID as string)
             }
         })
 

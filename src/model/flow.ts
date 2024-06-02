@@ -12,7 +12,8 @@ export const Flow = {
             nodes: {
                 trigger: {
                     title: "trigger",
-                    type: "onExecute"
+                    type: "onExecute",
+                    trigger: true
                 }
             }
         }

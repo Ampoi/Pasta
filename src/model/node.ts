@@ -1,8 +1,9 @@
-export type Input = {
+type SettingInput = {
     type: "setting"
     value: any
-    defaultPortBlockID: string
-} |  {
+}
+
+type PortInput = {
     type: "port"
     value: {
         blockID: string
@@ -10,11 +11,31 @@ export type Input = {
     }
 }
 
+export type Input = SettingInput | PortInput
+
 export type Node = {
     title: string
     description?: string
     type: "code" | string
-    inputs?: {
-        [inputID: string]: Input
+} & (
+    (
+        ({
+            defaultPortBlockID?: undefined
+            trigger: true
+        } | {
+            defaultPortBlockID: string
+            trigger?: false
+        }) &
+        {
+            inputs?: {
+                [inputID: string]: Input
+            }
+        }
+    ) | {
+        defaultPortBlockID?: undefined
+        trigger?: false
+        inputs: {
+            [inputID: string]: PortInput
+        }
     }
-}
+)
