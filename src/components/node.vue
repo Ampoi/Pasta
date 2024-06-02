@@ -9,16 +9,14 @@
         :nodeID
         name="default"
         v-model:selectedPort="selectedPort"
-        portType="input"
-        @connectPorts="connectPorts"/>
+        portType="input"/>
       <Port
         v-for="input in blockData?.inputs"
         :nodeID
         v-model:selectedPort="selectedPort"
         portType="input"
         :type="input.type"
-        :name="input.name"
-        @connectPorts="connectPorts"/>
+        :name="input.name"/>
     </div>
 
     <div
@@ -65,16 +63,14 @@
         :nodeID
         name="default"
         v-model:selectedPort="selectedPort"
-        portType="output"
-        @connectPorts="connectPorts"/>
+        portType="output"/>
       <Port
         v-for="output in blockData?.outputs"
         :nodeID
         v-model:selectedPort="selectedPort"
         portType="output"
         :type="output.type"
-        :name="output.name"
-        @connectPorts="connectPorts"/>
+        :name="output.name"/>
     </div>
   </div>
 </template>
@@ -157,9 +153,6 @@ onMounted(() => {
 })
 
 const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
-const connectPorts = (from: PortPlace, to: PortPlace) => {
-  emit("connectPorts", from, to)
-}
 
 defineExpose({
   id: props.nodeID,

@@ -44,10 +44,6 @@ const props = defineProps<{
     type: string
 })>()
 
-const emit = defineEmits<{
-    (e: "connectPorts", from: PortPlace, to: PortPlace): void
-}>()
-
 const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
 
 const selected = computed<boolean>(() => {
@@ -60,22 +56,10 @@ const selected = computed<boolean>(() => {
 })
 
 const onClick = () => {
-  const clickedPort: PortPlace = {
+  selectedPort.value = {
     type: props.portType,
     blockID: props.nodeID,
     portID: props.name ?? "default"
-  }
-  console.log(clickedPort)
-
-  if( !selectedPort.value ){
-    selectedPort.value = clickedPort
-  }else{
-    if( clickedPort.type == "input" ){
-      emit("connectPorts", selectedPort.value, clickedPort)
-    }else{
-      emit("connectPorts", clickedPort, selectedPort.value)
-    }
-    selectedPort.value = null
   }
 }
 </script>

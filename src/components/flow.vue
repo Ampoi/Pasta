@@ -70,6 +70,17 @@ const connectPorts = (from: PortPlace, to: PortPlace) => {
   }
 }
 
+watch(selectedPort, (newValue, oldValue) => {
+  if( !newValue || !oldValue ) return
+  
+  if( newValue.type == "input" ) {
+    connectPorts(oldValue, newValue)
+  }else{
+    connectPorts(newValue, oldValue)
+  }
+  selectedPort.value = null
+})
+
 const modalOpenedTab = defineModel<string | undefined>("modalOpenedTab")
 
 const runFlow = async () => {
