@@ -3,20 +3,19 @@
     <!--引数-->
     <div
       class="flex flex-col items-end gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
-      v-if="blockID != 'trigger'"
+      v-if="nodeID != 'trigger'"
     >
       <Port
+        :selected="isPortSelected('input', 'default')"
         :defaultPort="true"
-        @click="() => onPortClick('input', 'default')"
-        :selected="isPortSelected('input', 'default')"/>
+        @click="() => onPortClick('input', 'default')"/>
       <Port
         v-for="input in blockData?.inputs"
-        :blockID
+        :selected="isPortSelected('input', input.name)"
+        :reverse="true"
         :type="input.type"
         :name="input.name"
-        :reverse="true"
-        @click="() => onPortClick('input', input.name)"
-        :selected="isPortSelected('input', input.name)"/>
+        @click="() => onPortClick('input', input.name)"/>
     </div>
 
     <div
@@ -35,7 +34,7 @@
         <input
           type="text"
           class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
-          :value="blockSettings.title"
+          :value="node.title"
         />
       </div>
       <div
@@ -60,16 +59,16 @@
       class="flex flex-col items-start gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
     >
       <Port
+        :selected="isPortSelected('output', 'default')"
         :defaultPort="true"
-        @click="() => onPortClick('output', 'default')"
-        :selected="isPortSelected('output', 'default')"/>
+        @click="() => onPortClick('output', 'default')"/>
       <Port
-        v-for="output in blockData?.outputs"
-        :blockID
+        v-for="output in blockData?.inputs"
+        :selected="isPortSelected('output', output.name)"
+        :reverse="true"
         :type="output.type"
         :name="output.name"
-        @click="() => onPortClick('output', output.name)"
-        :selected="isPortSelected('output', output.name)"/>
+        @click="() => onPortClick('output', output.name)"/>
     </div>
   </div>
 </template>
@@ -87,10 +86,11 @@ import { PortPlace } from "../utils/connectPorts";
 import { projectPath } from "../utils/projectPath";
 
 const props = defineProps<{
-  blockID: string;
-  blockSettings: Node;
+  nodeID: string;
   flowID: string;
 }>()
+
+const node = defineModel<Node>("node", { required: true })
 
 const emit = defineEmits<{
   (e: "connectPorts", from: PortPlace, to: PortPlace): void
@@ -102,9 +102,9 @@ type Port = {
 };
 
 const block = ref<HTMLElement>();
-const blockPath = computed(() => `${projectPath.value}/blocks/${props.blockSettings.type}/block.json`);
+const blockPath = computed(() => `${projectPath.value}/blocks/${node.value.type}/block.json`);
 const blockData = ref<Block | undefined>();
-watch(() => props.blockSettings, async () => {
+watch(node, async () => {
   try {
     const fileText = await readTextFile(blockPath.value);
     const fileJSON = JSON.parse(fileText) as Block;
@@ -120,7 +120,7 @@ watchEffect(() => {
   const inputs = blockData.value?.inputs ?? [];
   const outputs = blockData.value?.outputs ?? [];
 
-  ports[props.flowID][props.blockID] = {
+  ports[props.flowID][props.nodeID] = {
     inputs: inputs.map((input) => input.name),
     outputs: outputs.map((output) => output.name),
   };
@@ -155,7 +155,7 @@ const selectedPort = defineModel<PortPlace | null>("selectedPort")
 const onPortClick = (type: "input" | "output", portID: string) => {
   const clickedPort = {
     type,
-    blockID: props.blockID,
+    blockID: props.nodeID,
     portID
   }
 
@@ -174,12 +174,12 @@ const onPortClick = (type: "input" | "output", portID: string) => {
 const isPortSelected = (type: "input" | "output", portID: string): boolean => (
   !!(selectedPort.value) &&
   (type == selectedPort.value.type) &&
-  (props.blockID == selectedPort.value.blockID) &&
+  (props.nodeID == selectedPort.value.blockID) &&
   (portID == selectedPort.value.portID)
 )
 
 defineExpose({
-  id: props.blockID,
+  id: props.nodeID,
   getNodeRect
 })
 </script>

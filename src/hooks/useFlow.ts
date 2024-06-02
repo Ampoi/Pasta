@@ -36,7 +36,7 @@ export const useFlow = (_flowID: string) => {
             }catch(e){
                 console.warn(`flowの保存中にエラーが発生しました:\n${e}`)
             }
-        })
+        }, { deep: true })
     })
 
     watch(flowID, updateFlow)

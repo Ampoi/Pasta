@@ -2,12 +2,12 @@
   <div class="relative">
     <div class="flex flex-row gap-60 items-center">
       <div v-for="row in renderedBlockIDs" class="flex flex-col gap-10">
-        <div v-for="blockID in row">
-          <div v-if="!blockID" class="h-40" />
+        <div v-for="nodeID in row">
+          <div v-if="!nodeID" class="h-40" />
           <Suspense v-else>
             <NodeComponent
-              :blockID
-              :blockSettings="flow.nodes[blockID]"
+              :nodeID
+              v-model:node="flow.nodes[nodeID]"
               :flowID="id"
               :ref="(el: any) => { nodes[el.id] = el }"
               v-model:selected-port="selectedPort"
