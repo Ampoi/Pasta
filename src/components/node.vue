@@ -1,67 +1,64 @@
 <template>
   <div class="flex flex-row" ref="blockElement">
-    <!--引数-->
-    <div
-      class="flex flex-col gap-2 max-w-[160px] -mr-2 z-10 my-auto py-3"
-      v-if="nodeID != 'trigger'"
-    >
-      <Port
-        :nodeID
-        name="default"
-        v-model:selectedPort="selectedPort"
-        portType="input"/>
-      <Port
-        v-for="input in block?.inputs"
-        :nodeID
-        v-model:selectedPort="selectedPort"
-        portType="input"
-        :type="input.type"
-        :name="input.name"/>
-    </div>
-
-    <div
-      class="flex flex-col justify-center gap-2 grow bg-zinc-900 p-3 rounded-xl w-80 border-zinc-700 border-[1px]"
-    >
-      <div class="flex flex-row items-center gap-2">
-        <div
-          class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
-          :style="{ background: block?.icon.color }"
-        >
-          <Icon
-            :icon="block?.icon.value ?? 'fluent:question-16-filled'"
-            class="text-lg"
-          />
-        </div>
-        <input
-          type="text"
-          class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
-          v-model="node.title"
-        />
-      </div>
-      <div
-        class="grow border-zinc-700 text-zinc-500 border-[1px] rounded-md flex flex-col justify-center p-2 gap-2"
-        v-if="block && 0 < (block.inputs?.length ?? 0)">
-        <div
-          v-for="setting in block.inputs"
-          class="flex flex-row gap-2 items-center">
-          <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
-            {{ setting.name }}
-          </p>
-          <button>
-            <Icon icon="fluent:arrow-circle-right-12-filled"/>
-          </button>
-          <input
-            type="number"
-            class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow text-sm"
-          />
-        </div>
-      </div>
-    </div>
+    <table class="table-auto">
+      <tbody>
+        <tr>
+          <td>
+            <Port
+              v-if="nodeID != 'trigger'"
+              :nodeID
+              name="default"
+              v-model:selectedPort="selectedPort"
+              portType="input"/>
+          </td>
+          <td class="flex flex-row -ml-3 items-center gap-2 pt-3 pb-2 bg-zinc-900 px-4 border-t-[1px] border-x-[1px] border-zinc-700 rounded-t-xl -mr-3">
+            <div
+              class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
+              :style="{ background: block?.icon.color }"
+            >
+              <Icon
+                :icon="block?.icon.value ?? 'fluent:question-16-filled'"
+                class="text-lg"
+              />
+            </div>
+            <input
+              type="text"
+              class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
+              v-model="node.title"
+            />
+          </td>
+        </tr>
+        <tr
+          v-for="(input, index) in block?.inputs">
+          <td>
+            <Port
+              v-if="nodeID != 'trigger'"
+              :nodeID
+              v-model:selectedPort="selectedPort"
+              portType="input"
+              :type="input.type"
+              :name="input.name"/>
+          </td>
+          <td
+            class="flex flex-row gap-2 items-center -ml-3 px-4 py-1 bg-zinc-900 text-zinc-500 border-x-[1px] border-zinc-700 -mr-3"
+            :class="{ 'rounded-b-xl border-b-[1px] pb-3': (block && block.inputs ? (block.inputs.length - 1) : 0) == index }">
+            <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
+              {{ input.name }}
+            </p>
+            <button>
+              <Icon icon="fluent:arrow-circle-right-12-filled"/>
+            </button>
+            <input
+              type="number"
+              class="px-2 py-1 border-[1px] rounded-sm border-zinc-700 bg-transparent grow text-sm"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <!--返り値-->
-    <div
-      class="flex flex-col gap-2 max-w-[160px] -ml-2 z-10 my-auto py-3"
-    >
+    <div class="flex flex-col gap-2 max-w-[160px] z-10 my-auto py-3">
       <Port
         :nodeID
         name="default"
