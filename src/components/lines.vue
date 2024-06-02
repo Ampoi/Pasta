@@ -24,16 +24,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    (e: "getBlockRect", blockID: string, callback: Callback<Rect>): void
+    (e: "getNodeRect", blockID: string, callback: Callback<Rect>): void
 }>()
 
-const getBlockRect = async (blockID: string) => {
-    return new Promise<Rect>((resolve) => emit("getBlockRect", blockID, resolve))
+const getNodeRect = async (blockID: string) => {
+    return new Promise<Rect>((resolve) => emit("getNodeRect", blockID, resolve))
 }
 
 const { lines, updateLinesWithArgs } = useLines()
 const updateLines = computed(() => {
-    return () => updateLinesWithArgs(props.flow, getBlockRect, props.flowID)
+    return () => updateLinesWithArgs(props.flow, getNodeRect, props.flowID)
 })
 
 onMounted(() => {

@@ -5,11 +5,11 @@
         <div v-for="blockID in row">
           <div v-if="!blockID" class="h-40" />
           <Suspense v-else>
-            <BlockComponent
+            <NodeComponent
               :blockID
               :blockSettings="flow.nodes[blockID]"
               :flowID="id"
-              :ref="(el: any) => { blocks[el.id] = el }"
+              :ref="(el: any) => { nodes[el.id] = el }"
               v-model:selected-port="selectedPort"
               @connect-ports="connectPorts"/>
           </Suspense>
@@ -20,14 +20,14 @@
       class="-z-10"
       :flow
       :flowID="id"
-      @getBlockRect="getBlockRect"/>
+      @getNodeRect="getNodeRect"/>
   </div>
 </template>
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
-import BlockComponent from './block.vue';
+import NodeComponent from './node.vue';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
 import { PortPlace, addPortConnection } from '../utils/connectPorts';
@@ -47,13 +47,13 @@ watch(() => props.id, (newID) => {
   flowID.value = newID
 })
 
-const blocks = reactive<{ [blockID: string]: InstanceType<typeof BlockComponent> }>({})
+const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
 
-const getBlockRect = (blockID: string, callback: Callback<Rect>) => {
+const getNodeRect = (nodeID: string, callback: Callback<Rect>) => {
   try {
-    blocks[blockID].getBlockRect(callback)
+    nodes[nodeID].getNodeRect(callback)
   } catch (error) {
-    console.warn(`an error occurred on blockID: ${blockID}:\n${error}`)
+    console.warn(`an error occurred on blockID: ${nodeID}:\n${error}`)
   }
 }
 

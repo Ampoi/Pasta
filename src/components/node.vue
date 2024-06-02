@@ -77,7 +77,7 @@
 import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import { Node } from "../model/node";
 import { Block } from "../model/block";
-import Port from "./block/port.vue";
+import Port from "./node/port.vue";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
 import { Rect } from "../model/utils";
@@ -127,11 +127,11 @@ watchEffect(() => {
 });
 
 let isMounted = false
-let getBlockRectQue: (() => void) | undefined = undefined
+let getNodeRectQue: (() => void) | undefined = undefined
 
-const getBlockRect = (callback: Callback<Rect> ) => {
+const getNodeRect = (callback: Callback<Rect> ) => {
   if( !isMounted ){
-    getBlockRectQue = () => getBlockRect(callback)
+    getNodeRectQue = () => getNodeRect(callback)
   }else{
     const blockElement = block.value;
     if( !blockElement ) throw new Error("blockElement is not defined")
@@ -144,9 +144,9 @@ const getBlockRect = (callback: Callback<Rect> ) => {
 
 onMounted(() => {
   isMounted = true
-  if( getBlockRectQue ){
-    getBlockRectQue()
-    getBlockRectQue = undefined
+  if( getNodeRectQue ){
+    getNodeRectQue()
+    getNodeRectQue = undefined
   }
 })
 
@@ -180,6 +180,6 @@ const isPortSelected = (type: "input" | "output", portID: string): boolean => (
 
 defineExpose({
   id: props.blockID,
-  getBlockRect
+  getNodeRect
 })
 </script>
