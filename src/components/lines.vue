@@ -15,7 +15,7 @@ import { onMounted, watch } from 'vue';
 import { Rect } from '../model/utils';
 import { ports } from "../utils/ports"
 import { Callback } from '../model/utils';
-import { useLines } from "../hooks/useLines"
+import { lines, updateLinesWithArgs } from "../hooks/lines"
 import { flow, flowID } from '../hooks/flow';
 
 const emit = defineEmits<{
@@ -26,7 +26,6 @@ const getNodeRect = async (blockID: string) => {
     return new Promise<Rect>((resolve) => emit("getNodeRect", blockID, resolve))
 }
 
-const { lines, updateLinesWithArgs } = useLines()
 const updateLines = () => updateLinesWithArgs(getNodeRect)
 
 onMounted(() => {

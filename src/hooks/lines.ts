@@ -105,6 +105,13 @@ const getPortPositions = async (
     return portPositions
 }
 
+type Line = Record<"from"|"to",
+    Record<"x"|"y",number> & {
+        blockID: string
+        portID: string
+    }
+>
+
 const getLines = (
     portPositions: {
         [blockID: string]: {
@@ -118,10 +125,10 @@ const getLines = (
     },
     flow: Flow
 ) => {
-    const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
+    const lines: Line[] = []
     const blockEntries = Object.entries(flow.nodes)
 
-    for( const [blockID, block] of blockEntries ){
+    for( const [toBlockID, block] of blockEntries ){
         if( !block.inputs ) continue
         let isBlockDefaultPortsConnected = false
 
@@ -137,23 +144,26 @@ const getLines = (
                     fromBlockID: block.defaultPortBlockID as string,
                     fromPortID: "default"
                 }
-    
+
                 const fromBlockPortPositions = portPositions[fromBlockID]
                 if( !fromBlockPortPositions ) continue
     
-                const from = fromBlockPortPositions.outputs?.[fromPortID]
-                if( !from ) continue
+                const fromPosition = fromBlockPortPositions.outputs?.[fromPortID]
+                if( !fromPosition ) continue
 
-                const toBlockPortPositions = portPositions[blockID]
-                if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${blockID}`)
+                const toBlockPortPositions = portPositions[toBlockID]
+                if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${toBlockID}`)
 
                 const toPortID = input.type == "setting" ? "default" : portID
-                const to = toBlockPortPositions.inputs?.[toPortID]
-                if( !to ) throw new Error(`${portID} is not in outputs of ${blockID}`)
+                const toPosition = toBlockPortPositions.inputs?.[toPortID]
+                if( !toPosition ) throw new Error(`${portID} is not in outputs of ${toBlockID}`)
 
                 if( input.type == "setting" ) isBlockDefaultPortsConnected = true
     
-                lines.push({ from, to })
+                lines.push({
+                    from: { ...fromPosition, blockID: fromBlockID, portID: fromPortID },
+                    to: { ...toPosition, blockID: toBlockID, portID: toPortID }
+                })
             }catch ( error ){
                 console.warn(error)
             }
@@ -163,17 +173,13 @@ const getLines = (
     return lines
 }
 
-export const useLines = () => {
-    const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
+export const lines = ref<Line[]>([])
 
-    const updateLinesWithArgs = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
-        if( !flowID.value ) return
+export const updateLinesWithArgs = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
+    if( !flowID.value ) return
 
-        const blockPositions = await getBlockPositions(flow.value, getBlockRect)
-        const portPositions = await getPortPositions(blockPositions, getBlockRect, flowID.value)
-        const newLines = getLines(portPositions, flow.value)
-        lines.value = newLines
-    }
-
-    return { lines, updateLinesWithArgs }
+    const blockPositions = await getBlockPositions(flow.value, getBlockRect)
+    const portPositions = await getPortPositions(blockPositions, getBlockRect, flowID.value)
+    const newLines = getLines(portPositions, flow.value)
+    lines.value = newLines
 }

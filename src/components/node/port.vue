@@ -5,12 +5,16 @@
             'flex-row-reverse': portType != 'input'
         }">
         <div
-            class="h-[2px] grow min-w-2 bg-zinc-800"/>
+            class="h-[2px] grow min-w-2 bg-zinc-800"
+            :class="{
+                'opacity-0': !isConnected,
+            }"/>
         <div
             class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
             :class="{
-                'border-blue-500': selected,
-                'border-zinc-700': !selected
+                'border-zinc-700': !selected,
+                '!border-blue-500': selected,
+                'bg-red-900 border-red-500': !isConnected && portType == 'input' && name != 'default'
             }"
             @click="onClick"
             ref="port">
@@ -32,6 +36,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { type PortPlace } from "../../utils/connectPorts";
+import { lines } from "../../hooks/lines";
 
 const props = defineProps<{
     portType: "input" | "output"
@@ -62,4 +67,13 @@ const onClick = () => {
     portID: props.name ?? "default"
   }
 }
+
+const isConnected = computed(() => {
+    return lines.value.some((line) => {
+        return (
+            (line.from.blockID == props.nodeID && line.from.portID == props.name && props.portType == "output") ||
+            (line.to.blockID == props.nodeID && line.to.portID == props.name && props.portType == "input")
+        )
+    })
+})
 </script>
