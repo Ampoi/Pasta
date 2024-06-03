@@ -31,6 +31,7 @@ export const useFlow = (_flowID: string) => {
 
     updateFlow().then(() => {
         watch(flow, async () => {
+            console.log("flowが更新されました")
             try{
                 await writeTextFile(flowPath.value, JSON.stringify(flow.value))
             }catch(e){

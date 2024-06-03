@@ -119,14 +119,14 @@ const getLines = (
 ) => {
     const lines: Record<"from"|"to",Record<"x"|"y",number>>[] = [];
     const blockEntries = Object.entries(flow.nodes)
-    
-    blockEntries.forEach(([blockID, block]) => {
-        if( !block.inputs ) return
+
+    for( const [blockID, block] of blockEntries ){
+        if( !block.inputs ) continue
         let isBlockDefaultPortsConnected = false
 
-        Object.entries(block.inputs).forEach(([portID, input]) => {
-            if( input.type == "setting" && isBlockDefaultPortsConnected ) return
-            if( input.value == undefined ) return
+        for( const [portID, input] of Object.entries(block.inputs) ){
+            if( input.type == "setting" && isBlockDefaultPortsConnected ) continue
+            if( input.value == undefined ) continue
 
             try {
                 const { fromBlockID, fromPortID } = input.type == "port" ? {
@@ -138,10 +138,10 @@ const getLines = (
                 }
     
                 const fromBlockPortPositions = portPositions[fromBlockID]
-                if( !fromBlockPortPositions ) return
+                if( !fromBlockPortPositions ) continue
     
                 const from = fromBlockPortPositions.outputs?.[fromPortID]
-                if( !from ) return
+                if( !from ) continue
 
                 const toBlockPortPositions = portPositions[blockID]
                 if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${blockID}`)
@@ -156,8 +156,8 @@ const getLines = (
             }catch ( error ){
                 console.warn(error)
             }
-        })
-    })
+        }
+    }
 
     return lines
 }

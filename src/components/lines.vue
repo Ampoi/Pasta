@@ -37,7 +37,7 @@ const updateLines = computed(() => {
 })
 
 onMounted(() => {
-    watch(() => props.flow, updateLines.value, { immediate: true })
+    watch(() => props.flow, updateLines.value, { immediate: true, deep: true })
     watch(ports, updateLines.value, { deep: true })
 })
 </script>
