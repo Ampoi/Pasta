@@ -21,6 +21,7 @@ function createDependencies(flow: Flow) {
 
         Object.values(node.inputs).forEach((input) => {
             if( input.type == "port" ) {
+                if( !input.value ) return
                 connectFromSet.add(input.value.blockID)
             }else{
                 connectFromSet.add(node.defaultPortBlockID as string)

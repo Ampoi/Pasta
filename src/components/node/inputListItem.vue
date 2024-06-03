@@ -12,23 +12,20 @@
         <td
             class="flex flex-row gap-2 items-center -ml-3 px-4 py-1 bg-zinc-900 text-zinc-500 border-x-[1px] border-zinc-700 -mr-3"
             :class="{ 'rounded-b-xl border-b-[1px] pb-3': (block.inputs ? block.inputs.length : 0) - 1 == index }">
-            <p class="basis-20 whitespace-nowrap text-ellipsis overflow-hidden">
-                {{ blockInput.name }}
-            </p>
             <button
-                :class="{
-                    'text-blue-500': input.type == 'port'
-                }">
+                :class="{ 'text-blue-500': input.type == 'port' }"
+                @click="toggleBlockType">
                 <Icon icon="fluent:arrow-circle-right-12-filled"/>
             </button>
+            <p class="basis-36 whitespace-nowrap text-ellipsis overflow-hidden">
+                {{ blockInput.name }}
+            </p>
             <input
                 type="number"
                 class="px-2 py-1 border-[1px] rounded-md border-zinc-700 bg-transparent grow text-sm text-white outline-none"
                 :disabled="input.type == 'port'"
-                :class="{
-                    'opacity-40': input.type == 'port'
-                }"
-                :value="input.value"
+                :class="{ 'opacity-40': input.type == 'port' }"
+                v-model="inputSettingValue"
             />
         </td>
     </tr>
@@ -61,16 +58,18 @@ const props = defineProps<PortProps & {
 const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
 
 const node = defineModel<Node>("node", { required: true })
-
 const input = computed<Input>({
     get(){
-        if( node.value.inputs?.[props.blockInput.name] ){
-            return node.value.inputs[props.blockInput.name]
+        const inputInNode = node.value.inputs?.[props.blockInput.name]
+        
+        if( inputInNode ){
+            return inputInNode
         }else{
-            return {
+            const defaultInput: Input = {
                 type: "setting",
-                value: "default"
+                value: undefined
             }
+            return defaultInput
         }
     },
     set(newInput){
@@ -83,4 +82,23 @@ const input = computed<Input>({
         }
     }
 })
+
+const inputSettingValue = computed<any>({
+    get(){
+        return input.value.value
+    },
+    set(newValue){
+        if( input.value.type != "setting" ) throw new Error("Input is not a setting")
+        const newInput = { ...input.value, value: newValue }
+        input.value = newInput
+    }
+})
+
+const toggleBlockType = () => {
+    if( input.value.type == "port" ){
+        input.value = { type: "setting", value: undefined }
+    }else{
+        input.value = { type: "port", value: undefined }
+    }
+}
 </script>

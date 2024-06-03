@@ -126,6 +126,7 @@ const getLines = (
 
         Object.entries(block.inputs).forEach(([portID, input]) => {
             if( input.type == "setting" && isBlockDefaultPortsConnected ) return
+            if( input.value == undefined ) return
 
             try {
                 const { fromBlockID, fromPortID } = input.type == "port" ? {

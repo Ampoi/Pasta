@@ -5,7 +5,7 @@ type SettingInput = {
 
 type PortInput = {
     type: "port"
-    value: {
+    value?: {
         blockID: string
         portID: string
     }
