@@ -18,8 +18,6 @@
     </div>
     <Lines
       class="-z-10"
-      :flow
-      :flowID="id"
       @getNodeRect="getNodeRect"/>
   </div>
 </template>
@@ -36,16 +34,15 @@ import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
-import { useFlow } from '../hooks/useFlow';
+import { flow, flowID } from '../hooks/flow';
 
 const props = defineProps<{
   id: string
 }>()
 
-const { flow, flowID } = useFlow(props.id)
 watch(() => props.id, (newID) => {
   flowID.value = newID
-})
+}, { immediate: true })
 
 const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
 

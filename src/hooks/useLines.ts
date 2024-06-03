@@ -3,6 +3,7 @@ import { createLayers } from '../utils/createLayers';
 import { Flow } from "../model/flow";
 import { Rect } from "../model/utils";
 import { ports } from "../utils/ports"
+import { flow, flowID } from "./flow";
 
 const xGap = 240
 const yGap = 40
@@ -164,11 +165,13 @@ const getLines = (
 
 export const useLines = () => {
     const lines = ref<Record<"from"|"to",Record<"x"|"y",number>>[]>([])
-    
-    const updateLinesWithArgs = async (flow: Flow, getBlockRect: (blockID: string) => Promise<Rect>, flowID: string) => {
-        const blockPositions = await getBlockPositions(flow, getBlockRect)
-        const portPositions = await getPortPositions(blockPositions, getBlockRect, flowID)
-        const newLines = getLines(portPositions, flow)
+
+    const updateLinesWithArgs = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
+        if( !flowID.value ) return
+
+        const blockPositions = await getBlockPositions(flow.value, getBlockRect)
+        const portPositions = await getPortPositions(blockPositions, getBlockRect, flowID.value)
+        const newLines = getLines(portPositions, flow.value)
         lines.value = newLines
     }
 

@@ -11,17 +11,12 @@
     </svg>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { Rect } from '../model/utils';
 import { ports } from "../utils/ports"
-import { Flow } from '../model/flow';
 import { Callback } from '../model/utils';
 import { useLines } from "../hooks/useLines"
-
-const props = defineProps<{
-    flow: Flow
-    flowID: string
-}>()
+import { flow, flowID } from '../hooks/flow';
 
 const emit = defineEmits<{
     (e: "getNodeRect", blockID: string, callback: Callback<Rect>): void
@@ -32,12 +27,11 @@ const getNodeRect = async (blockID: string) => {
 }
 
 const { lines, updateLinesWithArgs } = useLines()
-const updateLines = computed(() => {
-    return () => updateLinesWithArgs(props.flow, getNodeRect, props.flowID)
-})
+const updateLines = () => updateLinesWithArgs(getNodeRect)
 
 onMounted(() => {
-    watch(() => props.flow, updateLines.value, { immediate: true, deep: true })
-    watch(ports, updateLines.value, { deep: true })
+    watch(() => flow.value, updateLines, { immediate: true, deep: true })
+    watch(() => flowID.value, updateLines, { immediate: true })
+    watch(ports, updateLines, { deep: true })
 })
 </script>
