@@ -63,18 +63,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import { onMounted, ref, watch, watchEffect } from "vue";
 import { Node } from "../model/node";
-import { Block } from "../model/block";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
 import { Rect } from "../model/utils";
 import { Callback } from "../model/utils";
-import { readTextFile } from "@tauri-apps/api/fs";
 import { PortPlace } from "../utils/connectPorts";
-import { projectPath } from "../utils/projectPath";
 import InputListItem from "./node/inputListItem.vue";
 import Port from "./node/port.vue";
+import { useBlock } from "../hooks/useBlock";
 
 const props = defineProps<{
   nodeID: string;
@@ -86,19 +84,13 @@ const emit = defineEmits<{
 }>()
 
 const blockElement = ref<HTMLElement>();
-const blockPath = computed(() => `${projectPath.value}/blocks/${node.value.type}/block.json`);
-const block = ref<Block | undefined>();
 
 const node = defineModel<Node>("node", { required: true })
-watch(node, async () => {
-  try {
-    const fileText = await readTextFile(blockPath.value);
-    const fileJSON = JSON.parse(fileText) as Block;
-    block.value = fileJSON;
-  } catch (error) {
-    console.warn(error);
-  }
-}, { immediate: true })()
+
+const { block, blockID } = useBlock(node.value.type)
+watch(() => node.value.type, async (newID) => { //NOTICE: node.value.typeは動くか怪しい
+  blockID.value = newID
+})()
 
 watchEffect(() => {
   if (!ports[props.flowID]) ports[props.flowID] = {};
