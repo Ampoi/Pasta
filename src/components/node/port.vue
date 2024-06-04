@@ -8,7 +8,7 @@
             <div
                 class="h-[2px] grow min-w-2 bg-zinc-800"
                 :class="{
-                    'opacity-0': !isConnected,
+                    'opacity-0': !isConnected && !selected,
                 }"/>
             <div
                 class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
@@ -35,9 +35,11 @@
         </div>
         <div
             v-if="selected"
-            class="absolute top-1/2 right-0">
+            class="absolute top-1/2"
+            :class="portType == 'input' ? 'left-0': 'right-0'">
             <svg
-                class="w-12 h-20 absolute top-0 right-0 translate-x-full"
+                class="w-12 h-20 absolute top-0"
+                :class="portType == 'input' ? 'left-0 -translate-x-full -scale-x-100': 'right-0 translate-x-full'"
                 ref="linesArea">
                 <path
                     d="M 0 0 C 48 0,
@@ -46,9 +48,11 @@
             </svg>
             <button
                 class="
-                    absolute -bottom-20 translate-y-1/2 -right-12 translate-x-full h-12 w-32 rounded-xl flex flex-row justify-center items-center transition-all duration-200
+                    absolute -bottom-20 translate-y-1/2  h-12 w-32 rounded-xl flex flex-row justify-center items-center transition-all duration-200
                     border-[1px] border-zinc-500 text-zinc-500 not:hover:border-dashed
-                    hover:text-white/80 hover:bg-blue-500/40 hover:border-blue-500">
+                    hover:text-white/80 hover:bg-blue-500/40 hover:border-blue-500"
+                :class="portType == 'input' ? '-left-12 -translate-x-full': '-right-12 translate-x-full'"
+                @click="createBlockFromThisPort">
                 <Icon
                     icon="fluent:add-circle-16-regular"
                     class="text-xl"/>
@@ -106,4 +110,9 @@ const isConnected = computed(() => {
         )
     })
 })
+
+const createBlockFromThisPort = () => {
+    console.log("createBlockFromThisPort")
+    selectedPort.value = null
+}
 </script>
