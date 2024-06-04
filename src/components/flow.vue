@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <div class="flex flex-row gap-60 items-center">
-      <div v-for="(layer, row) in renderedBlockIDs" class="flex flex-col gap-10">
+      <div v-for="layer in renderedBlockIDs" class="flex flex-col gap-10">
         <div v-for="nodeID in layer">
           <div v-if="!nodeID" class="h-40" />
           <Suspense v-else>
@@ -13,24 +13,6 @@
               v-model:selected-port="selectedPort"
               @connect-ports="connectPorts"/>
           </Suspense>
-        </div>
-        <div
-          class="relative h-12"
-          v-if="selectedPort">
-          <button
-            v-if="row != 0"
-            class="border-[1px] bg-blue-900/40 border-blue-500 text-white/80 h-full rounded-xl flex flex-row gap-1 items-center justify-center w-full transition-al duration-200 opacity-0"
-            :class="{ 'hover:opacity-100': true }">
-            <Icon
-              icon="fluent:add-circle-16-regular"
-              class="text-xl"/>
-            <p>新規ブロック</p>
-          </button>
-          <div
-            class="absolute top-0 left-0 w-full h-full"
-            :class="{
-              'border-zinc-700 border-[1px] border-dashed -z-10 rounded-xl': row != 0
-            }"/>
         </div>
       </div>
     </div>
@@ -53,7 +35,6 @@ import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
 import { flow, flowID } from '../hooks/flow';
-import { Icon } from '@iconify/vue/dist/iconify.js';
 
 const props = defineProps<{
   id: string

@@ -1,42 +1,72 @@
 <template>
-    <div
-        class="flex flex-row items-center"
-        :class="{
-            'flex-row-reverse': portType != 'input'
-        }">
+    <div class="relative">
         <div
-            class="h-[2px] grow min-w-2 bg-zinc-800"
+            class="flex flex-row items-center"
             :class="{
-                'opacity-0': !isConnected,
-            }"/>
-        <div
-            class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
-            :class="{
-                'border-zinc-700': !selected,
-                '!border-blue-500': selected,
-                'bg-red-900 border-red-500': !isConnected && portType == 'input' && name != 'default'
-            }"
-            @click="onClick"
-            ref="port">
+                'flex-row-reverse': portType != 'input'
+            }">
             <div
-                v-if="props.name == 'default'"
-                class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
+                class="h-[2px] grow min-w-2 bg-zinc-800"
+                :class="{
+                    'opacity-0': !isConnected,
+                }"/>
             <div
-                v-else
-                class="flex items-center gap-2"
-                :class="portType == 'input' ? 'flex-row-reverse' : 'flex-row'">
-                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-500 grid place-content-center">
-                    {{ type ? type[0].toUpperCase(): "?" }}
+                class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
+                :class="{
+                    'border-zinc-700': !selected,
+                    '!border-blue-500': selected,
+                    'bg-red-900 border-red-500': !isConnected && portType == 'input' && name != 'default'
+                }"
+                @click="onClick"
+                ref="port">
+                <div
+                    v-if="props.name == 'default'"
+                    class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
+                <div
+                    v-else
+                    class="flex items-center gap-2"
+                    :class="portType == 'input' ? 'flex-row-reverse' : 'flex-row'">
+                    <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-500 grid place-content-center">
+                        {{ type ? type[0].toUpperCase(): "?" }}
+                    </div>
+                    <p class="overflow-hidden text-ellipsis text-sm text-white">{{ name }}</p>
                 </div>
-                <p class="overflow-hidden text-ellipsis text-sm text-white">{{ name }}</p>
             </div>
+        </div>
+        <div
+            v-if="selected"
+            class="absolute top-1/2 right-0">
+            <svg
+                class="w-12 h-20 absolute top-0 right-0 translate-x-full"
+                ref="linesArea">
+                <path
+                    d="M 0 0 C 48 0,
+                    0 80, 48 80"
+                    stroke="#27272a" fill="none" stroke-width="2"/>
+            </svg>
+            <button
+                class="
+                    absolute -bottom-20 translate-y-1/2 -right-12 translate-x-full h-12 w-32 rounded-xl flex flex-row justify-center items-center transition-all duration-200
+                    border-[1px] border-zinc-500 text-zinc-500 not:hover:border-dashed
+                    hover:text-white/80 hover:bg-blue-500/40 hover:border-blue-500">
+                <Icon
+                    icon="fluent:add-circle-16-regular"
+                    class="text-xl"/>
+                <p>新規ブロック</p>
+            </button>
         </div>
     </div>
 </template>
+<style scoped>
+.not\:hover\:border-dashed:not(:hover) {
+    border-style: dashed
+}
+</style>
 <script setup lang="ts">
 import { computed } from "vue";
 import { type PortPlace } from "../../utils/connectPorts";
 import { lines } from "../../hooks/lines";
+import { Icon } from "@iconify/vue/dist/iconify.js";
 
 const props = defineProps<{
     portType: "input" | "output"
