@@ -52,7 +52,7 @@
                     border-[1px] border-zinc-500 text-zinc-500 not:hover:border-dashed
                     hover:text-white/80 hover:bg-blue-500/40 hover:border-blue-500"
                 :class="portType == 'input' ? '-left-12 -translate-x-full': '-right-12 translate-x-full'"
-                @click="createBlockFromThisPort">
+                @click="createNodeFromThisPort">
                 <Icon
                     icon="fluent:add-circle-16-regular"
                     class="text-xl"/>
@@ -71,6 +71,7 @@ import { computed } from "vue";
 import { type PortPlace } from "../../utils/connectPorts";
 import { lines } from "../../hooks/lines";
 import { Icon } from "@iconify/vue/dist/iconify.js";
+import { createNode } from "../../hooks/flow"
 
 const props = defineProps<{
     portType: "input" | "output"
@@ -111,8 +112,8 @@ const isConnected = computed(() => {
     })
 })
 
-const createBlockFromThisPort = () => {
-    console.log("createBlockFromThisPort")
+const createNodeFromThisPort = () => {
     selectedPort.value = null
+    createNode(props.nodeID, props.portType)
 }
 </script>

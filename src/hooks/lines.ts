@@ -1,6 +1,5 @@
 import { ref } from "vue"
 import { createLayers } from '../utils/createLayers';
-import { Flow } from "../model/flow";
 import { Rect } from "../model/utils";
 import { ports } from "../utils/ports"
 import { flow, flowID } from "./flow";
@@ -11,8 +10,8 @@ const spaceHeight = 160
 const portHeight = 34
 const portYGap = 8
 
-const getBlockPositions = async (flow: Flow, getBlockRect: (blockID: string) => Promise<Rect>) => {
-    const layers = createLayers(flow)
+const getBlockPositions = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
+    const layers = createLayers(flow.value)
     const blockPositions: Record<string, { x: number, y: number }> = {}
     const layerHeights: number[] = []
 
@@ -55,8 +54,7 @@ const getBlockPositions = async (flow: Flow, getBlockRect: (blockID: string) => 
 
 const getPortPositions = async (
     blockPositions: Record<string, Record<"x"|"y", number>>,
-    getBlockRect: (blockID: string) => Promise<Rect>,
-    flowID: string
+    getBlockRect: (blockID: string) => Promise<Rect>
 ) => {
     const portPositions: {
         [blockID: string]: {
@@ -90,7 +88,8 @@ const getPortPositions = async (
         }
     }
 
-    const flowPorts = ports[flowID]
+    if( !flowID.value ) throw new Error("flowID is not defined")
+    const flowPorts = ports[flowID.value]
     if( flowPorts ){
         await Promise.all(Object.entries(flowPorts).map(async ([blockID, blockPorts]) => {
             if( !blockPositions[blockID] ) return
@@ -122,16 +121,36 @@ const getLines = (
                 }
             }
         }
-    },
-    flow: Flow
+    }
 ) => {
     const lines: Line[] = []
-    const blockEntries = Object.entries(flow.nodes)
+    const blockEntries = Object.entries(flow.value.nodes)
 
     for( const [toBlockID, block] of blockEntries ){
-        if( !block.inputs ) continue
         let isBlockDefaultPortsConnected = false
 
+        const toBlockPortPositions = portPositions[toBlockID]
+        if( !toBlockPortPositions ) continue
+        
+        if( !block.inputs ){
+            if( block.defaultPortBlockID ){
+                const fromBlockID = block.defaultPortBlockID
+                const fromBlockPortPositions = portPositions[fromBlockID]
+                if( !fromBlockPortPositions ) continue
+                const fromPosition = fromBlockPortPositions.outputs?.default
+                if( !fromPosition ) continue
+
+                const toPosition = toBlockPortPositions.inputs?.default
+                if( !toPosition ) continue
+
+                lines.push({
+                    from: { ...fromPosition, blockID: fromBlockID, portID: "default" },
+                    to: { ...toPosition, blockID: toBlockID, portID: "default" }
+                })
+            }
+            continue
+        }
+        
         for( const [portID, input] of Object.entries(block.inputs) ){
             if( input.type == "setting" && isBlockDefaultPortsConnected ) continue
             if( input.value == undefined ) continue
@@ -150,9 +169,6 @@ const getLines = (
     
                 const fromPosition = fromBlockPortPositions.outputs?.[fromPortID]
                 if( !fromPosition ) continue
-
-                const toBlockPortPositions = portPositions[toBlockID]
-                if( !toBlockPortPositions ) throw new Error(`portPositions doesn't have property: ${toBlockID}`)
 
                 const toPortID = input.type == "setting" ? "default" : portID
                 const toPosition = toBlockPortPositions.inputs?.[toPortID]
@@ -178,8 +194,8 @@ export const lines = ref<Line[]>([])
 export const updateLinesWithArgs = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
     if( !flowID.value ) return
 
-    const blockPositions = await getBlockPositions(flow.value, getBlockRect)
-    const portPositions = await getPortPositions(blockPositions, getBlockRect, flowID.value)
-    const newLines = getLines(portPositions, flow.value)
+    const blockPositions = await getBlockPositions(getBlockRect)
+    const portPositions = await getPortPositions(blockPositions, getBlockRect)
+    const newLines = getLines(portPositions)
     lines.value = newLines
 }

@@ -15,20 +15,22 @@ function createDependencies(flow: Flow) {
     const dependencies: DependencyMap = {}
 
     Object.entries(flow.nodes).forEach(([id, node]) => {
-        if( !node.inputs ) return
-
-        const connectFromSet = new Set<string>()
-
-        Object.values(node.inputs).forEach((input) => {
-            if( input.type == "port" ) {
-                if( !input.value ) return
-                connectFromSet.add(input.value.blockID)
-            }else{
-                connectFromSet.add(node.defaultPortBlockID as string)
-            }
-        })
-
-        dependencies[id] = Array.from(connectFromSet)
+        if( node.inputs ){
+            const connectFromSet = new Set<string>()
+    
+            Object.values(node.inputs).forEach((input) => {
+                if( input.type == "port" ) {
+                    if( !input.value ) return
+                    connectFromSet.add(input.value.blockID)
+                }else{
+                    connectFromSet.add(node.defaultPortBlockID as string)
+                }
+            })
+    
+            dependencies[id] = Array.from(connectFromSet)
+        }else if( node.defaultPortBlockID ){
+            dependencies[id] = [node.defaultPortBlockID]
+        }
     })
 
     return dependencies

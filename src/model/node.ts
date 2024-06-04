@@ -6,7 +6,7 @@ type SettingInput = {
 type PortInput = {
     type: "port"
     value?: {
-        blockID: string
+        blockID: string //TODO:BlockIDからNodeIDにする
         portID: string
     }
 }
@@ -20,10 +20,10 @@ export type Node = {
 } & (
     (
         ({
-            defaultPortBlockID?: undefined
+            defaultPortBlockID?: undefined //TODO:BlockIDからNodeIDにする
             trigger: true
         } | {
-            defaultPortBlockID: string
+            defaultPortBlockID: string //TODO:BlockIDからNodeIDにする
             trigger?: false
         }) &
         {
@@ -32,7 +32,7 @@ export type Node = {
             }
         }
     ) | {
-        defaultPortBlockID?: undefined
+        defaultPortBlockID?: undefined //TODO:BlockIDからNodeIDにする
         trigger?: false
         inputs: {
             [inputID: string]: PortInput

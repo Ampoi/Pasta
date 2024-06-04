@@ -2,6 +2,8 @@ import { computed, ref, watch } from "vue"
 import { Flow } from "../model/flow"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { projectPath } from "../utils/projectPath"
+import { Node } from "../model/node"
+import { getAlphabet } from "../utils/getAlphabet"
 
 const isFlow = (flow: unknown): flow is Flow => {
     if(!(
@@ -43,3 +45,15 @@ updateFlow().then(() => {
 })
 
 watch(flowID, updateFlow)
+
+export const createNode = ( fromNodeID: string, createFrom: "input" | "output" ) => {
+    const newNodeID = getAlphabet(Math.floor(Math.random() * (10 ** 5)))
+    if( createFrom == "output" ){
+        const newNode: Node = {
+            title: "",
+            type: "sum",
+            defaultPortBlockID: fromNodeID
+        }
+        flow.value.nodes = { ...flow.value.nodes, [newNodeID]: newNode }
+    }
+}
