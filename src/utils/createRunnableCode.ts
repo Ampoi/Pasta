@@ -45,7 +45,11 @@ const getMainCode = (flow: Flow, blocks: { [blockID: string]: Block }, triggerOu
                     if( port.type === "setting" ){
                         input[portID] = typeof port.value == "string" ? `"${port.value}"` : port.value
                     }else{
-                        input[portID] = variableIDs[port.value.blockID][port.value.portID]
+                        if( !port.value ){
+                            input[portID] = undefined
+                        }else{
+                            input[portID] = variableIDs[port.value.nodeID][port.value.portID]
+                        }
                     }
                 })
             }

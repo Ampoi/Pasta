@@ -13,9 +13,9 @@
             <div
                 class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
                 :class="{
+                    '!bg-red-900 !border-red-500': !isConnected && portType == 'input' && name != 'default',
                     'border-zinc-700': !selected,
-                    '!border-blue-500': selected,
-                    'bg-red-900 border-red-500': !isConnected && portType == 'input' && name != 'default'
+                    '!border-blue-500': selected
                 }"
                 @click="onClick"
                 ref="port">
@@ -90,7 +90,7 @@ const selected = computed<boolean>(() => {
     return (
         !!(selectedPort.value) &&
         (props.portType == selectedPort.value.type) &&
-        (props.nodeID == selectedPort.value.blockID) &&
+        (props.nodeID == selectedPort.value.nodeID) &&
         (props.name == selectedPort.value.portID)
     )
 })
@@ -98,7 +98,7 @@ const selected = computed<boolean>(() => {
 const onClick = () => {
   selectedPort.value = {
     type: props.portType,
-    blockID: props.nodeID,
+    nodeID: props.nodeID,
     portID: props.name ?? "default"
   }
 }

@@ -133,8 +133,8 @@ const getLines = (
         if( !toBlockPortPositions ) continue
         
         if( !block.inputs ){
-            if( block.defaultPortBlockID ){
-                const fromBlockID = block.defaultPortBlockID
+            if( block.defaultPortNodeID ){
+                const fromBlockID = block.defaultPortNodeID
                 const fromBlockPortPositions = portPositions[fromBlockID]
                 if( !fromBlockPortPositions ) continue
                 const fromPosition = fromBlockPortPositions.outputs?.default
@@ -157,10 +157,10 @@ const getLines = (
 
             try {
                 const { fromBlockID, fromPortID } = input.type == "port" ? {
-                    fromBlockID: input.value.blockID,
+                    fromBlockID: input.value.nodeID,
                     fromPortID: input.value.portID
                 } : {
-                    fromBlockID: block.defaultPortBlockID as string,
+                    fromBlockID: block.defaultPortNodeID as string,
                     fromPortID: "default"
                 }
 

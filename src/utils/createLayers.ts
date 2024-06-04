@@ -21,15 +21,15 @@ function createDependencies(flow: Flow) {
             Object.values(node.inputs).forEach((input) => {
                 if( input.type == "port" ) {
                     if( !input.value ) return
-                    connectFromSet.add(input.value.blockID)
+                    connectFromSet.add(input.value.nodeID)
                 }else{
-                    connectFromSet.add(node.defaultPortBlockID as string)
+                    connectFromSet.add(node.defaultPortNodeID as string)
                 }
             })
     
             dependencies[id] = Array.from(connectFromSet)
-        }else if( node.defaultPortBlockID ){
-            dependencies[id] = [node.defaultPortBlockID]
+        }else if( node.defaultPortNodeID ){
+            dependencies[id] = [node.defaultPortNodeID]
         }
     })
 

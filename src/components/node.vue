@@ -88,7 +88,7 @@ const blockElement = ref<HTMLElement>();
 const node = defineModel<Node>("node", { required: true })
 
 const { block, blockID } = useBlock(node.value.type)
-watch(() => node.value.type, async (newID) => { //NOTICE: node.value.typeは動くか怪しい
+watch(() => node.value.type, async (newID) => { //MEMO: node.value.typeは動くか怪しい
   blockID.value = newID
 })()
 
