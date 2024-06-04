@@ -8,7 +8,6 @@
             <NodeComponent
               :nodeID
               v-model:node="flow.nodes[nodeID]"
-              :flowID="id"
               :ref="(el: any) => { nodes[el.id] = el }"
               v-model:selected-port="selectedPort"
               @connect-ports="connectPorts"/>
@@ -35,14 +34,6 @@ import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
 import { flow, flowID } from '../hooks/flow';
-
-const props = defineProps<{
-  id: string
-}>()
-
-watch(() => props.id, (newID) => {
-  flowID.value = newID
-}, { immediate: true })
 
 const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
 
@@ -84,10 +75,10 @@ const runFlow = async () => {
   modalOpenedTab.value = "logs"
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
-  await writeTextFile(`${projectPath.value}/pasta/${props.id}.ts`, code) //TODO:`.pasta`にする
+  await writeTextFile(`${projectPath.value}/pasta/${flowID.value}.ts`, code) //TODO:`.pasta`にする
   await invoke("run_flow", {
     projectPath: projectPath.value,
-    flowId: props.id
+    flowId: flowID.value
   })
 }
 

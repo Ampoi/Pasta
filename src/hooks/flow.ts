@@ -15,7 +15,7 @@ const isFlow = (flow: unknown): flow is Flow => {
     return true
 }
 
-export const flowID = ref<string>()
+export const flowID = ref<string | undefined>()
 const flowPath = computed(() => `${projectPath.value}/flows/${flowID.value}/main.json`)
 
 export const flow = ref(Flow.create())

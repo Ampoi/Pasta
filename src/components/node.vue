@@ -73,10 +73,10 @@ import { PortPlace } from "../utils/connectPorts";
 import InputListItem from "./node/inputListItem.vue";
 import Port from "./node/port.vue";
 import { useBlock } from "../hooks/useBlock";
+import { flowID } from "../hooks/flow";
 
 const props = defineProps<{
-  nodeID: string;
-  flowID: string;
+  nodeID: string
 }>()
 
 const emit = defineEmits<{
@@ -93,12 +93,13 @@ watch(() => node.value.type, async (newID) => { //NOTICE: node.value.typeは動�
 })()
 
 watchEffect(() => {
-  if (!ports[props.flowID]) ports[props.flowID] = {};
+  if( !flowID.value ) return
+  if (!ports[flowID.value]) ports[flowID.value] = {};
 
   const inputs = block.value?.inputs ?? [];
   const outputs = block.value?.outputs ?? [];
 
-  ports[props.flowID][props.nodeID] = {
+  ports[flowID.value][props.nodeID] = {
     inputs: inputs.map((input) => input.name),
     outputs: outputs.map((output) => output.name),
   };
