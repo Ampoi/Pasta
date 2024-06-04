@@ -4,33 +4,33 @@ import { flow } from "../hooks/flow"
 
 export type PortPlace = {
     type: "input" | "output"
-    blockID: string //TODO:BlockIDからNodeIDにする
-    portID: string //TODO:BlockIDからNodeIDにする
+    nodeID: string
+    portID: string
 }
 
 export const addPortConnection = (from: PortPlace, to: PortPlace) => {
     if (
-        from.blockID == to.blockID ||
+        from.nodeID == to.nodeID ||
         from.type == to.type
     ) return
 
     const newInput: Input = from.portID == "default" ? {
         type: "setting",
-        value: flow.value.nodes[to.blockID].inputs?.default?.value
+        value: flow.value.nodes[to.nodeID].inputs?.default?.value
     } : {
         type: "port",
         value: {
-            blockID: from.blockID,
+            nodeID: from.nodeID,
             portID: from.portID
         }
     }
 
     const newBlock: Node = (() => {
         const tmp = {
-            ...flow.value.nodes[to.blockID],
-            defaultPortBlockID: from.blockID,
+            ...flow.value.nodes[to.nodeID],
+            defaultPortNodeID: from.nodeID,
             inputs: {
-                ...flow.value.nodes[to.blockID].inputs,
+                ...flow.value.nodes[to.nodeID].inputs,
                 [to.portID]: newInput
             }
         }
@@ -42,7 +42,7 @@ export const addPortConnection = (from: PortPlace, to: PortPlace) => {
         ...flow,
         nodes: {
             ...flow.value.nodes,
-            [to.blockID]: newBlock
+            [to.nodeID]: newBlock
         }
     }
     

@@ -52,7 +52,7 @@ export const createNode = (fromNodeID: string, createFrom: "input" | "output") =
         const newNode: Node = {
             title: "",
             type: "sum",
-            defaultPortBlockID: fromNodeID
+            defaultPortNodeID: fromNodeID
         }
         flow.value.nodes = { ...flow.value.nodes, [newNodeID]: newNode }
     }
