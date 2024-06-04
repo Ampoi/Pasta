@@ -8,4 +8,4 @@ const strictlyStringProjectID = computed(() => {
     return projectID.value
 })
 
-export const projectPath = computed(() => `${appDataDir}/projects/${strictlyStringProjectID.value}`)
+export const projectPath = computed(() => `${appDataDir}projects/${strictlyStringProjectID.value}`)

@@ -42,20 +42,9 @@
           v-model:modal-opened-tab="modalOpenedTab"
           ref="flowComponent"/>
       </DraggableArea>
-      <div
+      <CreateFlowView
         v-else
-        class="grid place-content-center w-full h-full">
-        <div class="flex flex-col gap-4 items-center text-zinc-500">
-          <h2 class="text-5xl font-semibold">フローを作成</h2>
-          <input
-            type="text"
-            class="px-2 py-1 bg-transparent border-[1px] border-zinc-700 rounded-lg text-center placeholder:text-zinc-700"
-            placeholder="フロー名">
-          <button class="text-black bg-zinc-800 py-2 px-4 rounded-lg font-semibold">
-            作成する
-          </button>
-        </div>
-      </div>
+        class="w-full h-full"/>
       <Modal
         v-if="modalOpenedTab"
         v-model:opened-tab="modalOpenedTab"/>
@@ -69,16 +58,17 @@ import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
 import FlowSelector from "../components/editor/flowSelector.vue";
 import Modal from "../components/modal.vue";
+import CreateFlowView from "../components/createFlowView.vue";
 
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
-import { readDir, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
+import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import { Icon } from "@iconify/vue";
 import { projectID } from "../utils/projectID";
 import { projectPath } from "../utils/projectPath"
-import { flowID } from "../hooks/flow";
+import { flowID, getFlowIDs } from "../hooks/flow";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
@@ -100,19 +90,7 @@ watch(project, (newValue) => {
   writeTextFile(projectFilePath, JSON.stringify(newValue))
 })
 
-const flowIDs = reactive<string[]>(await (async () => {
-  const fileEntries = await readDir(`${projectPath.value}/flows`).catch((e) => {
-    console.log(e)
-    return []
-  })
-
-  const directoryNames = fileEntries
-    .filter(entry => entry.children)
-    .map(entry => entry.name)
-    .filter((name): name is string => !!name)
-  
-  return directoryNames
-})())
+const flowIDs = reactive<string[]>(await getFlowIDs())
 
 flowID.value = flowIDs[0]
 
