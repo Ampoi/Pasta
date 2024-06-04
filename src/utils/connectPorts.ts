@@ -1,13 +1,14 @@
 import { Node, Input } from "../model/node"
 import { Flow } from "../model/flow"
+import { flow } from "../hooks/flow"
 
 export type PortPlace = {
     type: "input" | "output"
-    blockID: string
-    portID: string
+    blockID: string //TODO:BlockIDからNodeIDにする
+    portID: string //TODO:BlockIDからNodeIDにする
 }
 
-export const addPortConnection = (flow: Flow, from: PortPlace, to: PortPlace) => {
+export const addPortConnection = (from: PortPlace, to: PortPlace) => {
     if (
         from.blockID == to.blockID ||
         from.type == to.type
@@ -15,8 +16,7 @@ export const addPortConnection = (flow: Flow, from: PortPlace, to: PortPlace) =>
 
     const newInput: Input = from.portID == "default" ? {
         type: "setting",
-        value: flow.nodes[to.blockID].inputs?.default?.value,
-        defaultPortBlockID: from.blockID
+        value: flow.value.nodes[to.blockID].inputs?.default?.value
     } : {
         type: "port",
         value: {
@@ -25,18 +25,23 @@ export const addPortConnection = (flow: Flow, from: PortPlace, to: PortPlace) =>
         }
     }
 
-    const newBlock: Node = {
-        ...flow.nodes[to.blockID],
-        inputs: {
-            ...flow.nodes[to.blockID].inputs,
-            [to.portID]: newInput
+    const newBlock: Node = (() => {
+        const tmp = {
+            ...flow.value.nodes[to.blockID],
+            defaultPortBlockID: from.blockID,
+            inputs: {
+                ...flow.value.nodes[to.blockID].inputs,
+                [to.portID]: newInput
+            }
         }
-    }
+        if( tmp.trigger == true ) throw new Error("trigger node can't be toBlock")
+        return tmp
+    })()
 
     const newFlow: Flow = {
         ...flow,
         nodes: {
-            ...flow.nodes,
+            ...flow.value.nodes,
             [to.blockID]: newBlock
         }
     }

@@ -61,7 +61,7 @@ const renderedBlockIDs = computed(() => {
 const selectedPort = ref<PortPlace | null>(null)
 
 const connectPorts = (from: PortPlace, to: PortPlace) => {
-  const newFlow = addPortConnection(flow.value, from, to)
+  const newFlow = addPortConnection(from, to)
   if( newFlow ) {
     flow.value = newFlow
   }
