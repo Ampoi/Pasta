@@ -1,54 +1,54 @@
 <template>
-  <div class="w-screen h-screen flex flex-col bg-zinc-900">
-    <header
-      data-tauri-drag-region
-      class="flex flex-row items-center py-1.5 pl-20 pr-8 gap-8"
-      @dblclick="maximizeWindow">
-      <button
-        @click="openLaunchView">
-        <Icon icon="fluent:home-16-regular" class="text-zinc-500 text-xl"/>
-      </button>
-      <div class="relative -ml-4">
-        <input
-          type="text"
-          v-model="project.title"
-          class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 basis-60 font-bold text-white"/>
+  <div class="w-screen h-screen flex flex-row bg-zinc-900">
+    <Suspense>
+      <SideBar/>
+    </Suspense>
+    <div class="flex flex-col grow">
+      <header
+        data-tauri-drag-region
+        class="flex flex-row items-center py-1.5 px-8 gap-8"
+        @dblclick="maximizeWindow">
         <button
-          class="absolute right-2 top-1/2 -translate-y-1/2"
-          @click="openProjectFolder">
-          <Icon icon="fluent:folder-16-regular" class="text-zinc-500 text-xl"/>
+          @click="openLaunchView">
+          <Icon icon="fluent:home-16-regular" class="text-zinc-500 text-xl"/>
         </button>
-      </div>
-      <FlowSelector
-        v-if="flowIDs.length > 0"
-        :flowIDs="flowIDs"
-        v-model:flowID="flowID"
-        class="-ml-5"/>
-      <div class="grow" />
-      <button
-        @click="installDependencies">
-        <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
-      </button>
-      <button
-        @click="runCode">
-        <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
-      </button>
-    </header>
-    <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
-      <DraggableArea
-        class="w-full h-full p-4"
-        v-if="flowID">
-        <Flow
-          v-model:modal-opened-tab="modalOpenedTab"
-          ref="flowComponent"/>
-      </DraggableArea>
-      <CreateFlowView
-        v-else
-        class="w-full h-full"/>
-      <Modal
-        v-if="modalOpenedTab"
-        v-model:opened-tab="modalOpenedTab"/>
-    </main>
+        <div class="relative -ml-4">
+          <input
+            type="text"
+            v-model="project.title"
+            class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 basis-60 font-bold text-white"/>
+          <button
+            class="absolute right-2 top-1/2 -translate-y-1/2"
+            @click="openProjectFolder">
+            <Icon icon="fluent:folder-16-regular" class="text-zinc-500 text-xl"/>
+          </button>
+        </div>
+        <div class="grow" />
+        <button
+          @click="installDependencies">
+          <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
+        </button>
+        <button
+          @click="runCode">
+          <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
+        </button>
+      </header>
+      <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
+        <DraggableArea
+          class="w-full h-full p-4"
+          v-if="flowID">
+          <Flow
+            v-model:modal-opened-tab="modalOpenedTab"
+            ref="flowComponent"/>
+        </DraggableArea>
+        <CreateFlowView
+          v-else
+          class="w-full h-full"/>
+        <Modal
+          v-if="modalOpenedTab"
+          v-model:opened-tab="modalOpenedTab"/>
+      </main>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -56,9 +56,9 @@ import { reactive, ref, watch } from "vue";
 
 import Flow from "../components/flow.vue"
 import DraggableArea from "../components/draggableArea.vue";
-import FlowSelector from "../components/editor/flowSelector.vue";
 import Modal from "../components/modal.vue";
 import CreateFlowView from "../components/createFlowView.vue";
+import SideBar from "../components/sideBar.vue";
 
 import { appWindow } from "@tauri-apps/api/window";
 import { Project } from "../model/project";
@@ -68,7 +68,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { Icon } from "@iconify/vue";
 import { projectID } from "../utils/projectID";
 import { projectPath } from "../utils/projectPath"
-import { flowID, getFlowIDs } from "../hooks/flow";
+import { flowID } from "../hooks/flow";
 
 const maximizeWindow = (event: MouseEvent) => {
   event.preventDefault();
@@ -89,10 +89,6 @@ const project = reactive<Project>(await (async () => {
 watch(project, (newValue) => {
   writeTextFile(projectFilePath, JSON.stringify(newValue))
 })
-
-const flowIDs = reactive<string[]>(await getFlowIDs())
-
-flowID.value = flowIDs[0]
 
 const openLaunchView = () => {
   projectID.value = null
