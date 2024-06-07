@@ -9,7 +9,6 @@
               :nodeID
               v-model:node="flow.nodes[nodeID]"
               :ref="(el: any) => {
-                console.log(nodeID, el)
                 if(el){nodes[el.id] = el}
               }"
               v-model:selected-port="selectedPort"/>
@@ -29,13 +28,12 @@ import Lines from './lines.vue';
 import NodeComponent from './node.vue';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
-import { PortPlace, connectPorts } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
-import { flow, flowID } from '../hooks/flow';
+import { flow, flowID, connectPorts, PortPlace } from '../hooks/flow';
 
 const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
 

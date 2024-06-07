@@ -32,11 +32,11 @@
 </template>
 <script setup lang="ts">
 import Port from './port.vue';
-import { PortPlace } from '../../utils/connectPorts';
 import { Block } from '../../model/block';
 import { Icon } from '@iconify/vue/dist/iconify.js';
 import { Node, Input } from '../../model/node';
 import { computed } from 'vue';
+import { PortPlace } from '../../hooks/flow';
 
 type PortProps = {
     portType: "input" | "output"

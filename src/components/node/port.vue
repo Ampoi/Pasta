@@ -60,7 +60,7 @@
 </style>
 <script setup lang="ts">
 import { computed } from "vue";
-import { type PortPlace } from "../../utils/connectPorts";
+import { PortPlace } from "../../hooks/flow";
 import { lines } from "../../hooks/lines";
 import CreateNewBlockButton from "./createNewBlockButton.vue";
 

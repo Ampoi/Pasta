@@ -67,11 +67,10 @@ import { ref, watch, watchEffect } from "vue";
 import { Node } from "../model/node";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
-import { PortPlace } from "../utils/connectPorts";
 import InputListItem from "./node/inputListItem.vue";
 import Port from "./node/port.vue";
 import { useBlock } from "../hooks/useBlock";
-import { flowID } from "../hooks/flow";
+import { flowID, PortPlace } from "../hooks/flow";
 import { useNodeRect } from "../utils/getNodeRect"
 
 const props = defineProps<{

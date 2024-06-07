@@ -19,9 +19,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Icon } from '@iconify/vue/dist/iconify.js'
-import { type PortPlace } from "../../utils/connectPorts";
 import NewBlockListPopOver from './newBlockListPopOver.vue';
-import { createNode } from '../../hooks/flow';
+import { createNode, PortPlace } from '../../hooks/flow';
 
 const props = defineProps<{
     nodeID: string
