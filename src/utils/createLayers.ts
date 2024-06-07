@@ -22,12 +22,15 @@ function createDependencies(flow: Flow) {
                 if( input.type == "port" ) {
                     if( !input.value ) return
                     connectFromSet.add(input.value.nodeID)
-                }else{
-                    connectFromSet.add(node.defaultPortNodeID as string)
                 }
             })
-    
-            dependencies[id] = Array.from(connectFromSet)
+            
+            if( connectFromSet.size == 0 ){
+                if( !node.defaultPortNodeID ) throw new Error("defaultPortNodeID is not defined")
+                dependencies[id] = [node.defaultPortNodeID]
+            }else{
+                dependencies[id] = Array.from(connectFromSet)
+            }
         }else if( node.defaultPortNodeID ){
             dependencies[id] = [node.defaultPortNodeID]
         }
