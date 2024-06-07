@@ -38,26 +38,18 @@
             class="absolute top-1/2"
             :class="portType == 'input' ? 'left-0': 'right-0'">
             <svg
-                class="w-12 h-20 absolute top-0"
+                class="w-6 h-10 absolute top-0"
                 :class="portType == 'input' ? 'left-0 -translate-x-full -scale-x-100': 'right-0 translate-x-full'"
                 ref="linesArea">
                 <path
-                    d="M 0 0 C 48 0,
-                    0 80, 48 80"
+                    d="M 0 0 C 24 0,
+                    0 40, 24 40"
                     stroke="#27272a" fill="none" stroke-width="2"/>
             </svg>
-            <button
-                class="
-                    absolute -bottom-20 translate-y-1/2  h-12 w-32 rounded-xl flex flex-row justify-center items-center transition-all duration-200
-                    border-[1px] border-zinc-500 text-zinc-500 not:hover:border-dashed
-                    hover:text-white/80 hover:bg-blue-500/40 hover:border-blue-500"
-                :class="portType == 'input' ? '-left-12 -translate-x-full': '-right-12 translate-x-full'"
-                @click="createNodeFromThisPort">
-                <Icon
-                    icon="fluent:add-circle-16-regular"
-                    class="text-xl"/>
-                <p>新規ブロック</p>
-            </button>
+            <CreateNewBlockButton
+                :portType
+                :nodeID="nodeID"
+                v-model:selectedPort="selectedPort"/>
         </div>
     </div>
 </template>
@@ -70,8 +62,7 @@
 import { computed } from "vue";
 import { type PortPlace } from "../../utils/connectPorts";
 import { lines } from "../../hooks/lines";
-import { Icon } from "@iconify/vue/dist/iconify.js";
-import { createNode } from "../../hooks/flow"
+import CreateNewBlockButton from "./createNewBlockButton.vue";
 
 const props = defineProps<{
     portType: "input" | "output"
@@ -111,9 +102,4 @@ const isConnected = computed(() => {
         )
     })
 })
-
-const createNodeFromThisPort = () => {
-    selectedPort.value = null
-    createNode(props.nodeID, props.portType)
-}
 </script>
