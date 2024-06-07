@@ -5,49 +5,37 @@
             class="rounded-md border-[1px] border-zinc-700 bg-transparent px-2 py-1 text-sm outline-none placeholder:text-zinc-500"
             placeholder="ブロックを検索...">
         <div class="grow flex flex-col gap-1 overflow-y-auto">
-            <div class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg">
-                <div class="size-5 rounded-md bg-blue-500 grid place-content-center">
+            <button
+                class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg"
+                v-for="(block, blockID) in blocks"
+                @click="emit('selectBlock', blockID)">
+                <div
+                    class="size-5 rounded-md grid place-content-center"
+                    :style="{ background: block.icon.color }">
                     <Icon
-                        icon="fluent:add-12-regular"
+                        :icon="block.icon.value"
                         class="text-xs"/>
                 </div>
-                <p class="text-sm">sum</p>
-            </div>
-            <div class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg">
-                <div class="size-5 rounded-md bg-blue-500 grid place-content-center">
-                    <Icon
-                        icon="fluent:add-12-regular"
-                        class="text-xs"/>
-                </div>
-                <p class="text-sm">sum</p>
-            </div>
-            <div class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg">
-                <div class="size-5 rounded-md bg-blue-500 grid place-content-center">
-                    <Icon
-                        icon="fluent:add-12-regular"
-                        class="text-xs"/>
-                </div>
-                <p class="text-sm">sum</p>
-            </div>
-            <div class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg">
-                <div class="size-5 rounded-md bg-blue-500 grid place-content-center">
-                    <Icon
-                        icon="fluent:add-12-regular"
-                        class="text-xs"/>
-                </div>
-                <p class="text-sm">sum</p>
-            </div>
-            <div class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg">
-                <div class="size-5 rounded-md bg-blue-500 grid place-content-center">
-                    <Icon
-                        icon="fluent:add-12-regular"
-                        class="text-xs"/>
-                </div>
-                <p class="text-sm">sum</p>
-            </div>
+                <p class="text-sm">{{ block.name }}</p>
+            </button>
         </div>
     </div>
 </template>
 <script setup lang="ts">
 import { Icon } from '@iconify/vue/dist/iconify.js';
+import { getAllBlocks } from '../../utils/getAllBlocks';
+
+const blocks = await getAllBlocks().then(blocks => {
+    const newBlocks = blocks
+    for( const [blockID, block] of Object.entries(blocks) ){
+        if(block.trigger){
+            delete newBlocks[blockID]
+        }
+    }
+    return newBlocks
+})
+
+const emit = defineEmits<{
+    (e: "selectBlock", blockID: string): void
+}>()
 </script>

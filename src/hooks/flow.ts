@@ -46,12 +46,12 @@ updateFlow().then(() => {
 
 watch(flowID, updateFlow)
 
-export const createNode = (fromNodeID: string, createFrom: "input" | "output") => {
+export const createNode = (blockID: string, fromNodeID: string, createFrom: "input" | "output") => {
     const newNodeID = getAlphabet(Math.floor(Math.random() * (10 ** 5)))
     if (createFrom == "output") {
         const newNode: Node = {
             title: "",
-            type: "sum",
+            type: blockID,
             defaultPortNodeID: fromNodeID
         }
         flow.value.nodes = { ...flow.value.nodes, [newNodeID]: newNode }
