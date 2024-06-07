@@ -71,6 +71,7 @@ watch(selectedPort, (newValue, oldValue) => {
 
 const modalOpenedTab = defineModel<string | undefined>("modalOpenedTab")
 
+//TODO: flow.tsに移動
 const runFlow = async () => {
   modalOpenedTab.value = "logs"
   const blocks = await getAllBlocks()

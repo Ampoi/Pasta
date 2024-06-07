@@ -22,7 +22,6 @@ import { createFlow } from '../hooks/flow';
 const flowName = ref("");
 
 const createFlowWithID = async () => {
-    console.log("!?!?")
     await createFlow(flowName.value)
 }
 </script>

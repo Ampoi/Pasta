@@ -63,17 +63,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watch, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import { Node } from "../model/node";
 import { ports } from "../utils/ports";
 import { Icon } from "@iconify/vue";
-import { Rect } from "../model/utils";
-import { Callback } from "../model/utils";
 import { PortPlace } from "../utils/connectPorts";
 import InputListItem from "./node/inputListItem.vue";
 import Port from "./node/port.vue";
 import { useBlock } from "../hooks/useBlock";
 import { flowID } from "../hooks/flow";
+import { useNodeRect } from "../utils/getNodeRect"
 
 const props = defineProps<{
   nodeID: string
@@ -82,8 +81,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "connectPorts", from: PortPlace, to: PortPlace): void
 }>()
-
-const blockElement = ref<HTMLElement>();
 
 const node = defineModel<Node>("node", { required: true })
 
@@ -105,31 +102,12 @@ watchEffect(() => {
   };
 });
 
-let isMounted = false
-let getNodeRectQue: (() => void) | undefined = undefined
-
-const getNodeRect = (callback: Callback<Rect> ) => {
-  if( !isMounted ){
-    getNodeRectQue = () => getNodeRect(callback)
-  }else{
-    const blockElementValue = blockElement.value;
-    if( !blockElementValue ) throw new Error("blockElement is not defined")
-    callback({
-      height: blockElementValue.clientHeight,
-      width: blockElementValue.clientWidth,
-    })
-  }
-}
-
-onMounted(() => {
-  isMounted = true
-  if( getNodeRectQue ){
-    getNodeRectQue()
-    getNodeRectQue = undefined
-  }
-})
-
 const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: true })
+const blockElement = ref<HTMLElement>();
+
+const { getNodeRect, setupGetNode } = useNodeRect(blockElement)
+
+setupGetNode()
 
 defineExpose({
   id: props.nodeID,
