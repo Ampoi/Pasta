@@ -1,6 +1,7 @@
 import { Node, Input } from "../model/node"
 import { Flow } from "../model/flow"
 import { flow } from "../hooks/flow"
+import { createLayers } from "./createLayers"
 
 export type PortPlace = {
     type: "input" | "output"
@@ -8,7 +9,8 @@ export type PortPlace = {
     portID: string
 }
 
-export const addPortConnection = (from: PortPlace, to: PortPlace) => {
+export const connectPorts = (from: PortPlace, to: PortPlace) => {
+    console.log(from, to)
     if (
         from.nodeID == to.nodeID ||
         from.type == to.type
@@ -39,12 +41,19 @@ export const addPortConnection = (from: PortPlace, to: PortPlace) => {
     })()
 
     const newFlow: Flow = {
-        ...flow,
+        ...flow.value,
         nodes: {
             ...flow.value.nodes,
             [to.nodeID]: newBlock
         }
     }
-    
-    return newFlow
+
+    try{
+        console.log(newFlow)
+        console.log(createLayers(newFlow))
+
+        flow.value = newFlow
+    }catch(e){
+        console.warn(e)
+    }
 }

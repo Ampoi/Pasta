@@ -8,9 +8,11 @@
             <NodeComponent
               :nodeID
               v-model:node="flow.nodes[nodeID]"
-              :ref="(el: any) => { nodes[el.id] = el }"
-              v-model:selected-port="selectedPort"
-              @connect-ports="connectPorts"/>
+              :ref="(el: any) => {
+                console.log(nodeID, el)
+                if(el){nodes[el.id] = el}
+              }"
+              v-model:selected-port="selectedPort"/>
           </Suspense>
         </div>
       </div>
@@ -27,7 +29,7 @@ import Lines from './lines.vue';
 import NodeComponent from './node.vue';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
-import { PortPlace, addPortConnection } from '../utils/connectPorts';
+import { PortPlace, connectPorts } from '../utils/connectPorts';
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
 import { Rect } from "../model/utils"
@@ -50,13 +52,6 @@ const renderedBlockIDs = computed(() => {
 });
 
 const selectedPort = ref<PortPlace | null>(null)
-
-const connectPorts = (from: PortPlace, to: PortPlace) => {
-  const newFlow = addPortConnection(from, to)
-  if( newFlow ) {
-    flow.value = newFlow
-  }
-}
 
 watch(selectedPort, (newValue, oldValue) => {
   if( !newValue || !oldValue ) return

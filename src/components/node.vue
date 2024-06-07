@@ -78,10 +78,6 @@ const props = defineProps<{
   nodeID: string
 }>()
 
-const emit = defineEmits<{
-  (e: "connectPorts", from: PortPlace, to: PortPlace): void
-}>()
-
 const node = defineModel<Node>("node", { required: true })
 
 const { block, blockID } = useBlock(node.value.type)
