@@ -3,7 +3,7 @@ import { Flow } from "../model/flow"
 import { createDir, exists, readDir, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { projectPath } from "../utils/projectPath"
 import { Node } from "../model/node"
-import { getAlphabet } from "../utils/getAlphabet"
+import { getAlphabet, getNumber } from "../utils/getAlphabet"
 
 const isFlow = (flow: unknown): flow is Flow => {
     if (!(
@@ -47,10 +47,13 @@ updateFlow().then(() => {
 watch(flowID, updateFlow)
 
 export const createNode = (blockID: string, fromNodeID: string, createFrom: "input" | "output") => {
-    const newNodeID = getAlphabet(Math.floor(Math.random() * (10 ** 5)))
+    const nodeNamesWithoutTrigger = Object.keys(flow.value.nodes).filter((nodeName) => nodeName != "trigger")
+    const newNodeNumber = nodeNamesWithoutTrigger.length == 0 ? 0 : getNumber(nodeNamesWithoutTrigger.sort().reverse()[0]) + 1
+
+    const newNodeID = getAlphabet(newNodeNumber)
     if (createFrom == "output") {
         const newNode: Node = {
-            title: "",
+            title: newNodeID,
             type: blockID,
             defaultPortNodeID: fromNodeID
         }

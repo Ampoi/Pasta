@@ -12,3 +12,16 @@ export function getAlphabet(n: number): string {
 
     return result;
 }
+
+export function getNumber(alphabet: string): number {
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabetList = (lower + upper).split('');
+
+    let result = 0;
+    for (let i = 0; i < alphabet.length; i++) {
+        result = result * alphabetList.length + alphabetList.indexOf(alphabet[i]);
+    }
+
+    return result;
+}
