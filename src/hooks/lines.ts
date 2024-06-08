@@ -10,9 +10,9 @@ const spaceHeight = 160
 const portHeight = 34
 const portYGap = 8
 
-const getBlockPositions = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
+const getNodePositions = async (getNodeElementRect: (nodeID: string) => Promise<Rect>) => {
     const layers = createLayers(flow.value)
-    const blockPositions: Record<string, { x: number, y: number }> = {}
+    const nodePositions: Record<string, { x: number, y: number }> = {}
     const layerHeights: number[] = []
 
     let widthSum = 0
@@ -20,13 +20,13 @@ const getBlockPositions = async (getBlockRect: (blockID: string) => Promise<Rect
         let heightSum = 0
         let maxWidth = 0
         
-        for( const blockID of layer ){
-            if( blockID ){
-                const blockRect = await getBlockRect(blockID)
-                blockPositions[blockID] = { x: widthSum, y: heightSum }
+        for( const nodeID of layer ){
+            if( nodeID ){
+                const nodeRect = await getNodeElementRect(nodeID)
+                nodePositions[nodeID] = { x: widthSum, y: heightSum }
     
-                if( maxWidth < blockRect.width ) maxWidth = blockRect.width
-                heightSum += blockRect.height + yGap
+                if( maxWidth < nodeRect.width ) maxWidth = nodeRect.width
+                heightSum += nodeRect.height + yGap
             }else{
                 heightSum += spaceHeight + yGap
             }
@@ -42,22 +42,22 @@ const getBlockPositions = async (getBlockRect: (blockID: string) => Promise<Rect
 
     layers.forEach((layer, i) => {
         const topBounding = (maxLayerHeight - layerHeights[i]) / 2
-        layer.forEach((blockID) => {
-            if( blockID ){
-                blockPositions[blockID].y += topBounding
+        for( const nodeID of layer ){
+            if( nodeID ){
+                nodePositions[nodeID].y += topBounding
             }
-        })
+        }
     })
 
-    return blockPositions
+    return nodePositions
 }
 
 const getPortPositions = async (
-    blockPositions: Record<string, Record<"x"|"y", number>>,
-    getBlockRect: (blockID: string) => Promise<Rect>
+    nodePositions: Record<string, Record<"x"|"y", number>>,
+    getNodeElementRect: (nodeID: string) => Promise<Rect>
 ) => {
     const portPositions: {
-        [blockID: string]: {
+        [nodeID: string]: {
             [type in "inputs" | "outputs"]?: {
                 [portID: string]: {
                     x: number;
@@ -70,33 +70,35 @@ const getPortPositions = async (
     //TODO: ここらへんのリファクタリング
     const updatePortPosition = async (
         type: "inputs" | "outputs",
-        blockID: string,
+        nodeID: string,
         blockPorts: (typeof ports)[number][string]["inputs"|"outputs"],
         portID: string,
         i: number,
         { x, y }: Record<"x"|"y",number>
     ) => {
         const portAmount = blockPorts.length + 1
-        const blockRect = await getBlockRect(blockID)
+        const nodeRect = await getNodeElementRect(nodeID)
         
-        if( !portPositions[blockID] ) portPositions[blockID] = {}
-        if( !portPositions[blockID][type] ) portPositions[blockID][type] = {};
+        if( !portPositions[nodeID] ) portPositions[nodeID] = {}
+        if( !portPositions[nodeID][type] ) portPositions[nodeID][type] = {};
 
-        (portPositions[blockID][type] as {[portID: string]: {x: number, y: number}})[portID] = {
-            x: x + (type == "outputs" ? blockRect.width : 0),
-            y: y + blockRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + (portHeight + portYGap) * i + portHeight/2
+        (portPositions[nodeID][type] as {[portID: string]: {x: number, y: number}})[portID] = {
+            x: x + (type == "outputs" ? nodeRect.width : 0),
+            y: y + nodeRect.height/2 - ( (portHeight + portYGap) * portAmount - portYGap ) / 2 + (portHeight + portYGap) * i + portHeight/2
         }
     }
 
     if( !flowID.value ) throw new Error("flowID is not defined")
     const flowPorts = ports[flowID.value]
     if( flowPorts ){
-        await Promise.all(Object.entries(flowPorts).map(async ([blockID, blockPorts]) => {
-            if( !blockPositions[blockID] ) return
+        await Promise.all(Object.entries(flowPorts).map(async ([nodeID, blockPorts]) => {
+            if( !nodePositions[nodeID] ) return
+
+            const updatePortPositions = (portType: "inputs" | "outputs") => ["default", ...blockPorts[portType]].map(async (portID, i) => await updatePortPosition(portType, nodeID, blockPorts[portType], portID, i, nodePositions[nodeID]))
     
             await Promise.all([
-                ...["default", ...blockPorts.inputs].map(async (portID, i) => await updatePortPosition("inputs", blockID, blockPorts.inputs, portID, i, blockPositions[blockID])),
-                ...["default", ...blockPorts.outputs].map(async (portID, i) => await updatePortPosition("outputs", blockID, blockPorts.outputs, portID, i, blockPositions[blockID]))
+                ...updatePortPositions("inputs"),
+                ...updatePortPositions("outputs"),
             ])
         }))
     }
@@ -113,7 +115,7 @@ type Line = Record<"from"|"to",
 
 const getLines = (
     portPositions: {
-        [blockID: string]: {
+        [nodeID: string]: {
             [type in "inputs" | "outputs"]?: {
                 [portID: string]: {
                     x: number;
@@ -127,7 +129,7 @@ const getLines = (
     const blockEntries = Object.entries(flow.value.nodes)
 
     for( const [toBlockID, block] of blockEntries ){
-        let isBlockDefaultPortsConnected = false
+        let isBlockDefaultPortConnected = false
 
         const toBlockPortPositions = portPositions[toBlockID]
         if( !toBlockPortPositions ) continue
@@ -152,7 +154,7 @@ const getLines = (
         }
         
         for( const [portID, input] of Object.entries(block.inputs) ){
-            if( input.type == "setting" && isBlockDefaultPortsConnected ) continue
+            if( input.type == "setting" && isBlockDefaultPortConnected ) continue
             if( input.value == undefined ) continue
 
             try {
@@ -174,7 +176,7 @@ const getLines = (
                 const toPosition = toBlockPortPositions.inputs?.[toPortID]
                 if( !toPosition ) throw new Error(`${portID} is not in outputs of ${toBlockID}`)
 
-                if( input.type == "setting" ) isBlockDefaultPortsConnected = true
+                if( input.type == "setting" ) isBlockDefaultPortConnected = true
     
                 lines.push({
                     from: { ...fromPosition, blockID: fromBlockID, portID: fromPortID },
@@ -194,7 +196,7 @@ export const lines = ref<Line[]>([])
 export const updateLinesWithArgs = async (getBlockRect: (blockID: string) => Promise<Rect>) => {
     if( !flowID.value ) return
 
-    const blockPositions = await getBlockPositions(getBlockRect)
+    const blockPositions = await getNodePositions(getBlockRect)
     const portPositions = await getPortPositions(blockPositions, getBlockRect)
     const newLines = getLines(portPositions)
     lines.value = newLines
