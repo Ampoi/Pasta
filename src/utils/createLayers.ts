@@ -1,7 +1,7 @@
 import { Flow } from "../model/flow"
 
 type DependencyMap = {
-    [key: string]: string[]
+    [nodeID: string]: string[]
 }
 
 export function createLayers(flow: Flow, withSpacers = true) {
@@ -14,16 +14,16 @@ export function createLayers(flow: Flow, withSpacers = true) {
 function createDependencies(flow: Flow) {
     const dependencies: DependencyMap = {}
 
-    Object.entries(flow.nodes).forEach(([id, node]) => {
+    for( const [id, node] of Object.entries(flow.nodes) ){
         if( node.inputs ){
             const connectFromSet = new Set<string>()
-    
-            Object.values(node.inputs).forEach((input) => {
+
+            for( const input of Object.values(node.inputs) ){
                 if( input.type == "port" ) {
-                    if( !input.value ) return
+                    if( !input.value ) continue
                     connectFromSet.add(input.value.nodeID)
                 }
-            })
+            }
             
             if( connectFromSet.size == 0 ){
                 if( !node.defaultPortNodeID ) throw new Error("defaultPortNodeID is not defined")
@@ -34,7 +34,7 @@ function createDependencies(flow: Flow) {
         }else if( node.defaultPortNodeID ){
             dependencies[id] = [node.defaultPortNodeID]
         }
-    })
+    }
 
     return dependencies
 }
@@ -46,12 +46,14 @@ function createLayersFromDependencies(
     type Map = { [blockID: string]: Map | string }
 
     const maxDepths: { [key: string]: number } = {}
-    Object.keys(dependencies).forEach((key) => { maxDepths[key] = 0 })
+    for( const nodeID of Object.keys(dependencies) ){
+        maxDepths[nodeID] = 0
+    }
 
     function makeMap(id: string, depth: number) {
         const children = Object.entries(dependencies)
-            .map(([blockID, parents]) => parents.includes(id) ? blockID : null)
-            .filter((blockID): blockID is string => !!blockID)
+            .map(([nodeID, parents]) => parents.includes(id) ? nodeID : null)
+            .filter((nodeID): nodeID is string => !!nodeID)
 
         const map: Map = {}
         children.forEach((child) => {
@@ -71,15 +73,7 @@ function createLayersFromDependencies(
     }
 
     const map = makeMap("trigger", 1)
-    const maxDepth = (() => {
-        let tmp = 0
-        Object.values(maxDepths).forEach((depth) => {
-            if (depth > tmp) {
-                tmp = depth
-            }
-        })
-        return tmp
-    })();
+    const maxDepth = Object.values(maxDepths).reduce((tmpMaxDepth, nodeMaxDepth) => tmpMaxDepth < nodeMaxDepth ? nodeMaxDepth : tmpMaxDepth, 0)
 
     const layers: (string | null)[][] = Array.from({ length: maxDepth }).map(() => []);
     function addBlock(parentID: string, id: string, searchMap: Map | string) {
@@ -91,18 +85,22 @@ function createLayersFromDependencies(
         }
         layers[depth].push(id)
         if (typeof searchMap != "string") {
-            Object.entries(searchMap).forEach(([childID, newMap]) => addBlock(id, childID, newMap))
+            for( const [childID, newMap] of Object.entries(searchMap) ){
+                addBlock(id, childID, newMap)
+            }
         }
     }
 
     addBlock("trigger", "trigger", map)
     return layers.map((layer) => {
         const newLayer: typeof layer = []
-        layer.forEach((item) => {
-            if (!newLayer.includes(item) || item == null) {
-                newLayer.push(item)
+        
+        for( const nodeID of layer ){
+            if( !newLayer.includes(nodeID) || nodeID == null ) {
+                newLayer.push(nodeID)
             }
-        })
+        }
+
         return newLayer
     })
 }
