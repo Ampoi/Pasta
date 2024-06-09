@@ -10,7 +10,7 @@ import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import { constrainedEditor } from "constrained-editor-plugin"
 import { code, codeID } from "../../hooks/code"
-import { onMounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { getCodeData } from "../../utils/getCodeData";
 
 const editorElement = ref<HTMLElement>()
@@ -132,5 +132,11 @@ onMounted(async () => {
         }
     })
     watch(codeID, updateEditor)
+})
+
+onBeforeUnmount(() => {
+    if( model ){
+        model.dispose()
+    }
 })
 </script>
