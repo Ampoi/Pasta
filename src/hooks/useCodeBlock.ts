@@ -6,6 +6,7 @@ import { flowID } from "./flow";
 import { watch as watchFile } from "tauri-plugin-fs-watch-api";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { CodeData, getCodeData } from "../utils/getCodeData";
+import { Que } from "../utils/que";
 
 export const useCodeBlock = (_codeID: string) => {
     const codeID = ref<string>(_codeID)
@@ -15,20 +16,20 @@ export const useCodeBlock = (_codeID: string) => {
         return `${projectPath.value}/flows/${flowID.value}/codes/${codeID.value}.ts`
     });
 
-    let readTextFileQue: number
     const codeData =  ref<CodeData>()
+
+    const updateCodeDataQue = new Que(async () => {
+        console.log("read!")
+        const code = await readTextFile(codePath.value)
+        codeData.value = getCodeData(code)
+    }, 1000)
+
+    updateCodeDataQue.add()
 
     //TODO:フォルダごと監視できるっぽいからフォルダごと監視したい
     watchFile(codePath.value, () => {
-        console.log("file changed")
-        
-        if( readTextFileQue ) clearTimeout(readTextFileQue)
-        readTextFileQue = setTimeout(async () => {
-            clearTimeout(readTextFileQue)
-            const code = await readTextFile(codePath.value)
-            codeData.value = getCodeData(code)
-        }, 1000)
-    }, { delayMs: 200 })
+        updateCodeDataQue.add()
+    }, { delayMs: 500 })
 
     const block = computed<DefaultBlock | undefined>(() => {
         return {
