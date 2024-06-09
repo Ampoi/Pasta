@@ -11,7 +11,8 @@
               :ref="(el: any) => {
                 if(el){nodes[el.id] = el}
               }"
-              v-model:selected-port="selectedPort"/>
+              v-model:selected-port="selectedPort"
+              @open-code-modal="emit('openCodeModal')"/>
           </Suspense>
         </div>
       </div>
@@ -34,6 +35,10 @@ import { Rect } from "../model/utils"
 import { invoke } from '@tauri-apps/api';
 import { getAllBlocks } from '../utils/getAllBlocks';
 import { flow, flowID, connectPorts, PortPlace } from '../hooks/flow';
+
+const emit = defineEmits<{
+  (e: "openCodeModal"): void
+}>()
 
 const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
 

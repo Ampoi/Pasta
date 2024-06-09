@@ -39,7 +39,8 @@
           v-if="flowID">
           <Flow
             v-model:modal-opened-tab="modalOpenedTab"
-            ref="flowComponent"/>
+            ref="flowComponent"
+            @open-code-modal="console.log('openModal')"/>
         </DraggableArea>
         <CreateFlowView
           v-else

@@ -28,6 +28,15 @@
           />
         </div>
       </div>
+      <button
+        v-if="node.code"
+        class="border-[1px] border-zinc-700 p-4 rounded-xl flex flex-row gap-2 justify-center items-center text-zinc-500"
+        @click="emit('openCodeModal')">
+        <Icon
+          icon="fluent:code-text-edit-20-filled"
+          class="text-lg"/>
+        <p>コードを編集する</p>
+      </button>
       <div
         class="flex flex-col gap-2"
         v-if="block?.inputs && block.inputs.length > 0">
@@ -76,13 +85,17 @@ const props = defineProps<{
   nodeID: string
 }>()
 
+const emit = defineEmits<{
+  (e: "openCodeModal"): void
+}>()
+
 const node = defineModel<Node>("node", { required: true })
 
-const { block, blockID, code } = (() => {
+const { block, blockID } = (() => {
   if( node.value.code ) {
     return useCodeBlock(node.value.codeID)
   }else{
-    return { ...useBlock(node.value.blockID), code: undefined }
+    return useBlock(node.value.blockID)
   }
 })()
 

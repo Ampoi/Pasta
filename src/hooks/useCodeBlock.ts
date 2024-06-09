@@ -10,8 +10,6 @@ export const useCodeBlock = (_codeID: string) => {
         if( !flowID.value ) throw new Error("flowID is not defined")
         return `${projectPath.value}/flows/${flowID.value}/codes/${codeID.value}.ts`
     });
-    
-    const code = ref<string>(codePath.value);
 
     const block = computed<DefaultBlock | undefined>(() => {
         return {
@@ -28,5 +26,5 @@ export const useCodeBlock = (_codeID: string) => {
         }
     })
 
-    return { blockID: codeID, block, code }
+    return { blockID: codeID, block }
 }
