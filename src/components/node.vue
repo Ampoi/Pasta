@@ -31,7 +31,7 @@
       <button
         v-if="node.code"
         class="border-[1px] border-zinc-700 p-4 rounded-xl flex flex-row gap-2 justify-center items-center text-zinc-500"
-        @click="emit('openCodeModal')">
+        @click="openCodeModal">
         <Icon
           icon="fluent:code-text-edit-20-filled"
           class="text-lg"/>
@@ -80,6 +80,7 @@ import { useBlock } from "../hooks/useBlock";
 import { flowID, PortPlace } from "../hooks/flow";
 import { useNodeRect } from "../utils/getNodeRect"
 import { useCodeBlock } from "../hooks/useCodeBlock";
+import { codeID } from "../hooks/code";
 
 const props = defineProps<{
   nodeID: string
@@ -121,8 +122,14 @@ const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: t
 const blockElement = ref<HTMLElement>();
 
 const { getNodeRect, setupGetNode } = useNodeRect(blockElement)
-
 setupGetNode()
+
+const openCodeModal = () => {
+  if( !node.value.code ) return
+
+  emit('openCodeModal')
+  codeID.value = node.value.codeID
+}
 
 defineExpose({
   id: props.nodeID,
