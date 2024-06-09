@@ -13,10 +13,10 @@ type PortInput = {
 
 export type Input = SettingInput | PortInput
 
-export type Node = {
+type DefaultNode = {
     title: string
-    description?: string
-    type: "code" | string
+    type: string
+    code: false
 } & (
     (
         ({
@@ -39,3 +39,28 @@ export type Node = {
         }
     }
 )
+
+type CodeNode = {
+    title: string
+    code: true
+} & ({
+    defaultPortNodeID?: undefined
+    inputs: {
+        [inputID: string]: PortInput
+    }
+} | {
+    defaultPortNodeID: string
+    inputs?: undefined
+})
+
+export const CodeNode = {
+    create(defaultPortNodeID: string): CodeNode {
+        return {
+            title: "Code",
+            code: true,
+            defaultPortNodeID
+        }
+    }
+}
+
+export type Node = DefaultNode | CodeNode

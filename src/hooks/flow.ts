@@ -54,10 +54,15 @@ export const createNode = (blockID: string, fromNodeID: string, createFrom: "inp
 
     const newNodeID = getAlphabet(newNodeNumber)
     if (createFrom == "output") {
-        const newNode: Node = {
+        const newNode: Node = blockID == "code" ? {
+            title: newNodeID,
+            code: true,
+            defaultPortNodeID: fromNodeID
+        } : {
             title: newNodeID,
             type: blockID,
-            defaultPortNodeID: fromNodeID
+            defaultPortNodeID: fromNodeID,
+            code: false
         }
         flow.value.nodes = { ...flow.value.nodes, [newNodeID]: newNode }
     }

@@ -13,7 +13,8 @@ export const Flow = {
                 trigger: {
                     title: "trigger",
                     type: "onExecute",
-                    trigger: true
+                    trigger: true,
+                    code: false
                 }
             }
         }

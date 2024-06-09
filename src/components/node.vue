@@ -78,9 +78,17 @@ const props = defineProps<{
 
 const node = defineModel<Node>("node", { required: true })
 
-const { block, blockID } = useBlock(node.value.type)
-watch(() => node.value.type, async (newID) => { //MEMO: node.value.typeは動くか怪しい
-  blockID.value = newID
+const { block, blockID } = (() => {
+  if( node.value.code ) {
+    throw new Error("🥺")
+  }else{
+    return useBlock(node.value.type)
+  }
+})()
+
+watch(node, async (newNode) => {
+  if( newNode.code ) return
+  blockID.value = newNode.type
 })()
 
 watchEffect(() => {
