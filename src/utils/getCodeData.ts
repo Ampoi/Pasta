@@ -1,4 +1,16 @@
-export const getCodeData = (code: string) => {
+export type CodeData = {
+    args: {
+        name: string;
+        type: string;
+    }[];
+    bodyLinesRange: number[];
+    outputs: {
+        type: string;
+        name: string;
+    }[];
+}
+
+export const getCodeData = (code: string): CodeData => {
     let isArgs = false
     const args: { name: string, type: string }[] = []
 

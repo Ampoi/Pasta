@@ -66,6 +66,7 @@ fn main() {
             install_typescript,
             run_flow
         ])
+        .plugin(tauri_plugin_fs_watch::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
