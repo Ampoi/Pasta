@@ -2,7 +2,7 @@ import { computed, ref, watch } from "vue"
 import { Flow } from "../model/flow"
 import { createDir, exists, readDir, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { projectPath } from "../utils/projectPath"
-import { Node } from "../model/node"
+import { CodeNode, Node } from "../model/node"
 import { getAlphabet, getNumber } from "../utils/getAlphabet"
 import { Input } from "../model/node"
 import { createLayers } from "../utils/createLayers"
@@ -54,16 +54,14 @@ export const createNode = (blockID: string, fromNodeID: string, createFrom: "inp
 
     const newNodeID = getAlphabet(newNodeNumber)
     if (createFrom == "output") {
-        const newNode: Node = blockID == "code" ? {
-            title: newNodeID,
-            code: true,
-            defaultPortNodeID: fromNodeID
-        } : {
-            title: newNodeID,
-            type: blockID,
-            defaultPortNodeID: fromNodeID,
-            code: false
-        }
+        const newNode: Node = blockID == "code" ?
+            CodeNode.create(fromNodeID, newNodeID)
+            : {
+                title: newNodeID,
+                blockID,
+                defaultPortNodeID: fromNodeID,
+                code: false
+            }
         flow.value.nodes = { ...flow.value.nodes, [newNodeID]: newNode }
     }
 }

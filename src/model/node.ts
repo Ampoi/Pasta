@@ -1,3 +1,5 @@
+import { getAlphabet } from "../utils/getAlphabet"
+
 type SettingInput = {
     type: "setting"
     value: any
@@ -15,7 +17,7 @@ export type Input = SettingInput | PortInput
 
 type DefaultNode = {
     title: string
-    type: string
+    blockID: string
     code: false
 } & (
     (
@@ -43,7 +45,8 @@ type DefaultNode = {
 type CodeNode = {
     title: string
     code: true
-    type?: undefined
+    blockID?: undefined
+    codeID: string
 } & ({
     defaultPortNodeID?: undefined
     inputs: {
@@ -55,10 +58,11 @@ type CodeNode = {
 })
 
 export const CodeNode = {
-    create(defaultPortNodeID: string): CodeNode {
+    create(defaultPortNodeID: string, title = "Code"): CodeNode {
         return {
-            title: "Code",
+            title,
             code: true,
+            codeID: getAlphabet(Math.floor(Math.random() * 10**10)),
             defaultPortNodeID
         }
     }

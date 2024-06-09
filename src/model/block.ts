@@ -6,11 +6,6 @@ type Value = {
 export type CodeBlock = {
     name: string
     description: string
-    icon: {
-        value: string
-        color: string
-    }
-    trigger?: false
 }
 
 export type DefaultBlock = {
@@ -37,4 +32,4 @@ export type TriggerBlock = {
     inputs?: undefined
 }
 
-export type Block = TriggerBlock | CodeBlock | DefaultBlock
+export type Block = TriggerBlock | DefaultBlock

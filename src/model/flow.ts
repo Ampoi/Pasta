@@ -12,7 +12,7 @@ export const Flow = {
             nodes: {
                 trigger: {
                     title: "trigger",
-                    type: "onExecute",
+                    blockID: "onExecute",
                     trigger: true,
                     code: false
                 }

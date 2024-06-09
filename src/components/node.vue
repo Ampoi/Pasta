@@ -2,7 +2,7 @@
   <div class="relative" ref="blockElement">
     <div class="flex flex-col gap-3 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
       <div class="relative">
-        <div class="absolute top-1/2 -left-12">
+        <div class="absolute top-1/2 -left-10">
           <Port
             v-if="nodeID != 'trigger'"
             :nodeID
@@ -30,9 +30,8 @@
       </div>
       <div
         class="flex flex-col gap-2"
-        v-if="block?.inputs">
+        v-if="block?.inputs && block.inputs.length > 0">
         <InputListItem
-          v-if="nodeID != 'trigger' && block && block.inputs"
           v-for="(input, index) in block.inputs"
           :nodeID
           v-model:selectedPort="selectedPort"
@@ -71,6 +70,7 @@ import Port from "./node/port.vue";
 import { useBlock } from "../hooks/useBlock";
 import { flowID, PortPlace } from "../hooks/flow";
 import { useNodeRect } from "../utils/getNodeRect"
+import { useCodeBlock } from "../hooks/useCodeBlock";
 
 const props = defineProps<{
   nodeID: string
@@ -78,17 +78,17 @@ const props = defineProps<{
 
 const node = defineModel<Node>("node", { required: true })
 
-const { block, blockID } = (() => {
+const { block, blockID, code } = (() => {
   if( node.value.code ) {
-    throw new Error("🥺")
+    return useCodeBlock(node.value.codeID)
   }else{
-    return useBlock(node.value.type)
+    return { ...useBlock(node.value.blockID), code: undefined }
   }
 })()
 
 watch(node, async (newNode) => {
   if( newNode.code ) return
-  blockID.value = newNode.type
+  blockID.value = newNode.blockID
 })()
 
 watchEffect(() => {
