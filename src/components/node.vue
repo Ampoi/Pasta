@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row items-center" ref="blockElement">
+  <div class="relative" ref="blockElement">
     <div class="flex flex-col gap-3 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
       <div class="relative">
         <div class="absolute top-1/2 -left-12">
@@ -45,7 +45,7 @@
     </div>
 
     <!--返り値-->
-    <div class="flex flex-col gap-2 -ml-3">
+    <div class="flex flex-col gap-2 -ml-3 absolute right-3 translate-x-full top-1/2 -translate-y-1/2">
       <Port
         :nodeID
         name="default"

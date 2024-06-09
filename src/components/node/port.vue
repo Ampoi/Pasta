@@ -1,36 +1,25 @@
 <template>
     <div class="relative">
         <div
-            class="flex flex-row items-center"
+            class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
             :class="{
-                'flex-row-reverse': portType != 'input'
-            }">
+                '!bg-red-900 !border-red-500': !isConnected && portType == 'input' && name != 'default',
+                'border-zinc-700': !selected,
+                '!border-blue-500': selected
+            }"
+            @click="onClick"
+            ref="port">
             <div
-                class="h-[2px] grow min-w-2 bg-zinc-800"
-                :class="{
-                    'opacity-0': !isConnected && !selected,
-                }"/>
+                v-if="props.name == 'default'"
+                class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
             <div
-                class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
-                :class="{
-                    '!bg-red-900 !border-red-500': !isConnected && portType == 'input' && name != 'default',
-                    'border-zinc-700': !selected,
-                    '!border-blue-500': selected
-                }"
-                @click="onClick"
-                ref="port">
-                <div
-                    v-if="props.name == 'default'"
-                    class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-slate-400 grid place-content-center"/>
-                <div
-                    v-else
-                    class="flex items-center gap-2"
-                    :class="portType == 'input' ? 'flex-row-reverse' : 'flex-row'">
-                    <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-500 grid place-content-center">
-                        {{ type ? type[0].toUpperCase(): "?" }}
-                    </div>
-                    <p class="overflow-hidden text-ellipsis text-sm text-white">{{ name }}</p>
+                v-else
+                class="flex items-center gap-2"
+                :class="portType == 'input' ? 'flex-row-reverse' : 'flex-row'">
+                <div class="size-5 text-sm font-mono rounded-md font-semibold text-white bg-blue-500 grid place-content-center">
+                    {{ type ? type[0].toUpperCase(): "?" }}
                 </div>
+                <p class="overflow-hidden text-ellipsis text-sm text-white">{{ name }}</p>
             </div>
         </div>
         <div
