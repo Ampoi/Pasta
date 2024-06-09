@@ -1,37 +1,32 @@
 <template>
   <div class="flex flex-row" ref="blockElement">
-    <table class="table-auto">
-      <tbody>
-        <tr>
-          <td>
-            <Port
-              v-if="nodeID != 'trigger'"
-              :nodeID
-              name="default"
-              v-model:selectedPort="selectedPort"
-              portType="input"/>
-          </td>
-          <td
-            class="flex flex-row -ml-3 items-center gap-2 py-3 bg-zinc-900 px-4 border-t-[1px] border-x-[1px] border-zinc-700 rounded-t-xl -mr-3"
-            :class="{
-              'rounded-b-xl border-b-[1px]': (block?.inputs?.length ?? 0) == 0
-            }">
-            <div
-              class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
-              :style="{ background: block?.icon.color }"
-            >
-              <Icon
-                :icon="block?.icon.value ?? 'fluent:question-16-filled'"
-                class="text-lg"
-              />
-            </div>
-            <input
-              type="text"
-              class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
-              v-model="node.title"
+    <div class="flex flex-col gap-2 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
+      <div class="relative">
+        <Port
+          v-if="nodeID != 'trigger'"
+          :nodeID
+          name="default"
+          v-model:selectedPort="selectedPort"
+          portType="input"
+          class="absolute -left-1 -translate-x-full top-1/2 -translate-y-1/2"/>
+        <div class="flex flex-row items-center gap-2">
+          <div
+            class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
+            :style="{ background: block?.icon.color }"
+          >
+            <Icon
+              :icon="block?.icon.value ?? 'fluent:question-16-filled'"
+              class="text-lg"
             />
-          </td>
-        </tr>
+          </div>
+          <input
+            type="text"
+            class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
+            v-model="node.title"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-3">
         <InputListItem
           v-if="nodeID != 'trigger' && block && block.inputs"
           v-for="(input, index) in block.inputs"
@@ -42,11 +37,11 @@
           :index
           :blockInput="input"
           v-model:node="node"/>
-      </tbody>
-    </table>
+      </div>
+    </div>
 
     <!--返り値-->
-    <div class="flex flex-col gap-2 max-w-[160px] z-10 my-auto py-3">
+    <div class="flex flex-col gap-2 max-w-[160px] z-10 my-auto py-3 -ml-3">
       <Port
         :nodeID
         name="default"
