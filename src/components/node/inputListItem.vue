@@ -32,7 +32,7 @@
 </template>
 <script setup lang="ts">
 import Port from './port.vue';
-import { Block } from '../../model/block';
+import { DefaultBlock, TriggerBlock } from '../../model/block';
 import { Icon } from '@iconify/vue/dist/iconify.js';
 import { Node, Input } from '../../model/node';
 import { computed } from 'vue';
@@ -45,7 +45,7 @@ type PortProps = {
 
 const props = defineProps<PortProps & {
     index: number
-    block: Block
+    block: TriggerBlock | DefaultBlock
     blockInput: {
         name: string
         type: string

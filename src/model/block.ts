@@ -3,7 +3,17 @@ type Value = {
     type: string;
 };
 
-export type Block = {
+export type CodeBlock = {
+    name: string
+    description: string
+    icon: {
+        value: string
+        color: string
+    }
+    trigger?: false
+}
+
+export type DefaultBlock = {
     name: string
     description: string
     icon: {
@@ -11,10 +21,20 @@ export type Block = {
         color: string
     }
     outputs: Value[]
-} & ({
+    trigger?: false
+    inputs: Value[]
+}
+
+export type TriggerBlock = {
+    name: string
+    description: string
+    icon: {
+        value: string
+        color: string
+    }
+    outputs: Value[]
     trigger: true
     inputs?: undefined
-} | {
-    trigger: false
-    inputs: Value[]
-});
+}
+
+export type Block = TriggerBlock | CodeBlock | DefaultBlock

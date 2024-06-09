@@ -5,7 +5,11 @@
         <div v-for="nodeID in layer">
           <div v-if="!nodeID" class="h-40" />
           <Suspense v-else>
+            <div v-if="flow.nodes[nodeID].type == 'code'">
+              code node!
+            </div>
             <NodeComponent
+              v-else
               :nodeID
               v-model:node="flow.nodes[nodeID]"
               :ref="(el: any) => {
