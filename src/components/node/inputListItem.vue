@@ -1,13 +1,15 @@
 <template>
     <div class="relative">
-        <Port
-            v-if="nodeID != 'trigger' && input.type == 'port'"
-            :nodeID
-            :name="blockInput.name"
-            :type="blockInput.type"
-            v-model:selectedPort="selectedPort"
-            portType="input"
-            class="absolute -left-1 -translate-x-full"/>
+        <div class="absolute -left-1 top-1/2 -translate-x-full">
+            <Port
+                v-if="nodeID != 'trigger' && input.type == 'port'"
+                :nodeID
+                :name="blockInput.name"
+                :type="blockInput.type"
+                v-model:selectedPort="selectedPort"
+                portType="input"
+                class="-translate-y-1/2"/>
+        </div>
         <div class="flex flex-row gap-2 items-center text-zinc-500">
             <button
                 :class="{ 'text-blue-500': input.type == 'port' }"

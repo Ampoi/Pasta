@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute">
+    <div class="relative">
         <div
             class="flex flex-row items-center"
             :class="{

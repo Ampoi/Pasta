@@ -1,14 +1,16 @@
 <template>
-  <div class="flex flex-row" ref="blockElement">
-    <div class="flex flex-col gap-2 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
+  <div class="flex flex-row items-center" ref="blockElement">
+    <div class="flex flex-col gap-3 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
       <div class="relative">
-        <Port
-          v-if="nodeID != 'trigger'"
-          :nodeID
-          name="default"
-          v-model:selectedPort="selectedPort"
-          portType="input"
-          class="absolute -left-1 -translate-x-full top-1/2 -translate-y-1/2"/>
+        <div class="absolute top-1/2 -left-12">
+          <Port
+            v-if="nodeID != 'trigger'"
+            :nodeID
+            name="default"
+            v-model:selectedPort="selectedPort"
+            portType="input"
+            class="-translate-y-1/2"/>
+        </div>
         <div class="flex flex-row items-center gap-2">
           <div
             class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
@@ -26,7 +28,9 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-3">
+      <div
+        class="flex flex-col gap-2"
+        v-if="block?.inputs">
         <InputListItem
           v-if="nodeID != 'trigger' && block && block.inputs"
           v-for="(input, index) in block.inputs"
@@ -41,7 +45,7 @@
     </div>
 
     <!--返り値-->
-    <div class="flex flex-col gap-2 max-w-[160px] z-10 my-auto py-3 -ml-3">
+    <div class="flex flex-col gap-2 -ml-3">
       <Port
         :nodeID
         name="default"
