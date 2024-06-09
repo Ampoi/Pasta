@@ -57,7 +57,17 @@ const resizeSpeed = 0.005
 const resizeMin = 0.25
 const resizeMax = 1
 
+const isCtrlPressed = ref(false)
+const ctrlKeys = ['Control', 'Meta']
+window.addEventListener('keydown', (event) => {
+    if(ctrlKeys.includes(event.key)) isCtrlPressed.value = true
+})
+window.addEventListener('keyup', (event) => {
+    if(ctrlKeys.includes(event.key)) isCtrlPressed.value = false
+})
+
 const resize = (event: WheelEvent) => {
+    if( !isCtrlPressed.value ) return
     event.preventDefault()
     size.value += event.deltaY * resizeSpeed
     if(size.value < resizeMin) size.value = resizeMin
