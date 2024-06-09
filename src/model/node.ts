@@ -43,6 +43,7 @@ type DefaultNode = {
 type CodeNode = {
     title: string
     code: true
+    type?: undefined
 } & ({
     defaultPortNodeID?: undefined
     inputs: {

@@ -121,15 +121,18 @@ export const connectPorts = (from: PortPlace, to: PortPlace) => {
     }
 
     const newBlock: Node = (() => {
+        const oldNode: Node = flow.value.nodes[to.nodeID]
+        if( !oldNode.code && oldNode.trigger == true ) throw new Error("trigger node can't be toBlock")
+
         const tmp = {
-            ...flow.value.nodes[to.nodeID],
+            ...oldNode,
             defaultPortNodeID: from.nodeID,
             inputs: {
-                ...flow.value.nodes[to.nodeID].inputs,
+                ...oldNode.inputs,
                 [to.portID]: newInput
             }
-        }
-        if( tmp.trigger == true ) throw new Error("trigger node can't be toBlock")
+        } as Node
+
         return tmp
     })()
 
