@@ -6,7 +6,7 @@
     <div class="flex flex-col grow">
       <header
         data-tauri-drag-region
-        class="flex flex-row items-center py-1.5 px-8 gap-8"
+        class="flex flex-row items-center py-1.5 px-4 gap-8"
         @dblclick="maximizeWindow">
         <button
           @click="openLaunchView">
@@ -34,20 +34,22 @@
         </button>
       </header>
       <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
-        <DraggableArea
-          class="w-full h-full p-4"
-          v-if="flowID">
-          <Flow
-            v-model:modal-opened-tab="modalOpenedTab"
-            ref="flowComponent"
-            @open-code-modal="console.log('openModal')"/>
-        </DraggableArea>
+        <div
+          v-if="flowID"
+          class="w-full h-full flex flex-row">
+          <DraggableArea class="grow">
+            <Flow
+              ref="flowComponent"
+              @open-code-modal="modalOpenedTab = 'Code'"
+              @open-logs-modal="modalOpenedTab = 'Logs'"/>
+          </DraggableArea>
+          <Modal
+            v-model:opened-tab="modalOpenedTab"
+            class="basis-1/3"/>
+        </div>
         <CreateFlowView
           v-else
           class="w-full h-full"/>
-        <Modal
-          v-if="modalOpenedTab"
-          v-model:opened-tab="modalOpenedTab"/>
       </main>
     </div>
   </div>
@@ -100,8 +102,7 @@ const openProjectFolder = () => {
   invoke("open_in_finder", { path: projectPath.value })
 }
 
-const modalTabs = ["code", "logs"] as const
-const modalOpenedTab = ref<typeof modalTabs[number]>()
+const modalOpenedTab = ref<"Logs" | "Code" | undefined>()
 
 const installDependencies = () => {
   invoke("install_typescript", { path: projectPath.value })

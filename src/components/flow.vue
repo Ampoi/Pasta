@@ -38,6 +38,7 @@ import { flow, flowID, connectPorts, PortPlace } from '../hooks/flow';
 
 const emit = defineEmits<{
   (e: "openCodeModal"): void
+  (e: "openLogsModal"): void
 }>()
 
 const nodes = reactive<{ [nodeID: string]: InstanceType<typeof NodeComponent> }>({})
@@ -67,11 +68,9 @@ watch(selectedPort, (newValue, oldValue) => {
   selectedPort.value = null
 })
 
-const modalOpenedTab = defineModel<string | undefined>("modalOpenedTab")
-
 //TODO: flow.tsに移動
 const runFlow = async () => {
-  modalOpenedTab.value = "logs"
+  emit('openLogsModal')
   const blocks = await getAllBlocks()
   const code = createRunnableCode(flow.value, blocks)
   await writeTextFile(`${projectPath.value}/pasta/${flowID.value}.ts`, code) //TODO:`.pasta`にする
