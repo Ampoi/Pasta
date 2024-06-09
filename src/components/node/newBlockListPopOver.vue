@@ -7,6 +7,18 @@
         <div class="grow flex flex-col gap-1 overflow-y-auto">
             <button
                 class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg"
+                @click="emit('selectBlock', 'code')">
+                <div
+                    class="size-5 rounded-md grid place-content-center"
+                    :style="{ background: '#2563eb' }">
+                    <Icon
+                        icon="fluent:code-text-16-filled"
+                        class="text-xs"/>
+                </div>
+                <p class="text-sm">新規コード</p>
+            </button>
+            <button
+                class="flex flex-row gap-2 items-center hover:bg-zinc-800 p-1 rounded-lg"
                 v-for="(block, blockID) in blocks"
                 @click="emit('selectBlock', blockID)">
                 <div
