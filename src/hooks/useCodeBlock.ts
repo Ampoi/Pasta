@@ -1,6 +1,6 @@
 import { computed, ref } from "vue"
 import { projectPath } from "../utils/projectPath"
-import { DefaultBlock } from "../model/block";
+import { Block, DefaultBlock } from "../model/block";
 import { flowID } from "./flow";
 
 import { watch as watchFile } from "tauri-plugin-fs-watch-api";
@@ -47,4 +47,27 @@ export const useCodeBlock = (_codeID: string) => {
     })
 
     return { blockID: codeID, block }
+}
+
+export const getCodeBlock = async (codeID: string) => {
+    if( !flowID.value ) throw new Error("flowID is not defined")
+    const codePath = `${projectPath.value}/flows/${flowID.value}/codes/${codeID}.ts`
+
+    const code = await readTextFile(codePath)
+    const codeData = getCodeData(code)
+
+    const block: Block = {
+        name: codeID,
+        description: "",
+        icon: {
+            value: "fluent:code-text-16-filled",
+            color: "#2563eb"
+        },
+        trigger: false,
+        //ここら辺を変更する
+        inputs: codeData?.args ?? [],
+        outputs: codeData?.outputs ?? []
+    }
+
+    return block
 }

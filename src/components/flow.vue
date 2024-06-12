@@ -27,7 +27,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import { createLayers } from '../utils/createLayers';
 import Lines from './lines.vue';
 import NodeComponent from './node.vue';
-import { writeTextFile } from '@tauri-apps/api/fs';
+import { createDir, exists, writeTextFile } from '@tauri-apps/api/fs';
 import { Callback } from "../model/utils"
 import { createRunnableCode } from '../utils/createRunnableCode';
 import { projectPath } from '../utils/projectPath';
@@ -72,7 +72,12 @@ watch(selectedPort, (newValue, oldValue) => {
 const runFlow = async () => {
   emit('openLogsModal')
   const blocks = await getAllBlocks()
-  const code = createRunnableCode(flow.value, blocks)
+  if( !flowID.value ) throw new Error("flowID is not defined")
+  const code = await createRunnableCode(flow.value, flowID.value, blocks)
+
+  if( !(await exists(`${projectPath.value}/pasta` )) ){
+    await createDir(`${projectPath.value}/pasta`)
+  }
   await writeTextFile(`${projectPath.value}/pasta/${flowID.value}.ts`, code) //TODO:`.pasta`にする
   await invoke("run_flow", {
     projectPath: projectPath.value,
