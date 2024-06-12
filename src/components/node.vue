@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" ref="blockElement">
+  <div class="relative select-none" ref="blockElement">
     <div class="flex flex-col gap-3 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
       <div class="relative">
         <div class="absolute top-1/2 -left-10">

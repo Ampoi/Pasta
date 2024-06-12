@@ -4,7 +4,7 @@
         <h2 class="font-semibold px-2">フロー</h2>
         <button
           v-for="id in flowIDs"
-          class="flex flex-row gap-2 items-center py-2 px-3 select-none hover:bg-zinc-800 rounded-lg"
+          class="flex flex-row gap-2 items-center py-2 px-3 hover:bg-zinc-800 rounded-lg"
           @click="() => select(id)">
           <Icon
             icon="fluent:flow-24-regular"

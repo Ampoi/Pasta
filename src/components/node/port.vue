@@ -1,7 +1,7 @@
 <template>
     <div class="relative">
         <div
-            class="bg-zinc-900 p-1.5 rounded-xl select-none border-[1px] w-min"
+            class="bg-zinc-900 p-1.5 rounded-xl border-[1px] w-min"
             :class="{
                 '!bg-red-900 !border-red-500': !isConnected && portType == 'input' && name != 'default',
                 'border-zinc-700': !selected,

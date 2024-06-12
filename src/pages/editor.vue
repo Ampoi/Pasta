@@ -44,8 +44,7 @@
               @open-logs-modal="modalOpenedTab = 'Logs'"/>
           </DraggableArea>
           <Modal
-            v-model:opened-tab="modalOpenedTab"
-            class="basis-1/3"/>
+            v-model:opened-tab="modalOpenedTab"/>
         </div>
         <CreateFlowView
           v-else
