@@ -1,8 +1,35 @@
 <template>
-    <div
-        class="bg-black w-full h-full border-[1px] border-zinc-700"
-        ref="editorElement" id="editor">
-
+    <div class="flex flex-col gap-2 w-full h-full">
+        <div class="flex flex-row gap-4">
+            <div class="flex flex-col gap-2 w-[calc(60%-2rem-1px)]">
+                <h2 class="font-semibold text-xl">入力</h2>
+                <div class="flex flex-col gap-1 max-h-[8rem] overflow-y-auto">
+                    <div class="flex flex-row border-zinc-700 border-[1px] rounded-lg">
+                        <input
+                            type="text"
+                            class="py-1 px-1.5 bg-transparent outline-none w-1/2 border-r-[1px] border-zinc-700 placeholder:text-zinc-500"
+                            placeholder="入力名">
+                        <input
+                            type="text"
+                            class="py-1 px-1.5 bg-transparent border-none outline-none w-1/2 placeholder:text-zinc-500"
+                            placeholder="型">
+                    </div>
+                </div>
+            </div>
+            <div class="w-[1px] bg-zinc-700"/>
+            <div class="flex flex-col gap-2 grow">
+                <h2 class="font-semibold text-xl">出力</h2>
+                <div class="flex flex-col gap-1 max-h-[8rem] overflow-y-auto">
+                    <input
+                        type="text"
+                        class="py-1 px-1.5 bg-transparent outline-none w-32 border-zinc-700 border-[1px] rounded-lg placeholder:text-zinc-500 w-full"
+                        placeholder="出力名">
+                </div>
+            </div>
+        </div>
+        <div
+            class="bg-black border-[1px] border-zinc-700 grow"
+            ref="editorElement" id="editor"/>
     </div>
 </template>
 <style scoped>
