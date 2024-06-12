@@ -1,4 +1,4 @@
-import { getCodeBlock, useCodeBlock } from "../hooks/useCodeBlock"
+import { getCodeBlock } from "../hooks/useCodeBlock"
 import { Block } from "../model/block"
 import { Flow } from "../model/flow"
 import { createLayers } from "./createLayers"
@@ -85,9 +85,13 @@ const getMainCode = async (
             
             variableIDs[nodeID] = outputVariables
 
-            mainCodeLines.push(`const { ${
-                Object.entries(outputVariables).map(([outputID, variableID]) => `${ outputID }: ${ variableID }`).join(", ")
-            } } = ${blockID}(${
+            mainCodeLines.push(`${
+                Object.keys(outputVariables).length > 0
+                    ? `const { ${
+                        Object.entries(outputVariables).map(([outputID, variableID]) => `${ outputID }: ${ variableID }`).join(", ")
+                    } } = `
+                    : ""
+            }${blockID}(${
                 Object.entries(input).map(([_inputID, value]) => value).join(", ")
             })`)
         }
