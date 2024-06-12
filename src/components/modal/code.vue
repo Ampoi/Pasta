@@ -1,10 +1,18 @@
 <template>
     <div
         class="bg-black w-full h-full border-[1px] border-zinc-700"
-        ref="editorElement">
+        ref="editorElement" id="editor">
 
     </div>
 </template>
+<style scoped>
+#editor * {
+    user-select: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+}
+</style>
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
