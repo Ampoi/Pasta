@@ -3,6 +3,7 @@ export type CodeData = {
         name: string;
         type: string;
     }[];
+    bodyLines: string[];
     bodyLinesRange: number[];
     outputs: {
         type: string;
@@ -38,6 +39,8 @@ export const getCodeData = (code: string): CodeData => {
 
     if (!bodyLinesRange.start) throw new Error(`${code}\nbodyLinesの範囲の最初のインデックスを見つけられませんでした`)
 
+    const bodyLines = codeLines.slice(bodyLinesRange.start-1, bodyLinesRange.end - 1)
+
     const returnLine = codeLines[codeLines.length - 2].replace(/\s+/g, '')
     const outputNames = returnLine.slice(7, returnLine.length - 1).split(",")
     const outputs = (outputNames.length == 1 && outputNames[0] == "")
@@ -51,6 +54,7 @@ export const getCodeData = (code: string): CodeData => {
 
     return {
         args,
+        bodyLines,
         bodyLinesRange: [
             bodyLinesRange.start, 1,
             bodyLinesRange.end - 1, codeLines[bodyLinesRange.end - 2].length + 1,

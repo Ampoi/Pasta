@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue';
 import { flowID } from './flow';
 import { projectPath } from '../utils/projectPath';
 import { createDir, exists, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
+import { getCodeData } from '../utils/getCodeData';
 
 export const code = ref<string | undefined>();
 export const codeID = ref<string | undefined>()
