@@ -5,6 +5,31 @@ import { createDir, exists, readTextFile, writeTextFile } from '@tauri-apps/api/
 import { getCodeData } from '../utils/getCodeData';
 
 export const code = ref<string | undefined>();
+
+export const codeData = computed({
+    get(){
+        if( !code.value ) return
+        
+        return getCodeData(code.value)
+    },
+    set(newValue){
+        if( !newValue ) return
+        
+        code.value = [
+            "export default (",
+            (newValue.args ?? []).map((input) => {
+                return `  ${input.name}: ${input.type}`
+            }).join(",\n"),
+            ") => {",
+            ...newValue.bodyLines,
+            `  return { ${
+                newValue.outputs.map(({ name }) => name).join(", ")
+            } }`,
+            "}"
+        ].join("\n")
+    }
+})
+
 export const codeID = ref<string | undefined>()
 
 const codePath = computed(() => {

@@ -20,32 +20,21 @@
 </template>
 <script setup lang="ts">
 import { Icon } from "@iconify/vue/dist/iconify.js";
-import { code } from "../../../hooks/code"
-import { getCodeData } from "../../../utils/getCodeData";
+import { codeData } from "../../../hooks/code"
 import { computed } from "vue";
 
 const inputs = computed({
     get(){
-        if( !code.value ) return
-        const codeData = getCodeData(code.value)
-        console.log( codeData.bodyLines, codeData.outputs )
-        return codeData.args
+        return codeData.value?.args
     },
     set(value){
-        if( !code.value ) return
-        const codeData = getCodeData(code.value)
-        code.value = [
-            "export default (",
-            (value ?? []).map((input) => {
-                return `  ${input.name}: ${input.type}`
-            }).join(",\n"),
-            ") => {",
-            ...codeData.bodyLines,
-            `  return { ${
-                codeData.outputs.map(({ name }) => name).join(", ")
-            } }`,
-            "}"
-        ].join("\n")
+        if( !value ) return
+        if( !codeData.value ) throw new Error("Code data is not defined")
+
+        codeData.value = {
+            ...codeData.value,
+            args: value
+        }
     }
 })
 

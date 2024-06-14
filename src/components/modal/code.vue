@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col gap-2 w-full h-full">
         <div class="flex flex-col gap-1">
-            <Input/>
+            <Inputs/>
         </div>
         <div
             class="bg-black border-[1px] border-zinc-700 grow"
@@ -23,7 +23,7 @@ import { constrainedEditor } from "constrained-editor-plugin"
 import { code, codeID } from "../../hooks/code"
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { getCodeData } from "../../utils/getCodeData";
-import Input from "./code/input.vue"
+import Inputs from "./code/inputs.vue"
 
 const editorElement = ref<HTMLElement>()
 
