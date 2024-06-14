@@ -136,6 +136,12 @@ const updateEditor = () => {
     addEditingRestrictions(editor)
 }
 
+watch(code, () => {
+    if( model && code.value ){
+        updateEditor()
+    }
+})
+
 onMounted(async () => {
     updateEditor()
     watch(code, (_newCode, oldCode) => {
