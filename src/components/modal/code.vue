@@ -136,8 +136,8 @@ const updateEditor = () => {
     addEditingRestrictions(editor)
 }
 
-watch(code, () => {
-    if( model && code.value ){
+watch(code, (newCode) => {
+    if( model && newCode && newCode != model.getValue() ){
         updateEditor()
     }
 })
