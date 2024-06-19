@@ -33,6 +33,13 @@
     "vue/multi-word-component-names": "off",
     "vue/valid-v-for": "off",
     "vue/require-v-for-key": "off",
-    "vue/singleline-html-element-content-newline": "off"
+    "vue/singleline-html-element-content-newline": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.property.name='forEach']",
+        "message": "Use for...of instead of forEach."
+      }
+    ]
   }
 }

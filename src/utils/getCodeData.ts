@@ -24,18 +24,18 @@ export const getCodeData = (code: string): CodeData => {
         end: codeLines.length - 1
     }
 
-    codeLines.forEach((line, row) => {
-        if (row == 0) {
-            isArgs = true
-        } else if (line == ") => {") {
-            isArgs = false
-            bodyLinesRange.start = row + 2
-        } else if (isArgs) {
-            const pairText = line[line.length - 1] == "," ? line.slice(0, line.length - 1) : line
-            const [name, type] = pairText.trim().split(": ")
-            args.push({ name, type })
-        }
-    })
+    for( const [row, line] of codeLines.entries() ){
+      if (row == 0) {
+          isArgs = true
+      } else if (line == ") => {") {
+          isArgs = false
+          bodyLinesRange.start = row + 2
+      } else if (isArgs) {
+          const pairText = line[line.length - 1] == "," ? line.slice(0, line.length - 1) : line
+          const [name, type] = pairText.trim().split(": ")
+          args.push({ name, type })
+      }
+    }
 
     if (!bodyLinesRange.start) throw new Error(`${code}\nbodyLinesの範囲の最初のインデックスを見つけられませんでした`)
 

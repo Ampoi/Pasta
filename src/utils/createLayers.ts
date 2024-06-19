@@ -56,9 +56,9 @@ function createLayersFromDependencies(
             .filter((nodeID): nodeID is string => !!nodeID)
 
         const map: Map = {}
-        children.forEach((child) => {
-            map[child] = makeMap(child, depth + 1)
-        })
+        for( const child of children ){
+          map[child] = makeMap(child, depth + 1)
+        }
 
         if (maxDepths[id] >= depth) {
             return id

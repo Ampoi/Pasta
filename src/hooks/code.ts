@@ -39,7 +39,7 @@ const codePath = computed(() => {
 })
 
 watch(code, async (newCode, oldCode) => {
-    if( newCode == oldCode ){console.log("iwafjoiwa");return;}
+    if( newCode == oldCode ) return
     if( !codePath.value ) return
     if( newCode == undefined ) return
 

@@ -1,7 +1,7 @@
 <template>
   <Suspense v-if="projectID">
     <Editor
-      :project-i-d/>
+      :projectID/>
   </Suspense>
   <Launch
     v-else
