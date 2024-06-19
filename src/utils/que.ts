@@ -1,6 +1,6 @@
 export class Que {
     constructor(
-        private readonly func: Function,
+        private readonly func: () => void,
         private readonly delay: number
     ){}
 

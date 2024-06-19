@@ -25,7 +25,7 @@ const getMainCode = async (
     blocks: { [blockID: string]: Block },
     triggerOutputs: { type: string, name: string }[]
 ) => {
-    let mainCodeLines: string[]  = []
+    const mainCodeLines: string[]  = []
     
     const layers = createLayers(flow, false).slice(1) as string[][]
     const usedBlockIDs = new Set<string>()
@@ -45,6 +45,7 @@ const getMainCode = async (
     for await ( const layer of layers ){
         for await ( const nodeID of layer ){
             const node = flow.nodes[nodeID]
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const input: Record<string, any> = {}
             if( node.inputs ){
                 Object.entries(node.inputs).forEach(([portID, port]) => {
@@ -92,7 +93,7 @@ const getMainCode = async (
                     } } = `
                     : ""
             }${blockID}(${
-                Object.entries(input).map(([_inputID, value]) => value).join(", ")
+                Object.entries(input).map(([ , value]) => value).join(", ")
             })`)
         }
     }

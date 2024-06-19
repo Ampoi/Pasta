@@ -1,31 +1,30 @@
 <template>
-  <div class="relative select-none" ref="blockElement">
+  <div
+    ref="blockElement"
+    class="relative select-none">
     <div class="flex flex-col gap-3 bg-zinc-900 p-4 border-[1px] border-zinc-700 rounded-xl">
       <div class="relative">
         <div class="absolute top-1/2 -left-10">
           <Port
             v-if="nodeID != 'trigger'"
+            v-model:selectedPort="selectedPort"
             :nodeID
             name="default"
-            v-model:selectedPort="selectedPort"
             portType="input"
             class="-translate-y-1/2"/>
         </div>
         <div class="flex flex-row items-center gap-2">
           <div
             class="text-white size-[30px] border-[1px] border-zinc-700 grid place-content-center rounded-md box-content"
-            :style="{ background: block?.icon.color }"
-          >
+            :style="{ background: block?.icon.color }">
             <Icon
               :icon="block?.icon.value ?? 'fluent:question-16-filled'"
-              class="text-lg"
-            />
+              class="text-lg"/>
           </div>
           <input
-            type="text"
-            class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow"
             v-model="node.title"
-          />
+            type="text"
+            class="px-2 py-1 rounded-md bg-transparent text-white outline-none border-[1px] border-zinc-700 grow">
         </div>
       </div>
       <button
@@ -38,31 +37,31 @@
         <p>コードを編集する</p>
       </button>
       <div
-        class="flex flex-col gap-2"
-        v-if="block?.inputs && block.inputs.length > 0">
+        v-if="block?.inputs && block.inputs.length > 0"
+        class="flex flex-col gap-2">
         <InputListItem
           v-for="(input, index) in block.inputs"
-          :nodeID
           v-model:selectedPort="selectedPort"
+          v-model:node="node"
+          :nodeID
           portType="input"
           :block="block"
           :index
-          :blockInput="input"
-          v-model:node="node"/>
+          :blockInput="input"/>
       </div>
     </div>
 
     <!--返り値-->
     <div class="flex flex-col gap-2 -ml-3 absolute right-3 translate-x-full top-1/2 -translate-y-1/2">
       <Port
+        v-model:selectedPort="selectedPort"
         :nodeID
         name="default"
-        v-model:selectedPort="selectedPort"
         portType="output"/>
       <Port
         v-for="output in block?.outputs"
-        :nodeID
         v-model:selectedPort="selectedPort"
+        :nodeID
         portType="output"
         :type="output.type"
         :name="output.name"/>

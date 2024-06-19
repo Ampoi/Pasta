@@ -1,160 +1,158 @@
 <template>
-    <div class="flex flex-col gap-2 w-full h-full">
-        <div class="flex flex-col gap-1">
-            <Inputs/>
-        </div>
-        <div
-            class="bg-black border-[1px] border-zinc-700 grow"
-            ref="editorElement" id="editor"/>
+  <div class="flex flex-col gap-2 w-full h-full">
+    <div class="flex flex-col gap-1">
+      <Inputs/>
     </div>
+    <div
+      id="editor"
+      ref="editorElement"
+      class="bg-black border-[1px] border-zinc-700 grow"/>
+  </div>
 </template>
-<style scoped>
-#editor * {
-    user-select: auto;
-    -webkit-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-}
-</style>
 <script setup lang="ts">
 import * as Monaco from "monaco-editor";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { constrainedEditor } from "constrained-editor-plugin"
-import { code, codeID } from "../../hooks/code"
+import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import { constrainedEditor } from "constrained-editor-plugin";
+import { code, codeID } from "../../hooks/code";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { getCodeData } from "../../utils/getCodeData";
-import Inputs from "./code/inputs.vue"
+import Inputs from "./code/inputs.vue";
 
-const editorElement = ref<HTMLElement>()
+const editorElement = ref<HTMLElement>();
 
-function createModel(){
-    const MonacoTypescript = Monaco.languages.typescript
-    MonacoTypescript.typescriptDefaults.setCompilerOptions({
-        ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
-        target: MonacoTypescript.ScriptTarget.ES2020,
-        moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
+function createModel() {
+  const MonacoTypescript = Monaco.languages.typescript;
+  MonacoTypescript.typescriptDefaults.setCompilerOptions({
+    ...MonacoTypescript.typescriptDefaults.getCompilerOptions(),
+    target: MonacoTypescript.ScriptTarget.ES2020,
+    moduleResolution: MonacoTypescript.ModuleResolutionKind.NodeJs,
+  });
+
+  if (code.value == undefined) throw new Error("Code is undefined");
+  if (codeID.value == undefined) throw new Error("Code ID is undefined");
+
+  const model = Monaco.editor.createModel(
+    code.value,
+    "typescript",
+    Monaco.Uri.from({
+      scheme: "file",
+      path: `/${codeID.value}.ts`,
     })
+  );
 
-    if( code.value == undefined ) throw new Error("Code is undefined")
-    if( codeID.value == undefined ) throw new Error("Code ID is undefined")
-
-    const model = Monaco.editor.createModel(
-        code.value,
-        "typescript",
-        Monaco.Uri.from({
-            scheme: "file",
-            path: `/${codeID.value}.ts`
-        })
-    )
-
-    return model
+  return model;
 }
 
-function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor){
-    const constrainedInstance = constrainedEditor(Monaco)
-    constrainedInstance.initializeIn(editor)
-    
-    if( code.value == undefined ) throw new Error("Code data is undefined")
+function addEditingRestrictions(editor: Monaco.editor.IStandaloneCodeEditor) {
+  const constrainedInstance = constrainedEditor(Monaco);
+  constrainedInstance.initializeIn(editor);
 
-    type CodeData = {
-        args: {
-            name: string;
-            type: string;
-        }[];
-        bodyLinesRange: number[];
-        outputs: {
-            type: string;
-            name: string;
-        }[];
-    }
-    
-    let codeData: CodeData | undefined = undefined
-    
-    try {
-        codeData = getCodeData(code.value)
-    }catch(e){
-        console.warn("error while getting code data", e)
-        const defaultCode = [
-            "export default (",
-            ") => {",
-            "  return {}",
-            "}"
-        ].join("\n")
-        code.value = defaultCode
-        codeData = getCodeData(defaultCode)
-        
-        if( !model ) throw new Error("Model is not defined")
-        model.setValue(defaultCode)
-    }
+  if (code.value == undefined) throw new Error("Code data is undefined");
 
-    constrainedInstance.addRestrictionsTo(model, [
-        {
-            range: codeData.bodyLinesRange,
-            allowMultiline: true
-        }
-    ])
+  type CodeData = {
+    args: {
+      name: string;
+      type: string;
+    }[];
+    bodyLinesRange: number[];
+    outputs: {
+      type: string;
+      name: string;
+    }[];
+  };
+
+  let codeData: CodeData | undefined = undefined;
+
+  try {
+    codeData = getCodeData(code.value);
+  } catch (e) {
+    console.warn("error while getting code data", e);
+    const defaultCode = ["export default (", ") => {", "  return {}", "}"].join(
+      "\n"
+    );
+    code.value = defaultCode;
+    codeData = getCodeData(defaultCode);
+
+    if (!model) throw new Error("Model is not defined");
+    model.setValue(defaultCode);
+  }
+
+  constrainedInstance.addRestrictionsTo(model, [
+    {
+      range: codeData.bodyLinesRange,
+      allowMultiline: true,
+    },
+  ]);
 }
 
 window.MonacoEnvironment = {
-    getWorker(id){
-        console.log(id)
-        return new tsWorker({ name: id })
-    }
-}
+  getWorker(id) {
+    console.log(id);
+    return new tsWorker({ name: id });
+  },
+};
 
-let model: Monaco.editor.ITextModel | undefined = undefined
+let model: Monaco.editor.ITextModel | undefined = undefined;
 
 const updateEditor = () => {
-    if( model ){
-        model.dispose()
-    }
-        
-    try{
-        model = createModel()
-    }catch(e){
-        console.error("error while creating model", e)
-        return
-    }
+  if (model) {
+    model.dispose();
+  }
 
-    model.onDidChangeContent(() => {
-        if( !model ) return
-        code.value = model.getValue()
-    })
+  try {
+    model = createModel();
+  } catch (e) {
+    console.error("error while creating model", e);
+    return;
+  }
 
-    if( !editorElement.value ) throw new Error("エディターが設定されてません！")
+  model.onDidChangeContent(() => {
+    if (!model) return;
+    code.value = model.getValue();
+  });
 
-    const editor = Monaco.editor.create(editorElement.value, {
-        theme: "vs-dark",
-        scrollBeyondLastLine: false,
-        lineNumbers: "off",
-        minimap: {
-            enabled: false
-        },
-        model
-    })
+  if (!editorElement.value) throw new Error("エディターが設定されてません！");
 
-    addEditingRestrictions(editor)
-}
+  const editor = Monaco.editor.create(editorElement.value, {
+    theme: "vs-dark",
+    scrollBeyondLastLine: false,
+    lineNumbers: "off",
+    minimap: {
+      enabled: false,
+    },
+    model,
+  });
+
+  addEditingRestrictions(editor);
+};
 
 watch(code, (newCode) => {
-    if( model && newCode && newCode != model.getValue() ){
-        updateEditor()
-    }
-})
+  if (model && newCode && newCode != model.getValue()) {
+    updateEditor();
+  }
+});
 
 onMounted(async () => {
-    updateEditor()
-    watch(code, (_newCode, oldCode) => {
-        if( oldCode == undefined ){
-            updateEditor()
-        }
-    })
-    watch(codeID, updateEditor)
-})
+  updateEditor();
+  watch(code, (_newCode, oldCode) => {
+    if (oldCode == undefined) {
+      updateEditor();
+    }
+  });
+  watch(codeID, updateEditor);
+});
 
 onBeforeUnmount(() => {
-    if( model ){
-        model.dispose()
-    }
-})
+  if (model) {
+    model.dispose();
+  }
+});
 </script>
+<style scoped>
+#editor * {
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+}
+</style>

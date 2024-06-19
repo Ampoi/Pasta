@@ -28,7 +28,7 @@ export const updateFlow = async () => {
     try {
         const fileText = await readTextFile(flowPath.value)
         const fileJSON = JSON.parse(fileText)
-        if (!isFlow(fileJSON)) throw new Error(`Invalid Flow: ${flowPath}`)
+        if (!isFlow(fileJSON)) throw new Error(`Invalid Flow: ${flowPath.value}`)
         flow.value = fileJSON
     } catch (e) {
         console.warn(`flowの更新中にエラーが発生しました:\n${e}`)

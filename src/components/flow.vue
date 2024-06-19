@@ -1,18 +1,22 @@
 <template>
   <div class="relative">
     <div class="flex flex-row gap-60 items-center">
-      <div v-for="layer in renderedBlockIDs" class="flex flex-col gap-10">
+      <div
+        v-for="layer in renderedBlockIDs"
+        class="flex flex-col gap-10">
         <div v-for="nodeID in layer">
-          <div v-if="!nodeID" class="h-40" />
+          <div
+            v-if="!nodeID"
+            class="h-40"/>
           <Suspense v-else>
             <NodeComponent
-              :nodeID
-              v-model:node="flow.nodes[nodeID]"
               :ref="(el: any) => {
                 if(el){nodes[el.id] = el}
               }"
               v-model:selected-port="selectedPort"
-              @open-code-modal="emit('openCodeModal')"/>
+              v-model:node="flow.nodes[nodeID]"
+              :nodeID
+              @openCodeModal="emit('openCodeModal')"/>
           </Suspense>
         </div>
       </div>

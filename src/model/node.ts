@@ -2,6 +2,7 @@ import { getAlphabet } from "../utils/getAlphabet"
 
 type SettingInput = {
     type: "setting"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any
 }
 

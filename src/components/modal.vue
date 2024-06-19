@@ -1,9 +1,9 @@
 <template>
   <div
-    class="bg-zinc-900 h-full border-zinc-700 border-l-[1px] text-white overflow-hidden p-2 flex flex-col gap-2 relative max-w-[calc(100%-400px)]"
-    :style="{ flexBasis: `${width}px` }"
     v-if="openedTab"
-    ref="modalElement">
+    ref="modalElement"
+    class="bg-zinc-900 h-full border-zinc-700 border-l-[1px] text-white overflow-hidden p-2 flex flex-col gap-2 relative max-w-[calc(100%-400px)]"
+    :style="{ flexBasis: `${width}px` }">
     <div class="pt-1 flex flex-row gap-2">
       <button @click="close">
         <Icon icon="fluent:dismiss-16-filled"/>
