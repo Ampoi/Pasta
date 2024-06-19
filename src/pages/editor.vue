@@ -10,27 +10,35 @@
         @dblclick="maximizeWindow">
         <button
           @click="openLaunchView">
-          <Icon icon="fluent:home-16-regular" class="text-zinc-500 text-xl"/>
+          <Icon
+            icon="fluent:home-16-regular"
+            class="text-zinc-500 text-xl"/>
         </button>
         <div class="relative -ml-4">
           <input
-            type="text"
             v-model="project.title"
-            class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 basis-60 font-bold text-white"/>
+            type="text"
+            class="bg-transparent py-1 pl-2 pr-8 rounded-md outline-none border-[1px] border-zinc-700 basis-60 font-bold text-white">
           <button
             class="absolute right-2 top-1/2 -translate-y-1/2"
             @click="openProjectFolder">
-            <Icon icon="fluent:folder-16-regular" class="text-zinc-500 text-xl"/>
+            <Icon
+              icon="fluent:folder-16-regular"
+              class="text-zinc-500 text-xl"/>
           </button>
         </div>
-        <div class="grow" />
+        <div class="grow"/>
         <button
           @click="installDependencies">
-          <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
+          <Icon
+            icon="fluent:play-16-regular"
+            class="text-zinc-500 text-xl"/>
         </button>
         <button
           @click="runCode">
-          <Icon icon="fluent:play-16-regular" class="text-zinc-500 text-xl"/>
+          <Icon
+            icon="fluent:play-16-regular"
+            class="text-zinc-500 text-xl"/>
         </button>
       </header>
       <main class="grow border-t-[1px] bg-black border-zinc-700 relative">
@@ -40,8 +48,8 @@
           <DraggableArea class="grow">
             <Flow
               ref="flowComponent"
-              @open-code-modal="modalOpenedTab = 'Code'"
-              @open-logs-modal="modalOpenedTab = 'Logs'"/>
+              @openCodeModal="modalOpenedTab = 'Code'"
+              @openLogsModal="modalOpenedTab = 'Logs'"/>
           </DraggableArea>
           <Modal
             v-model:opened-tab="modalOpenedTab"/>
@@ -84,8 +92,17 @@ watch(projectPath, () => {
 const projectFilePath = `${projectPath.value}/pasta.json`
 
 const project = reactive<Project>(await (async () => {
-  const newProject = await readTextFile(projectFilePath)
-  return (JSON.parse(newProject) as Project) ?? Project.create()
+  try{
+    const newProject = await readTextFile(projectFilePath)
+    if( !newProject ) throw new Error("Project file is empty")
+    
+    return (JSON.parse(newProject) as Project)
+  }catch(e){
+    const newProject = Project.create()
+    await writeTextFile(projectFilePath, JSON.stringify(newProject))
+
+    return newProject
+  }
 })())
 
 watch(project, (newValue) => {

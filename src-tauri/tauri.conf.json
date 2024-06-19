@@ -19,7 +19,7 @@
       "fs": {
         "all": true,
         "scope": [
-          "$APPDATA/**/*"
+          "$DOCUMENT/**/*"
         ]
       },
       "dialog": {
