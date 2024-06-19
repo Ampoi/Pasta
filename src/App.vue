@@ -1,13 +1,11 @@
 <template>
   <Suspense v-if="projectID">
     <Editor
-      :project-i-d
-    />
+      :project-i-d/>
   </Suspense>
   <Launch
     v-else
-    @open-project="openProject"
-  />
+    @openProject="openProject"/>
 </template>
 <script setup lang="ts">
 import Editor from "./pages/editor.vue"

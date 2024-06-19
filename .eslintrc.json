@@ -1,0 +1,29 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "plugin:vue/vue3-recommended",
+    "eslint:recommended",
+    "@vue/typescript/recommended"
+  ],
+  "plugins": [
+    "vue",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "vue/v-on-event-hyphenation": ["error", "never", {
+      "autofix": true
+    }],
+    "vue/html-closing-bracket-newline": ["error", {
+      "singleline": "never",
+      "multiline": "never"
+    }],
+    "vue/html-closing-bracket-spacing": ["error", {
+      "startTag": "never",
+      "endTag": "never",
+      "selfClosingTag": "never"
+    }]
+  }
+}

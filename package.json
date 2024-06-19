@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest",
-    "lint": "eslint --fix src/*.{ts,vue} && eslint --fix src/**/*.{ts,vue}"
+    "lint": "eslint ./src/*.{ts,vue} && eslint ./src/**/*.{ts,vue}"
   },
   "dependencies": {
     "@tauri-apps/api": "^1",
