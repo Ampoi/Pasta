@@ -23,8 +23,8 @@ import NewBlockListPopOver from './newBlockListPopOver.vue';
 import { createNode, PortPlace } from '../../hooks/flow';
 
 const props = defineProps<{
-    nodeID: string
-    portType: 'input' | 'output'
+  nodeID: string
+  portType: 'input' | 'output'
 }>()
 
 const isLeftSide = computed(() => props.portType == 'input')
@@ -33,7 +33,7 @@ const selectedPort = defineModel<PortPlace | null>("selectedPort", { required: t
 const showPopOver = ref(false)
 
 const createNodeFromThisPort = (blockID: string) => {
-    selectedPort.value = null
-    createNode(blockID, props.nodeID, props.portType)
+  selectedPort.value = null
+  createNode(blockID, props.nodeID, props.portType)
 }
 </script>
